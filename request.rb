@@ -1,9 +1,9 @@
 require 'pp'
 require 'uri'
 require 'net/http'
-# require 'net/https'
+require 'net/https'
 # require 'rubygems'
-# require 'crack'
+
 require 'core_extensions'
 
 
@@ -26,7 +26,7 @@ class Request
   end
   
   def perform
-    http.request(request)
+    http.request(request, options.to_params)
   end
   
   def request
@@ -34,9 +34,9 @@ class Request
       when :get, :GET, /\bget\b/i
         Net::HTTP::Get.new(@uri.path)
       when :post, :POST, /\bpost\b/i
-        Net::HTTP::Post.new(@uri.path)
+        Net::HTTP::Post.new(@uri.path, options.to_params)
       when :head, :HEAD, /\bhead\b/i
-        Net::HTTP::Head.new(@uri.path)
+        Net::HTTP::Head.new(@uri.path, options.to_params)
       else
         puts "HALP"
     end
@@ -45,10 +45,12 @@ class Request
   private
     def http
       connection = Net::HTTP.new(@uri.host, @uri.port)
+      connection.use_ssl = @uri.is_a?(URI::HTTPS)
+      connection.verify_mode = OpenSSL::SSL::VERIFY_NONE if connection.use_ssl
       connection
     end
 
 end
 
-q = Request.new(:get, "http://google.com")
+q = Request.new(:get, "https://github.com/api/v2/xml/user/show/mwunsch")
 puts q.perform
