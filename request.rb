@@ -14,7 +14,7 @@ module Weary
     attr_reader :uri
     attr_accessor :options
   
-    def initialize(http_verb, url, options={})
+    def initialize(url, http_verb= :get, options={})
       self.method = http_verb
       self.uri = url
       self.options = options
@@ -47,14 +47,13 @@ module Weary
   
     def perform
       req = http.request(request, options.to_params)
-      response = Response.new(@http_verb, req)
+      response = Response.new(req, @http_verb)
       if response.redirected?
         response.follow_redirect
       else
         response
       end
     end
-  
     # I often typed in "process" when I meant "perform" so this made sense to me:
     alias process perform
     
@@ -84,5 +83,5 @@ module Weary
   end
 end
 # "http://github.com/api/v2/xml/user/show/mwunsch"
-q = Weary::Request.new(:get, "http://github.com/api/v2/xml/user/show/mwunsch")
-p q.perform.body
+q = Weary::Request.new("http://github.com/api/v2/xml/user/show/mwunsch")
+p q.perform

@@ -4,7 +4,7 @@ module Weary
     attr_reader :raw, :method, :code, :message, :header, :content_type, :cookie, :body  
     alias mime_type content_type
     
-    def initialize(http_method, http_response)
+    def initialize(http_response, http_method)
       raise ArgumentError, "Must be a Net::HTTPResponse" unless http_response.is_a?(Net::HTTPResponse)
       @raw = http_response
       @method = http_method
@@ -39,7 +39,7 @@ module Weary
     
     def follow_redirect
       if redirected?
-        Request.new(@method, @raw['location']).perform
+        Request.new(@raw['location'], @method).perform
       else
         nil
       end
