@@ -14,14 +14,15 @@ module Weary
       @content_type = http_response.content_type
       @cookie = http_response['Set-Cookie']
       @body = http_response.body
+      self.format = http_response.content_type
     end
     
     def redirected?
       @raw.is_a?(Net::HTTPRedirection)
     end
     
-    def format
-      @format = case @content_type
+    def format=(type)
+      @format = case type
         when 'text/xml', 'application/xml'
           :xml
         when 'application/json', 'text/json', 'application/javascript', 'text/javascript'
@@ -37,6 +38,10 @@ module Weary
       end
     end
     
+    def format
+      @format
+    end
+    
     def follow_redirect
       if redirected?
         Request.new(@raw['location'], @method).perform
@@ -44,6 +49,13 @@ module Weary
         nil
       end
     end
+    
+    def parse
+      raise StandardError, "The Response has no body. #{@method.to_s.upcase} request sent." unless @body
+      Weary::Document.new(@body, @format)
+    end
+    # See Weary::Request as to why I keep using the word "process"
+    alias process parse
           
   end
 end

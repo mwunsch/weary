@@ -2,11 +2,6 @@ require 'pp'
 require 'uri'
 require 'net/http'
 require 'net/https'
-# require 'rubygems'
-
-require 'core_extensions'
-require 'response'
-
 
 module Weary
   class Request
@@ -82,6 +77,3 @@ module Weary
 
   end
 end
-# "http://github.com/api/v2/xml/user/show/mwunsch"
-q = Weary::Request.new("http://github.com/api/v2/xml/user/show/mwunsch")
-p q.perform
