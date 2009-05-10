@@ -5,6 +5,7 @@ require 'net/https'
 # require 'rubygems'
 
 require 'core_extensions'
+require 'response'
 
 
 
@@ -26,7 +27,8 @@ class Request
   end
   
   def perform
-    http.request(request, options.to_params)
+    req = http.request(request, options.to_params)
+    Response.new(req)
   end
   
   def request
@@ -34,11 +36,15 @@ class Request
       when :get, :GET, /\bget\b/i
         Net::HTTP::Get.new(@uri.path)
       when :post, :POST, /\bpost\b/i
-        Net::HTTP::Post.new(@uri.path, options.to_params)
+        Net::HTTP::Post.new(@uri.path)
+      when :put, :PUT, /\bput\b/i
+        Net::HTTP::Put.new(@uri.path)
+      when :delete, :del, :DELETE, :DEL, /\bdelete\b/i
+        Net::HTTP::Delete.new(@uri.path)
       when :head, :HEAD, /\bhead\b/i
-        Net::HTTP::Head.new(@uri.path, options.to_params)
+        Net::HTTP::Head.new(@uri.path)
       else
-        puts "HALP"
+        raise ArgumentError, "Only GET, POST, PUT, DELETE, and HEAD methods are supported"
     end
   end
   
@@ -52,5 +58,5 @@ class Request
 
 end
 
-q = Request.new(:get, "https://github.com/api/v2/xml/user/show/mwunsch")
-puts q.perform
+q = Request.new(:get, "http://github.com/api/v2/xml/user/show/mwunsch")
+q.perform
