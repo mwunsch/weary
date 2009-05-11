@@ -1,4 +1,5 @@
 class Hash #:nodoc:
+  
   # @return <String> This hash as a query string
   #
   # @example
@@ -57,4 +58,5 @@ class Hash #:nodoc:
       %{#{k.to_s.snake_case.sub(/^(.{1,1})/) { |m| m.downcase }}="#{v}"}
     end.join(' ')
   end
+  
 end

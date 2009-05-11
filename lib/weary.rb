@@ -24,8 +24,8 @@ module Weary
   
 end
 
-req = Weary::Request.new "http://github.com/api/v2/xml/user/show/mwunsch"
+req = Weary::Request.new "http://github.com/api/v2/yaml/user/show/mwunsch"
 res = req.perform.parse
-doc = Weary::Query "http://github.com/api/v2/yaml/user/show/mwunsch"
+doc = Weary::Query "http://github.com/api/v2/xml/user/show/mwunsch"
 
-p doc["user"]["company"]
+puts doc['user']['name']
