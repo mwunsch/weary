@@ -31,19 +31,5 @@ module Weary
       @parse
     end
 
-    def extract
-      case @parse
-        when Nokogiri::XML::Document
-          # Until I can figure out how to make a better to_hash method for Nokogiri:
-          # http://gist.github.com/109799
-          parse.to_hash
-        #  Crack::XML.parse(@raw)
-        when Hash
-          parse
-        else
-          raise StandardError, "Cannot extract data from plain text"
-      end
-    end
-
   end
 end
