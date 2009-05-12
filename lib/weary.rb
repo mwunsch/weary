@@ -15,6 +15,7 @@ require 'weary/core_extensions'
 require 'weary/request'
 require 'weary/response'
 require 'weary/document'
+require 'weary/base'
 
 module Weary
   
@@ -35,4 +36,4 @@ req = Weary::Request.new "http://github.com/api/v2/json/user/show/mwunsch"
 res = req.perform.handle.parse
 doc = Weary::Query "http://github.com/api/v2/xml/user/show/mwunsch"
 
-p res
+pp doc

@@ -44,8 +44,7 @@ module Weary
         response
       end
     end
-    # I often typed in "process" when I meant "perform" so this made sense to me:
-    alias process perform
+    alias make perform
     
     private
       def http

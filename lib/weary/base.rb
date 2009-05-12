@@ -2,6 +2,7 @@ module Weary
   class Base
     
     def self.on_domain(domain)
+      raise ArgumentError, 'The domain must be a URL.' unless domain.is_a?(String)
       @domain = domain
     end
     

@@ -1,7 +1,7 @@
 module Weary
   class Response
   
-    attr_reader :raw, :method, :code, :message, :header, :content_type, :cookie, :body  
+    attr_reader :raw, :method, :code, :message, :header, :content_type, :cookie, :body
     alias mime_type content_type
     
     def initialize(http_response, http_method)
@@ -54,7 +54,6 @@ module Weary
       raise StandardError, "The Response has no body. #{@method.to_s.upcase} request sent." unless @body
       Weary::Document.new(@body, @format)
     end
-    # See Weary::Request as to why I keep using the word "process"
     alias process handle
           
   end
