@@ -2,7 +2,8 @@ module Weary
   class Base
     
     def self.on_domain(domain)
-      raise ArgumentError, 'The domain must be a URL.' unless domain.is_a?(String)
+      parse_domain = URI.extract(domain)
+      raise ArgumentError, 'The domain must be a URL.' if parse_domain.empty?
       @domain = domain
     end
     
@@ -20,14 +21,36 @@ module Weary
     end
     
     def self.declare_resource(resource, options={})
-      options[:via] = :get if options[:via].nil?
+      @path = resource
       
       if block_given?
         #do_something
       else
-        #do something_else
+        options[:via] = :get if options[:via].nil?
       end
     end
     
   end
+  
+  class Resource
+    # This might be instantiated in the Base.declare_resource method.
+    # Looking to Routing in ActionController for inspiration
+    
+    def get(action,options={})
+    end
+    
+    def post(action,options={})
+    end
+    
+    def put(action,options={})
+    end
+    
+    def delete(action,options={})
+    end
+    
+    def head(action,options={})
+    end
+    
+  end
+  
 end
