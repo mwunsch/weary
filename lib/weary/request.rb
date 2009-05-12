@@ -1,8 +1,3 @@
-require 'pp'
-require 'uri'
-require 'net/http'
-require 'net/https'
-
 module Weary
   class Request
     

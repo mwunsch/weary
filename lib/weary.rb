@@ -4,6 +4,13 @@ require 'net/http'
 require 'net/https'
 require 'rubygems'
 
+gem 'crack'
+gem 'nokogiri'
+
+autoload :Yaml, 'yaml'
+autoload :Crack, 'crack'
+autoload :Nokogiri, 'nokogiri'
+
 require 'weary/core_extensions'
 require 'weary/request'
 require 'weary/response'

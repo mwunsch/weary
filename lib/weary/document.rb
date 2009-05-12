@@ -1,9 +1,4 @@
-require 'crack'
-require 'nokogiri'
-
-autoload :Yaml, 'yaml'
-
-module Weary
+module Weary  
   class Document
     
     attr_reader :raw, :type
