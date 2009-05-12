@@ -36,7 +36,7 @@ module Weary
     end
   
     def perform
-      req = http.request(request, options.to_params)
+      req = http.request(request)
       response = Response.new(req, @http_verb)
       if response.redirected?
         response.follow_redirect
@@ -56,7 +56,7 @@ module Weary
       end
     
       def request
-        case @http_verb
+        prepare = case @http_verb
           when :get
             Net::HTTP::Get.new(@uri.path)
           when :post
@@ -68,6 +68,9 @@ module Weary
           when :head
             Net::HTTP::Head.new(@uri.path)
         end
+        prepare.body = options[:body].is_a?(Hash) ? options[:body].to_params : options[:body] if options[:body]
+        prepare.basic_auth(options[:basic_auth][:username], options[:basic_auth][:password]) if options[:basic_auth]
+        prepare
       end
 
   end
