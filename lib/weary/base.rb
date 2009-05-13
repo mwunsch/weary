@@ -24,33 +24,26 @@ module Weary
       @path = resource
       
       if block_given?
-        #do_something
+        yield
       else
         options[:via] = :get if options[:via].nil?
       end
     end
     
-  end
-  
-  class Resource
-    # This might be instantiated in the Base.declare_resource method.
-    # Looking to Routing in ActionController for inspiration
+    private
+      def get(action,options={})
+      end
     
-    def get(action,options={})
-    end
+      def post(action,options={})
+      end
     
-    def post(action,options={})
-    end
+      def put(action,options={})
+      end
     
-    def put(action,options={})
-    end
+      def delete(action,options={})
+      end
     
-    def delete(action,options={})
-    end
-    
-    def head(action,options={})
-    end
-    
-  end
-  
+      def head(action,options={})
+      end
+  end  
 end
