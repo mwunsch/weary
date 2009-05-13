@@ -14,7 +14,6 @@ autoload :Nokogiri, 'nokogiri'
 require 'weary/core_extensions'
 require 'weary/request'
 require 'weary/response'
-require 'weary/document'
 require 'weary/base'
 
 module Weary
@@ -27,7 +26,7 @@ module Weary
   
 end
 
-req = Weary::Request.new "http://github.com/api/v2/json/user/show/mwunsch"
-doc = Weary::Query "http://github.com/api/v2/xml/user/show/mwunsch"
-
-pp doc
+# req = Weary::Request.new "http://github.com/api/v2/json/user/show/mwunsch"
+# doc = Weary::Query "http://github.com/api/v2/xml/user/show/mwunsch"
+# 
+# pp doc
