@@ -50,11 +50,19 @@ module Weary
       end
     end
     
-    def handle
+    def parse
       raise StandardError, "The Response has no body. #{@method.to_s.upcase} request sent." unless @body
-      Weary::Document.new(@body, @format)
+      case @format
+        when :xml, :html
+          Crack::XML.parse @body
+        when :json
+          Crack::JSON.parse @body
+        when :yaml
+          YAML::load @body
+        else
+          @body
+      end
     end
-    alias process handle
           
   end
 end
