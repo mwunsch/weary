@@ -63,6 +63,10 @@ module Weary
           @body
       end
     end
+    
+    def success?
+      (200..299).include?(@code)
+    end
           
   end
 end
