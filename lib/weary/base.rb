@@ -5,7 +5,6 @@ module Weary
       attr_reader :format, :domain, :url
     end
     
-    
     def self.on_domain(domain)
       parse_domain = URI.extract(domain)
       raise ArgumentError, 'The domain must be a URL.' if parse_domain.empty?
@@ -27,41 +26,55 @@ module Weary
     
     def self.declare_resource(resource, options={})
       
+      setup = {}
+      setup[:resource] = resource
       # available options:
       # :via = get, post, etc.
       # :with = paramaters passed to body or query
       # :requires = members of :with that must be in the action
       #             also, :at_least => 1
       # :authenticates = boolean; uses basic_authentication
-      # :forms_url = string that is created
+      # :construct_url = string that is created
       # :in_format = if we want to override the @@format
       
       if block_given?
-        yield resource
+        pp yield
       else
         options[:via] = :get if options[:via].nil?
       end
       
       via = options[:via].to_s.downcase
       format = @format ? @format : :json    #json is default format
-      puts format
+      format = options[:in_format] unless options[:in_format].nil?
+      
+      pp setup
     end
     
     private
-      def self.get(action,options={})
+      def self.get(method,options={})
+        action = {}
         options[:via] = :get
+        action[method.to_sym] = options
+        action
       end
     
-      def self.post(action,options={})
+      def self.post(method,options={})
+        action = {}
         options[:via] = :post
+        action[method.to_sym] = options
+        action
       end
     
-      def self.put(action,options={})
+      def self.put(method,options={})
+        options[:method] = method.to_s
         options[:via] = :put
+        options
       end
     
-      def self.delete(action,options={})
+      def self.delete(method,options={})
+        options[:method] = method.to_s
         options[:via] = :delete
+        options
       end
   end  
 end
