@@ -2,8 +2,10 @@ module Weary
   class Base
     
     class << self
-      attr_reader :format, :domain, :url
+      attr_reader :format, :domain, :url, :resources
     end
+    
+    # @resources should be an array of resource hashes as defined by declare_resource
     
     def self.on_domain(domain)
       parse_domain = URI.extract(domain)
@@ -25,9 +27,10 @@ module Weary
     end
     
     def self.declare_resource(resource, options={})
+      # each declare_resource call builds a hash that is added
+      # to the @resources array
       
       setup = {}
-      setup[:resource] = resource
       # available options:
       # :via = get, post, etc.
       # :with = paramaters passed to body or query
@@ -38,7 +41,8 @@ module Weary
       # :in_format = if we want to override the @@format
       
       if block_given?
-        pp yield
+        @method_array = []
+        setup[resource] = yield
       else
         options[:via] = :get if options[:via].nil?
       end
@@ -55,14 +59,14 @@ module Weary
         action = {}
         options[:via] = :get
         action[method.to_sym] = options
-        action
+        @method_array << action
       end
     
       def self.post(method,options={})
         action = {}
         options[:via] = :post
         action[method.to_sym] = options
-        action
+        @method_array << action
       end
     
       def self.put(method,options={})
