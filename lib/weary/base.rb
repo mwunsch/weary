@@ -2,13 +2,7 @@ module Weary
   class Base
     
     class << self
-      attr_reader :format, :domain, :url
-    end
-    
-    @@resources = []
-    
-    def self.resources
-      @@resources
+      attr_reader :format, :domain, :url, :resources
     end
     
     def self.on_domain(domain)
@@ -31,8 +25,7 @@ module Weary
     end
     
     def self.declare_resource(resource, options={})
-      # each declare_resource call builds a hash that is added
-      # to the @resources array
+      @resources ||= []
       @method_array = []
       setup = {}
       # available options:
@@ -55,7 +48,7 @@ module Weary
       format = @format ? @format : :json    #json is default format
       format = options[:in_format] unless options[:in_format].nil?
       
-      @@resources << setup
+      @resources << setup
     end
     
     private
