@@ -1,9 +1,8 @@
-require 'pp'
 require 'uri'
 require 'net/http'
 require 'net/https'
-require 'rubygems'
 
+require 'rubygems'
 gem 'crack'
 gem 'nokogiri'
 
@@ -14,6 +13,7 @@ autoload :Nokogiri, 'nokogiri'
 require 'weary/core_extensions'
 require 'weary/request'
 require 'weary/response'
+
 
 module Weary
   
@@ -48,9 +48,8 @@ module Weary
     #             also, :at_least => 1
     # :authenticates = boolean; uses basic_authentication
     # :construct_url = string that is created
-    # :in_format = if we want to override the @@format
+    # :in_format = to set format, defaults to :json
     
-    @resources ||= []
     @methods = []
     setup = {}
 
@@ -60,8 +59,11 @@ module Weary
       set_options(options)
       setup[resource] = options
     end
-      
+    
+    @resources ||= []  
     @resources << setup
+    
+    define_methods(setup[resource])
   end
 
   private
@@ -104,10 +106,15 @@ module Weary
       action[method.to_sym] = options
       @methods << action
     end
-  
+    
+    def define_methods(key)
+      code = ""
+      if key.is_a? Array
+        "Array"
+      elsif Hash
+        "Hash"
+      else
+        "Something Else"
+      end
+    end
 end
-
-# req = Weary::Request.new "http://github.com/api/v2/json/user/show/mwunsch"
-# doc = Weary::Query "http://github.com/api/v2/xml/user/show/mwunsch"
-# 
-# pp doc
