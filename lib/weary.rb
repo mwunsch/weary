@@ -41,24 +41,23 @@ module Weary
   end
 
   def declare_resource(resource, options={})
-    @resources ||= []
-    @method_array = []
-    setup = {}
-    
     # available options:
-    # :via = get, post, etc.
+    # :via = get, post, etc. defaults to get
     # :with = paramaters passed to body or query
     # :requires = members of :with that must be in the action
     #             also, :at_least => 1
     # :authenticates = boolean; uses basic_authentication
     # :construct_url = string that is created
     # :in_format = if we want to override the @@format
+    
+    @resources ||= []
+    @methods = []
+    setup = {}
 
     if block_given?
       setup[resource] = yield
     else
-      options[:via] = :get if options[:via].nil?
-      check_format(options)
+      set_options(options)
       setup[resource] = options
     end
       
@@ -68,38 +67,42 @@ module Weary
   private
     def get(method,options={})
       options[:via] = :get
-      check_format(options)
+      set_options(options)
       set_action(method,options)
     end
 
     def post(method,options={})
       options[:via] = :post
-      check_format(options)
+      set_options(options)
       set_action(method,options)
     end
 
     def put(method,options={})
       options[:via] = :put
-      check_format(options)
+      set_options(options)
       set_action(method,options)
     end
 
     def delete(method,options={})
       options[:via] = :delete
-      check_format(options)
+      set_options(options)
       set_action(method,options)
     end
     
-    def check_format(hash)
-      if hash[:in_format].nil?
-        hash[:in_format] = (@format || :json)
-      end
+    def set_options(hash)
+      hash[:with] ||= []
+      hash[:via] ||= :get
+      hash[:in_format] ||= (@format || :json)
+      hash[:authenticates] ||= false
+      hash[:with].concat(hash[:requires]) unless hash[:requires].nil?
+      
+      return nil
     end
     
     def set_action(method,options)
       action = {}
       action[method.to_sym] = options
-      @method_array << action
+      @methods << action
     end
   
 end
