@@ -20,6 +20,10 @@ module Weary
     def redirected?
       @raw.is_a?(Net::HTTPRedirection)
     end
+
+    def success?
+      (200..299).include?(@code)
+    end
     
     def format=(type)
       @format = case type
@@ -62,10 +66,6 @@ module Weary
         else
           @body
       end
-    end
-    
-    def success?
-      (200..299).include?(@code)
     end
           
   end
