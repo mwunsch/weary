@@ -60,10 +60,10 @@ module Weary
       setup[resource] = options
     end
     
-    @resources ||= []  
+    @resources ||= []
     @resources << setup
     
-    define_methods(setup[resource])
+    craft_methods(resource, setup)
   end
 
   private
@@ -107,14 +107,48 @@ module Weary
       @methods << action
     end
     
-    def define_methods(key)
-      code = ""
-      if key.is_a? Array
-        "Array"
-      elsif Hash
-        "Hash"
+    def craft_methods(key,hash)
+      if hash[key].is_a? Array
+        code = %Q{ def #{key}\n }
+        code << %Q{ o = self.dup \n }
+        hash[key].each do |method|
+          name = method.keys.to_s.to_sym
+          code << %Q{ o.instance_eval %Q!}
+          code << create_code_string(name,method)
+          code << %Q{!\n }
+        end
+        code << %Q{ return o }
+        code << %Q{ end\n }
+        class_eval code
+      elsif hash[key].is_a? Hash
+        class_eval create_code_string(key,hash)
       else
-        "Something Else"
+        # Something went wrong here
+      end
+    end
+    
+    def create_code_string(key,hash)
+      case hash[key][:via]
+        when :get, :delete
+          code = %Q{ def #{key}(params={})\n }
+          code << %Q{ options ||= {} \n }
+          code << %Q{ options[:basic_auth] = {:username => "#{@username}", :password => "#{@password}"} \n } if hash[key][:authenticates]
+          code << %Q{ p "#{hash[key][:via]}".to_sym \n }
+          code << %Q{ options[:query] = params \n}
+          code << %Q{ pp options \n }
+          code << %Q{ end\n }
+          code
+        when :post, :put
+          code = %Q{ def #{key}=(params={})\n }
+          code << %Q{ options ||= {} \n }
+          code << %Q{ options[:basic_auth] = {:username => "#{@username}", :password => "#{@password}"} \n } if hash[key][:authenticates]
+          code << %Q{ p "#{hash[key][:via]}".to_sym \n }
+          code << %Q{ options[:body] = params \n}
+          code << %Q{ pp options \n }
+          code << %Q{ end\n }
+          code
+        else
+          # Something went wrong here
       end
     end
 end
