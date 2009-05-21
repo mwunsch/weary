@@ -56,14 +56,14 @@ module Weary
     if block_given?
       setup[resource] = yield
     else
-      set_options(options)
-      setup[resource] = options
+      setup[resource] = set_options(options)
     end
     
     @resources ||= []
     @resources << setup
     
     craft_methods(resource, setup)
+    return setup
   end
 
   private
@@ -92,13 +92,12 @@ module Weary
     end
     
     def set_options(hash)
-      hash[:with] ||= []
       hash[:via] ||= :get
+      hash[:with] ||= []
+      hash[:with] = hash[:with] | hash[:requires] unless hash[:requires].nil?
       hash[:in_format] ||= (@format || :json)
       hash[:authenticates] ||= false
-      hash[:with].concat(hash[:requires]) unless hash[:requires].nil?
-      
-      return nil
+      return hash
     end
     
     def set_action(method,options)
@@ -110,14 +109,14 @@ module Weary
     def craft_methods(key,hash)
       if hash[key].is_a? Array
         code = %Q{ def #{key}\n }
-        code << %Q{ o = self.dup \n }
+        code << %Q{ obj = self.dup \n }
         hash[key].each do |method|
           name = method.keys.to_s.to_sym
-          code << %Q{ o.instance_eval %Q!}
-          code << create_code_string(name,method)
+          code << %Q{ obj.instance_eval %Q!}
+          code << create_code_string(name,method,key+"/")
           code << %Q{!\n }
         end
-        code << %Q{ return o }
+        code << %Q{ return obj }
         code << %Q{ end\n }
         class_eval code
       elsif hash[key].is_a? Hash
@@ -127,41 +126,38 @@ module Weary
       end
     end
     
-    def create_code_string(key,hash)
-      code = ""
-      option_hash = "options ||= {} \n"
+    def create_code_string(key,hash,resource="")
+      format = hash[key][:in_format]
+      code = %Q{ def #{key}(params={})\n }
+      code << "options ||= {} \n"
       
       case hash[key][:via]
         when :get, :delete
-          code << %Q{ def #{key}(params={})\n }
-          code << option_hash
           code << %Q{ options[:query] = params unless params.empty? \n }
-          code
         when :post, :put
-          code << %Q{ def #{key}=(params={})\n }
-          code << option_hash
           code << %Q{ options[:body] = params \n }
-          code
         else
           # Something went wrong here
       end
       
-      if hash[key][:with]
-        with = "["
-        hash[key][:with].each { |x| with << ":#{x}," }
-        with << "]"
-        code << %Q{ unnecessary = params.keys - #{with} \n }
-        code << %Q{ unnecessary.each { |x| params.delete(x)  } \n}
+      unless hash[key][:with].empty?
+        with_a = "["
+        hash[key][:with].each { |x| with_a << ":#{x}," }
+        with_a << "]"
+        code << %Q{ unnecessary = params.keys - #{with_a} \n }
+        code << %Q{ unnecessary.each { |x| params.delete(x) } \n}
       end      
-      if hash[key][:requires]
+      if hash[key][:requires] && !hash[key][:requires].empty?
         hash[key][:requires].each do |required|
           code << %Q{ raise ArgumentError, ":#{required} is a required parameter." unless params.has_key?(:#{required}) \n }
         end
       end
+      
+      code << %Q{ location = "#{domain}#{resource}#{key}.#{format}" \n }
       code << %Q{ options[:basic_auth] = {:username => "#{@username}", :password => "#{@password}"} \n } if hash[key][:authenticates]
-      code << %Q{ p :#{hash[key][:via]} \n }
-      code << %Q{ pp options \n }
+      code << %Q{ return Weary::Request.new(location, :#{hash[key][:via]}, options) \n }
       code << %Q{ end\n }
-      code
+      
+      return code
     end
 end
