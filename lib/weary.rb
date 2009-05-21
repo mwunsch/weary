@@ -128,27 +128,31 @@ module Weary
     end
     
     def create_code_string(key,hash)
+      code = ""
       case hash[key][:via]
         when :get, :delete
-          code = %Q{ def #{key}(params={})\n }
+          code << %Q{ def #{key}(params={})\n }
           code << %Q{ options ||= {} \n }
-          code << %Q{ options[:basic_auth] = {:username => "#{@username}", :password => "#{@password}"} \n } if hash[key][:authenticates]
-          code << %Q{ p "#{hash[key][:via]}".to_sym \n }
-          code << %Q{ options[:query] = params \n}
-          code << %Q{ pp options \n }
-          code << %Q{ end\n }
+          code << %Q{ options[:query] = params unless params.empty? \n}
           code
         when :post, :put
-          code = %Q{ def #{key}=(params={})\n }
+          code << %Q{ def #{key}=(params={})\n }
           code << %Q{ options ||= {} \n }
-          code << %Q{ options[:basic_auth] = {:username => "#{@username}", :password => "#{@password}"} \n } if hash[key][:authenticates]
-          code << %Q{ p "#{hash[key][:via]}".to_sym \n }
           code << %Q{ options[:body] = params \n}
-          code << %Q{ pp options \n }
-          code << %Q{ end\n }
           code
         else
           # Something went wrong here
       end
+      
+      if hash[key][:requires]
+        hash[key][:requires].each do |required|
+          code << %Q{ raise ArgumentError, "Lacks Required: :#{required}" unless params.has_key?("#{required}".to_sym) \n }
+        end
+      end
+      code << %Q{ options[:basic_auth] = {:username => "#{@username}", :password => "#{@password}"} \n } if hash[key][:authenticates]
+      code << %Q{ p "#{hash[key][:via]}".to_sym \n }
+      code << %Q{ pp options \n }
+      code << %Q{ end\n }
+      code
     end
 end
