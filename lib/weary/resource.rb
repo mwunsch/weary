@@ -1,20 +1,22 @@
 module Weary
   class Resource
-    attr_reader :name, :with, :requires
-    attr_accessor :via, :format
-    # :name, :via, :with, :requires, :authenticates, :in_format, :url
+    attr_reader :name, :with, :requires, :via, :format
+    
     def initialize(name,options={})
       self.name = name
-      self.via = options[:via].to_sym
+      self.via = options[:via]
       self.with = options[:with]
       self.requires = options[:requires]
-      self.format = options[:in_format].to_sym
+      self.format = options[:in_format]
       @authenticates = (options[:authenticates] != false)
     end
     
     def name=(resource)
-      string = resource.to_s
-      @name = string
+      @name = resource.to_s
+    end
+    
+    def via=(verb)
+      @via = verb.to_sym
     end
     
     def with=(params)
@@ -31,6 +33,10 @@ module Weary
       else
         @requires = params
       end
+    end
+    
+    def format=(type)
+      @format = type.to_sym
     end
     
     def authenticates?
