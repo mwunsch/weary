@@ -13,6 +13,7 @@ autoload :Nokogiri, 'nokogiri'
 require 'weary/core_extensions'
 require 'weary/request'
 require 'weary/response'
+require 'weary/resource'
 
 
 module Weary
@@ -32,7 +33,7 @@ module Weary
   end
 
   def as_format(format)
-    @format = format
+    @format = format.to_sym
   end
 
   def authenticates_with(username,password)
@@ -41,123 +42,92 @@ module Weary
   end
 
   def declare_resource(resource, options={})
+    @resources ||= []
+    location ||= @domain
     # available options:
     # :via = get, post, etc. defaults to get
     # :with = paramaters passed to body or query
     # :requires = members of :with that must be in the action
-    #             also, :at_least => 1
     # :authenticates = boolean; uses basic_authentication
     # :construct_url = string that is created
     # :in_format = to set format, defaults to :json
+        
+    r = Weary::Resource.new(resource, set_defaults(options))
+    declaration = r.to_hash
     
-    @methods = []
-    setup = {}
-
-    if block_given?
-      setup[resource] = yield
-    else
-      setup[resource] = set_options(options)
-    end
+    @resources << declaration
     
-    @resources ||= []
-    @resources << setup
-    
-    craft_methods(resource, setup)
-    return setup
+    craft_methods(r)
+    return declaration
+  end
+  
+  def get(resource,options={})
+    options[:via] = :get
+    declare_resource(resource,options)
+  end
+  
+  def post(resource,options={})
+    options[:via] = :post
+    declare_resource(resource,options)
+  end
+  
+  def put(resource,options={})
+    options[:via] = :put
+    declare_resource(resource,options)
+  end
+  
+  def delete(resource,options={})
+    options[:via] = :delete
+    declare_resource(resource,options)
   end
 
   private
-    def get(method,options={})
-      options[:via] = :get
-      set_options(options)
-      set_action(method,options)
-    end
-
-    def post(method,options={})
-      options[:via] = :post
-      set_options(options)
-      set_action(method,options)
-    end
-
-    def put(method,options={})
-      options[:via] = :put
-      set_options(options)
-      set_action(method,options)
-    end
-
-    def delete(method,options={})
-      options[:via] = :delete
-      set_options(options)
-      set_action(method,options)
-    end
-    
-    def set_options(hash)
+    def set_defaults(hash)
       hash[:via] ||= :get
       hash[:with] ||= []
       hash[:with] = hash[:with] | hash[:requires] unless hash[:requires].nil?
       hash[:in_format] ||= (@format || :json)
+      hash[:authenticates] = false if hash[:authenticates] == "false"
       hash[:authenticates] ||= false
       return hash
     end
     
-    def set_action(method,options)
-      action = {}
-      action[method.to_sym] = options
-      @methods << action
-    end
-    
-    def craft_methods(key,hash)
-      if hash[key].is_a? Array
-        code = %Q{ def #{key}\n }
-        code << %Q{ obj = self.dup \n }
-        hash[key].each do |method|
-          name = method.keys.to_s.to_sym
-          code << %Q{ obj.instance_eval %Q!}
-          code << create_code_string(name,method,key+"/")
-          code << %Q{!\n }
+    def craft_methods(resource)
+      code = %Q{
+        def #{resource.name}(params={})
+          options ||= {}
+      }
+      
+      unless resource.requires.nil?
+        resource.requires.each do |required|
+          code << %Q{raise ArgumentError, "This resource requires parameter: :#{required}" unless params.has_key?(:#{required}) \n}
         end
-        code << %Q{ return obj }
-        code << %Q{ end\n }
-        class_eval code
-      elsif hash[key].is_a? Hash
-        class_eval create_code_string(key,hash)
+      end
+      
+      unless resource.with.nil?
+        with = "["
+        resource.with.each {|x| with << ":#{x},"}
+        with << "]"
+        code << "unnecessary = params.keys - #{with} \n"
+        code << "unnecessary.each { |x| params.delete(x) } \n"
+      end
+            
+      if resource.via == (:post || :put)
+        code << "options[:body] = params \n"
       else
-        # Something went wrong here
-      end
-    end
-    
-    def create_code_string(key,hash,resource="")
-      format = hash[key][:in_format]
-      code = %Q{ def #{key}(params={})\n }
-      code << "options ||= {} \n"
-      
-      case hash[key][:via]
-        when :get, :delete
-          code << %Q{ options[:query] = params unless params.empty? \n }
-        when :post, :put
-          code << %Q{ options[:body] = params \n }
-        else
-          # Something went wrong here
+        code << "options[:query] = params unless params.empty? \n"
       end
       
-      unless hash[key][:with].empty?
-        with_a = "["
-        hash[key][:with].each { |x| with_a << ":#{x}," }
-        with_a << "]"
-        code << %Q{ unnecessary = params.keys - #{with_a} \n }
-        code << %Q{ unnecessary.each { |x| params.delete(x) } \n}
-      end      
-      if hash[key][:requires] && !hash[key][:requires].empty?
-        hash[key][:requires].each do |required|
-          code << %Q{ raise ArgumentError, ":#{required} is a required parameter." unless params.has_key?(:#{required}) \n }
+      if resource.authenticates?
+        code << %Q{options[:basic_auth] = {:username => "#{@username}", :password => "#{@password}"} \n}
+      end
+      
+      code << %Q{
+          return options
         end
-      end
+      }
       
-      code << %Q{ location = "#{domain}#{resource}#{key}.#{format}" \n }
-      code << %Q{ options[:basic_auth] = {:username => "#{@username}", :password => "#{@password}"} \n } if hash[key][:authenticates]
-      code << %Q{ return Weary::Request.new(location, :#{hash[key][:via]}, options) \n }
-      code << %Q{ end\n }
-      
-      return code
+      class_eval code
     end
+
 end
