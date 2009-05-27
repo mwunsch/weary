@@ -1,13 +1,16 @@
 module Weary
   class Resource
-    attr_reader :name, :with, :requires, :via, :format
+    attr_reader :name, :with, :requires, :via, :format, :url
     
     def initialize(name,options={})
+      @domain = options[:domain]
       self.name = name
       self.via = options[:via]
       self.with = options[:with]
       self.requires = options[:requires]
       self.format = options[:in_format]
+      self.url = options[:construct_url] if options[:url].nil?
+      @url = options[:url] unless options[:url].nil?
       @authenticates = (options[:authenticates] != false)
     end
     
@@ -23,8 +26,16 @@ module Weary
       if params.empty?
         @with = nil
       else
-        @with = params
+        @with = params.collect {|x| x.to_sym }
       end
+    end
+    
+    def url=(pattern)
+      raise StandardError, "Requires a domain to be set" if @domain.nil?
+      pattern = pattern.gsub("<domain>", @domain)
+      pattern = pattern.gsub("<resource>", @name)
+      pattern = pattern.gsub("<format>", @format.to_s)
+      @url = pattern
     end
     
     def requires=(params)
@@ -48,7 +59,8 @@ module Weary
                         :with => @with,
                         :requires => @requires,
                         :authenticates => @authenticates,
-                        :in_format => @format}}
+                        :in_format => @format,
+                        :url => @url}}
     end
     
   end

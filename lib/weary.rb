@@ -3,14 +3,12 @@ require 'net/http'
 require 'net/https'
 
 require 'rubygems'
-gem 'crack'
-gem 'nokogiri'
+require 'crack'
 
+gem 'nokogiri'
 autoload :Yaml, 'yaml'
-autoload :Crack, 'crack'
 autoload :Nokogiri, 'nokogiri'
 
-require 'weary/core_extensions'
 require 'weary/request'
 require 'weary/response'
 require 'weary/resource'
@@ -35,22 +33,33 @@ module Weary
   def as_format(format)
     @format = format.to_sym
   end
+  alias format= as_format
+  
+  def construct_url(pattern)
+    @url_pattern = pattern
+  end
 
   def authenticates_with(username,password)
     @username = username
     @password = password
+    return nil
   end
 
   def declare_resource(resource, options={})
-    @resources ||= []
-    location ||= @domain
     # available options:
     # :via = get, post, etc. defaults to get
     # :with = paramaters passed to body or query
     # :requires = members of :with that must be in the action
     # :authenticates = boolean; uses basic_authentication
-    # :construct_url = string that is created
+    # :construct_url = a pattern
     # :in_format = to set format, defaults to :json
+    # :url = a straight up url to the resource
+    
+    @resources ||= []
+    if block_given?
+      yield
+      return nil
+    end
         
     r = Weary::Resource.new(resource, set_defaults(options))
     declaration = r.to_hash
@@ -83,12 +92,14 @@ module Weary
 
   private
     def set_defaults(hash)
+      hash[:domain] = @domain
       hash[:via] ||= :get
       hash[:with] ||= []
       hash[:with] = hash[:with] | hash[:requires] unless hash[:requires].nil?
       hash[:in_format] ||= (@format || :json)
-      hash[:authenticates] = false if hash[:authenticates] == "false"
       hash[:authenticates] ||= false
+      hash[:authenticates] = false if hash[:authenticates] == "false"
+      hash[:construct_url] ||= (@url_pattern || "<domain><resource>.<format>")
       return hash
     end
     
@@ -97,36 +108,28 @@ module Weary
         def #{resource.name}(params={})
           options ||= {}
       }
-      
       unless resource.requires.nil?
         resource.requires.each do |required|
-          code << %Q{raise ArgumentError, "This resource requires parameter: :#{required}" unless params.has_key?(:#{required}) \n}
+          code << %Q{raise ArgumentError, "This resource requires parameter: ':#{required}'" unless params.has_key?(:#{required}) \n}
         end
       end
-      
       unless resource.with.nil?
-        with = "["
-        resource.with.each {|x| with << ":#{x},"}
-        with << "]"
+        with = %Q\[#{resource.with.collect {|x| ":#{x}"}.join(',')}]\
         code << "unnecessary = params.keys - #{with} \n"
         code << "unnecessary.each { |x| params.delete(x) } \n"
       end
-            
       if resource.via == (:post || :put)
-        code << "options[:body] = params \n"
+        code << "options[:body] = params unless params.empty? \n"
       else
         code << "options[:query] = params unless params.empty? \n"
       end
-      
       if resource.authenticates?
         code << %Q{options[:basic_auth] = {:username => "#{@username}", :password => "#{@password}"} \n}
       end
-      
       code << %Q{
           return options
         end
       }
-      
       class_eval code
     end
 
