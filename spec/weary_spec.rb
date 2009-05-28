@@ -5,28 +5,28 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'weary')
 
 describe Weary do
   before do
-    @Test = Class.new
-    @Test.instance_eval { extend Weary }
+    @test = Class.new
+    @test.instance_eval { extend Weary }
   end
   
   describe "default domain" do
     it 'should be set with a url' do
-      @Test.on_domain("http://twitter.com/")
-      @Test.domain.should == "http://twitter.com/"
+      @test.on_domain("http://twitter.com/")
+      @test.domain.should == "http://twitter.com/"
     end
     
     it "should also be set by it's alias" do
-      @Test.domain = "http://twitter.com/"
-      @Test.domain.should == "http://twitter.com/"
+      @test.domain = "http://twitter.com/"
+      @test.domain.should == "http://twitter.com/"
     end
     
     it 'should raise an exception when a url is not present' do
-      lambda { @Test.on_domain("foobar") }.should raise_error
+      lambda { @test.on_domain("foobar") }.should raise_error
     end
     
     it 'should only take the first url given' do
-      @Test.on_domain("with http://google.com/ and http://yahoo.com/")
-      @Test.domain.should == "http://google.com/"
+      @test.on_domain("with http://google.com/ and http://yahoo.com/")
+      @test.domain.should == "http://google.com/"
     end
     
     it "should only accept http and https url's"
@@ -36,18 +36,18 @@ describe Weary do
   
   describe "default format" do
     it 'can be set' do
-      @Test.as_format("xml")
-      @Test.instance_variable_defined?(:@default_format).should == true
+      @test.as_format("xml")
+      @test.instance_variable_defined?(:@default_format).should == true
     end
     
     it "should also be set by it's alias" do
-      @Test.format = "xml"
-      @Test.instance_variable_defined?(:@default_format).should == true
+      @test.format = "xml"
+      @test.instance_variable_defined?(:@default_format).should == true
     end
     
     it 'should be a symbol' do
-      @Test.as_format("xml")
-      @Test.instance_variable_get(:@default_format).class.should == Symbol
+      @test.as_format("xml")
+      @test.instance_variable_get(:@default_format).class.should == Symbol
     end
     
     it 'should be one of the allowed formats'
@@ -57,97 +57,97 @@ describe Weary do
   
   describe "default url pattern" do
     it 'can be set' do
-      @Test.construct_url("<domain><resource>.<format>")
-      @Test.instance_variable_defined?(:@url_pattern).should == true
+      @test.construct_url("<domain><resource>.<format>")
+      @test.instance_variable_defined?(:@url_pattern).should == true
     end
     
     it "should also be set by it's alias" do
-      @Test.url = "<domain><resource>.<format>"
-      @Test.instance_variable_defined?(:@url_pattern).should == true
+      @test.url = "<domain><resource>.<format>"
+      @test.instance_variable_defined?(:@url_pattern).should == true
     end
     
     it 'should be a string' do
-      @Test.construct_url(123)
-      @Test.instance_variable_get(:@url_pattern).class.should == String
+      @test.construct_url(123)
+      @test.instance_variable_get(:@url_pattern).class.should == String
     end
   end
   
   describe "basic authentication credentials" do
     it "should accept a username and password" do
-      @Test.authenticates_with("foo","bar")
-      @Test.instance_variable_get(:@username).should == "foo"
-      @Test.instance_variable_get(:@password).should == "bar"
+      @test.authenticates_with("foo","bar")
+      @test.instance_variable_get(:@username).should == "foo"
+      @test.instance_variable_get(:@password).should == "bar"
     end  
   end
   
   describe "resource declaration" do  
     before do
-      @Test.domain = "http://twitter.com/"
+      @test.domain = "http://twitter.com/"
     end
     
     it "should adds a new resource" do
-      @Test.declare_resource("resource")
-      @Test.resources[0].has_key?(:resource).should == true
+      @test.declare_resource("resource")
+      @test.resources[0].has_key?(:resource).should == true
     end
     
     it "should default to a GET request" do
-      @Test.declare_resource("resource")[:resource][:via].should == :get
+      @test.declare_resource("resource")[:resource][:via].should == :get
     end
     
     it "should default to JSON if no format is defined" do
-      @Test.declare_resource("resource")[:resource][:in_format].should == :json
+      @test.declare_resource("resource")[:resource][:in_format].should == :json
     end
     
     it "should use the declared format, if a specific format is not defined" do
-      @Test.format = :xml
-      @Test.declare_resource("resource")[:resource][:in_format].should == :xml
+      @test.format = :xml
+      @test.declare_resource("resource")[:resource][:in_format].should == :xml
     end
     
     it "should override the default format with it's own format" do
-      @Test.format = :xml
-      @Test.declare_resource("resource",{:in_format => :yaml})[:resource][:in_format].should == :yaml
+      @test.format = :xml
+      @test.declare_resource("resource",{:in_format => :yaml})[:resource][:in_format].should == :yaml
     end
     
     it "should form a url if there is a default pattern" do
-      @Test.declare_resource("resource")[:resource][:url].should == "http://twitter.com/resource.json"
+      @test.declare_resource("resource")[:resource][:url].should == "http://twitter.com/resource.json"
     end
     
     it "should override the default pattern with it's own url" do
-      @Test.declare_resource("resource",{:url => "http://foobar.com/<resource>"})[:resource][:url].should == "http://foobar.com/resource"
+      @test.declare_resource("resource",{:url => "http://foobar.com/<resource>"})[:resource][:url].should == "http://foobar.com/resource"
     end
     
     it "should be able to contain a set of allowed parameters" do
-      @Test.declare_resource("resource",{:with => [:id]})[:resource][:with].empty?.should == false
+      @test.declare_resource("resource",{:with => [:id]})[:resource][:with].empty?.should == false
     end
     
     it "should be able to contain a set of required parameters" do
-      @Test.declare_resource("resource",{:requires => [:id]})[:resource][:requires].empty?.should == false
+      @test.declare_resource("resource",{:requires => [:id]})[:resource][:requires].empty?.should == false
     end
     
     it "should merge required parameters into allowed parameters" do
-      @Test.declare_resource("resource",{:requires => [:id]})[:resource][:with].empty?.should == false
+      @test.declare_resource("resource",{:requires => [:id]})[:resource][:with].empty?.should == false
     end
     
     it "should authenticate with username and password" do
-      @Test.authenticates_with("foo","bar")
-      @Test.declare_resource("resource",{:authenticates => true})[:resource][:authenticates].should == true      
+      @test.authenticates_with("foo","bar")
+      @test.declare_resource("resource",{:authenticates => true})[:resource][:authenticates].should == true      
     end
     
     it "should raise an exception if authentication is required but no credentials are supplied" do
       lambda do
-        @Test.declare_resource("resource",{:authenticates => true})
+        @test.declare_resource("resource",{:authenticates => true})
       end.should raise_error
     end
     
     it "should create a method for an instantiated object" do
-      @Test.declare_resource("resource")
-      @Test.public_method_defined?(:resource).should == true
+      @test.declare_resource("resource")
+      @test.public_method_defined?(:resource).should == true
     end
     
     it "the method it creates should return a Weary::Response" do
-      @Test.domain = "http://localhost:8888/"
-      @Test.declare_resource("test")
-      t = @Test.new
+      @test.domain = "http://localhost:8888/"
+      @test.declare_resource("test")
+      t = @test.new
       t.test.class.should == Weary::Response
     end
     
