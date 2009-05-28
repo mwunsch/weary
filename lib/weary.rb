@@ -31,15 +31,17 @@ module Weary
     raise ArgumentError, 'The domain must be a URL.' if parse_domain.empty?
     @domain = parse_domain[0]
   end
+  alias domain= on_domain
 
   def as_format(format)
-    @format = format.to_sym
+    @default_format = format.to_sym
   end
   alias format= as_format
   
   def construct_url(pattern)
-    @url_pattern = pattern
+    @url_pattern = pattern.to_s
   end
+  alias url= construct_url
 
   def authenticates_with(username,password)
     @username = username
@@ -93,7 +95,7 @@ module Weary
       hash[:via] ||= :get
       hash[:with] ||= []
       hash[:with] = hash[:with] | hash[:requires] unless hash[:requires].nil?
-      hash[:in_format] ||= (@format || :json)
+      hash[:in_format] ||= (@default_format || :json)
       hash[:authenticates] ||= false
       hash[:authenticates] = false if hash[:authenticates] == "false"
       hash[:url] ||= (@url_pattern || "<domain><resource>.<format>")
@@ -120,7 +122,7 @@ module Weary
         code << "options[:body] = params unless params.empty? \n"
       else
         code << "options[:query] = params unless params.empty? \n"
-        code << %Q{url << "?" + options[:query].to_params \n}
+        code << %Q{url << "?" + options[:query].to_params unless options[:query].nil? \n}
       end
       if resource.authenticates?
         code << %Q{options[:basic_auth] = {:username => "#{@username}", :password => "#{@password}"} \n}

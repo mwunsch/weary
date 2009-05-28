@@ -18,7 +18,7 @@ module Weary
     end
     
     def via=(verb)
-      @via = verb.to_sym
+      @via = verb
     end
     
     def with=(params)
@@ -45,7 +45,7 @@ module Weary
     end
     
     def format=(type)
-      @format = type.to_sym
+      @format = type
     end
     
     def authenticates?
