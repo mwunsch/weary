@@ -73,9 +73,18 @@ describe Weary do
   end
   
   describe "basic authentication credentials" do
+    it "should accept a username and password" do
+      @Test.authenticates_with("foo","bar")
+      @Test.instance_variable_get(:@username).should == "foo"
+      @Test.instance_variable_get(:@password).should == "bar"
+    end  
   end
   
-  describe "resource declaration" do
+  describe "resource declaration" do  
+    before do
+      @Test.domain = "http://twitter.com/"
+    end
+    
     it "should adds a new resource" do
       @Test.declare_resource("resource")
       @Test.resources[0].has_key?(:resource).should == true
@@ -100,13 +109,10 @@ describe Weary do
     end
     
     it "should form a url if there is a default pattern" do
-      @Test.domain = "http://twitter.com/"
       @Test.declare_resource("resource")[:resource][:url].should == "http://twitter.com/resource.json"
     end
     
     it "should override the default pattern with it's own url" do
-      @Test.domain = "http://twitter.com/"
-      @Test.url = "<domain><resource>.<format>"
       @Test.declare_resource("resource",{:url => "http://foobar.com/<resource>"})[:resource][:url].should == "http://foobar.com/resource"
     end
     
@@ -122,11 +128,28 @@ describe Weary do
       @Test.declare_resource("resource",{:requires => [:id]})[:resource][:with].empty?.should == false
     end
     
+    it "should authenticate with username and password" do
+      @Test.authenticates_with("foo","bar")
+      @Test.declare_resource("resource",{:authenticates => true})[:resource][:authenticates].should == true      
+    end
+    
+    it "should raise an exception if authentication is required but no credentials are supplied" do
+      lambda do
+        @Test.declare_resource("resource",{:authenticates => true})
+      end.should raise_error
+    end
+    
     it "should create a method for an instantiated object" do
-      @Test.domain = "http://twitter.com/"
       @Test.declare_resource("resource")
       @Test.public_method_defined?(:resource).should == true
     end
-  end
-  
+    
+    it "the method it creates should return a Weary::Response" do
+      @Test.domain = "http://localhost:8888/"
+      @Test.declare_resource("test")
+      t = @Test.new
+      t.test.class.should == Weary::Response
+    end
+    
+  end 
 end

@@ -98,6 +98,9 @@ module Weary
       hash[:in_format] ||= (@default_format || :json)
       hash[:authenticates] ||= false
       hash[:authenticates] = false if hash[:authenticates] == "false"
+      if hash[:authenticates]
+        raise StandardError, "Can not authenticate unless username and password are defined" unless (@username && @password)
+      end
       hash[:url] ||= (@url_pattern || "<domain><resource>.<format>")
       return hash
     end
@@ -128,7 +131,7 @@ module Weary
         code << %Q{options[:basic_auth] = {:username => "#{@username}", :password => "#{@password}"} \n}
       end
       code << %Q{
-          Weary::Request.new(url, :#{resource.via}, options)
+          Weary::Request.new(url, :#{resource.via}, options).perform
         end
       }
       class_eval code

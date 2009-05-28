@@ -30,7 +30,10 @@ module Weary
     end
     
     def url=(pattern)
-      pattern = pattern.gsub("<domain>", @domain) if @domain
+      if pattern.index("<domain>")
+        raise StandardError, "Domain flag found but the domain is not defined" if @domain.nil?
+        pattern = pattern.gsub("<domain>", @domain)
+      end
       pattern = pattern.gsub("<resource>", @name)
       pattern = pattern.gsub("<format>", @format.to_s)
       @url = pattern
