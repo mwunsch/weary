@@ -9,8 +9,7 @@ module Weary
       self.with = options[:with]
       self.requires = options[:requires]
       self.format = options[:in_format]
-      self.url = options[:construct_url] if options[:url].nil?
-      @url = options[:url] unless options[:url].nil?
+      self.url = options[:url]
       @authenticates = (options[:authenticates] != false)
     end
     
@@ -31,8 +30,7 @@ module Weary
     end
     
     def url=(pattern)
-      raise StandardError, "Requires a domain to be set" if @domain.nil?
-      pattern = pattern.gsub("<domain>", @domain)
+      pattern = pattern.gsub("<domain>", @domain) if @domain
       pattern = pattern.gsub("<resource>", @name)
       pattern = pattern.gsub("<format>", @format.to_s)
       @url = pattern

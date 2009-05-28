@@ -51,15 +51,10 @@ module Weary
     # :with = paramaters passed to body or query
     # :requires = members of :with that must be in the action
     # :authenticates = boolean; uses basic_authentication
-    # :construct_url = a pattern
+    # :url = a pattern
     # :in_format = to set format, defaults to :json
-    # :url = a straight up url to the resource
     
     @resources ||= []
-    if block_given?
-      yield
-      return nil
-    end
         
     r = Weary::Resource.new(resource, set_defaults(options))
     declaration = r.to_hash
@@ -99,7 +94,7 @@ module Weary
       hash[:in_format] ||= (@format || :json)
       hash[:authenticates] ||= false
       hash[:authenticates] = false if hash[:authenticates] == "false"
-      hash[:construct_url] ||= (@url_pattern || "<domain><resource>.<format>")
+      hash[:url] ||= (@url_pattern || "<domain><resource>.<format>")
       return hash
     end
     
@@ -107,6 +102,7 @@ module Weary
       code = %Q{
         def #{resource.name}(params={})
           options ||= {}
+          url = "#{resource.url}"
       }
       unless resource.requires.nil?
         resource.requires.each do |required|
@@ -122,12 +118,13 @@ module Weary
         code << "options[:body] = params unless params.empty? \n"
       else
         code << "options[:query] = params unless params.empty? \n"
+        code << %Q{url << "?" + options[:query].to_params \n}
       end
       if resource.authenticates?
         code << %Q{options[:basic_auth] = {:username => "#{@username}", :password => "#{@password}"} \n}
       end
       code << %Q{
-          return options
+          Weary::Request.new(url, :#{resource.via}, options)
         end
       }
       class_eval code
