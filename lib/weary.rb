@@ -1,3 +1,5 @@
+$:.unshift(File.dirname(__FILE__))
+
 require 'uri'
 require 'net/http'
 require 'net/https'
