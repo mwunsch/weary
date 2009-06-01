@@ -18,6 +18,12 @@ require 'weary/resource'
 
 module Weary
   
+  Methods = { :get => "",
+              :post => "",
+              :put => "",
+              :delete => "",
+              :head => "" }
+  
   # Weary::Query quickly performs a :get request on a URL and parses the request
   def self.Query(url)
     req = Weary::Request.new(url, :get).perform

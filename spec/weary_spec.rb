@@ -144,12 +144,5 @@ describe Weary do
       @test.public_method_defined?(:resource).should == true
     end
     
-    it "the method it creates should return a Weary::Response" do
-      @test.domain = "http://localhost:8888/"
-      @test.declare_resource("test")
-      t = @test.new
-      t.test.class.should == Weary::Response
-    end
-    
   end 
 end
