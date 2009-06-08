@@ -63,6 +63,7 @@ module Weary
     # :authenticates = boolean; uses basic_authentication
     # :url = a pattern
     # :in_format = to set format, defaults to :json
+    # :no_follow = boolean; defaults to false. do not follow redirects
     
     @resources ||= []
         
@@ -108,6 +109,7 @@ module Weary
         raise StandardError, "Can not authenticate unless username and password are defined" unless (@username && @password)
       end
       hash[:url] ||= (@url_pattern || "<domain><resource>.<format>")
+      hash[:no_follow] ||= false
       return hash
     end
     

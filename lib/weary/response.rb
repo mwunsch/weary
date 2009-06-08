@@ -56,6 +56,7 @@ module Weary
     
     def parse
       raise StandardError, "The Response has no body. #{@method.to_s.upcase} request sent." unless @body
+      handle_errors
       case @format
         when :xml, :html
           Crack::XML.parse @body
@@ -67,6 +68,36 @@ module Weary
           @body
       end
     end
+    
+    private
+      def handle_errors
+        case @code
+          when 301,302
+            raise StandardError, "#{@message} to #{@raw['location']}"
+          when 200...400
+            return
+          when 400
+            raise StandardError, "#{@message}"
+          when 401
+            raise StandardError, "#{@message}"
+          when 403
+            raise StandardError, "#{@message}"
+          when 404
+            raise StandardError, "#{@message}"
+          when 405
+            raise StandardError, "#{@message}"
+          when 409
+            raise StandardError, "#{@message}"
+          when 422
+            raise StandardError, "#{@message}"
+          when 401...500
+            raise StandardError, "#{@message}"
+          when 500...600
+            raise StandardError, "#{@message}"
+          else
+            raise StandardError, "Unknown response code: #{@code}"
+        end
+      end
           
   end
 end
