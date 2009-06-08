@@ -14,7 +14,8 @@ Gem::Specification.new do |s|
      "README.md"
   ]
   s.files = [
-    "LICENSE",
+    ".gitignore",
+     "LICENSE",
      "README.md",
      "Rakefile",
      "VERSION",
@@ -24,16 +25,18 @@ Gem::Specification.new do |s|
      "lib/weary/resource.rb",
      "lib/weary/response.rb",
      "spec/weary/request_spec.rb",
-     "spec/weary_spec.rb"
+     "spec/weary_spec.rb",
+     "weary.gemspec"
   ]
   s.homepage = %q{http://github.com/mwunsch/weary}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
+  s.rubyforge_project = %q{weary}
   s.rubygems_version = %q{1.3.1}
   s.summary = %q{A little DSL for consuming RESTful web services}
   s.test_files = [
     "spec/weary/request_spec.rb",
-     "spec/weary_spec.rb",
+     "spec/weary_spec.rb"
   ]
 
   if s.respond_to? :specification_version then
