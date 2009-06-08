@@ -16,7 +16,8 @@ describe Weary::Request do
   end
   
   it "should craft a Net/HTTP Request" do
-    pending "Not sure how to test this"
+    test = Weary::Request.new("http://google.com").send :http
+    test.class.should == Net::HTTP
   end
   
   it "should follow redirects" do

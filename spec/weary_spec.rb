@@ -28,10 +28,6 @@ describe Weary do
       @test.on_domain("with http://google.com/ and http://yahoo.com/")
       @test.domain.should == "http://google.com/"
     end
-    
-    it "should only accept http and https url's"
-    
-    it 'should place a closing slash at the end of the url if one is not present'
   end
   
   describe "default format" do
@@ -49,10 +45,6 @@ describe Weary do
       @test.as_format("xml")
       @test.instance_variable_get(:@default_format).class.should == Symbol
     end
-    
-    it 'should be one of the allowed formats'
-    
-    it 'should raise an error if it is not an allowed format'
   end
   
   describe "default url pattern" do
