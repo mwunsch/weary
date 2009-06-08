@@ -95,17 +95,17 @@ describe Weary do
     end
     
     it "should default to JSON if no format is defined" do
-      @test.declare_resource("resource")[:resource][:in_format].should == :json
+      @test.declare_resource("resource")[:resource][:format].should == :json
     end
     
     it "should use the declared format, if a specific format is not defined" do
       @test.format = :xml
-      @test.declare_resource("resource")[:resource][:in_format].should == :xml
+      @test.declare_resource("resource")[:resource][:format].should == :xml
     end
     
     it "should override the default format with it's own format" do
       @test.format = :xml
-      @test.declare_resource("resource",{:in_format => :yaml})[:resource][:in_format].should == :yaml
+      @test.declare_resource("resource",{:format => :yaml})[:resource][:format].should == :yaml
     end
     
     it "should form a url if there is a default pattern" do

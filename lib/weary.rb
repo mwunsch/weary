@@ -63,8 +63,9 @@ module Weary
     # :requires = members of :with that must be in the action
     # :authenticates = boolean; uses basic_authentication
     # :url = a pattern
-    # :in_format = to set format, defaults to :json
+    # :format = to set format, defaults to :json
     # :no_follow = boolean; defaults to false. do not follow redirects
+      
     
     @resources ||= []
         
@@ -103,7 +104,7 @@ module Weary
       hash[:via] ||= :get
       hash[:with] ||= []
       hash[:with] = hash[:with] | hash[:requires] unless hash[:requires].nil?
-      hash[:in_format] ||= (@default_format || :json)
+      hash[:format] ||= (@default_format || :json)
       hash[:authenticates] ||= false
       hash[:authenticates] = false if hash[:authenticates] == "false"
       if hash[:authenticates]

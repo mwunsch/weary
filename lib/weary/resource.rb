@@ -8,7 +8,7 @@ module Weary
       self.via = options[:via]
       self.with = options[:with]
       self.requires = options[:requires]
-      self.format = options[:in_format]
+      self.format = options[:format]
       self.url = options[:url]
       @authenticates = (options[:authenticates] != false)
     end
@@ -60,7 +60,7 @@ module Weary
                         :with => @with,
                         :requires => @requires,
                         :authenticates => @authenticates,
-                        :in_format => @format,
+                        :format => @format,
                         :url => @url}}
     end
     
