@@ -11,6 +11,7 @@ module Weary
       self.format = options[:format]
       self.url = options[:url]
       @authenticates = (options[:authenticates] != false)
+      @follows = (options[:no_follow] == false)
     end
     
     def name=(resource)
@@ -55,13 +56,18 @@ module Weary
       @authenticates
     end
     
+    def follows_redirects?
+      @follows
+    end
+    
     def to_hash
       {@name.to_sym => {:via => @via,
                         :with => @with,
                         :requires => @requires,
-                        :authenticates => @authenticates,
+                        :authenticates => authenticates?,
                         :format => @format,
-                        :url => @url}}
+                        :url => @url},
+                        :no_follow => !follows_redirects?}
     end
     
   end

@@ -16,15 +16,15 @@ module Weary
     
     def method=(http_verb)
       @http_verb = case http_verb
-        when :get, :GET, /\bget\b/i
+        when *Methods[:get]
           :get
-        when :post, :POST, /\bpost\b/i
+        when *Methods[:post]
           :post
-        when :put, :PUT, /\bput\b/i
+        when *Methods[:put]
           :put
-        when :delete, :del, :DELETE, :DEL, /\bdelete\b/i
-          :del
-        when :head, :HEAD, /\bhead\b/i
+        when *Methods[:delete]
+          :delete
+        when *Methods[:head]
           :head
         else
           raise ArgumentError, "Only GET, POST, PUT, DELETE, and HEAD methods are supported"
@@ -66,7 +66,7 @@ module Weary
             Net::HTTP::Post.new(@uri.request_uri)
           when :put
             Net::HTTP::Put.new(@uri.request_uri)
-          when :del
+          when :delete
             Net::HTTP::Delete.new(@uri.request_uri)
           when :head
             Net::HTTP::Head.new(@uri.request_uri)
