@@ -69,6 +69,12 @@ module Weary
       end
     end
     
+    def search(selector)
+      raise ArgumentError, "Search can only be used with an XML or HTML document." unless @format != (:xml || :html)
+      doc = Nokogiri.parse(@body)
+      doc.search(selector)
+    end
+    
     private
       def handle_errors
         case @code
