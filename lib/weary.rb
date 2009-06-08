@@ -14,6 +14,7 @@ autoload :Nokogiri, 'nokogiri'
 require 'weary/request'
 require 'weary/response'
 require 'weary/resource'
+require 'weary/exceptions'
 
 
 module Weary

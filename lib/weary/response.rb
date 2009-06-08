@@ -73,29 +73,29 @@ module Weary
       def handle_errors
         case @code
           when 301,302
-            raise StandardError, "#{@message} to #{@raw['location']}"
+            raise HTTPError, "#{@message} to #{@raw['location']}"
           when 200...400
             return
           when 400
-            raise StandardError, "#{@message}"
+            raise HTTPError, "Failed with #{@code}: #{@message}"
           when 401
-            raise StandardError, "#{@message}"
+            raise HTTPError, "Failed with #{@code}: #{@message}"
           when 403
-            raise StandardError, "#{@message}"
+            raise HTTPError, "Failed with #{@code}: #{@message}"
           when 404
-            raise StandardError, "#{@message}"
+            raise HTTPError, "Failed with #{@code}: #{@message}"
           when 405
-            raise StandardError, "#{@message}"
+            raise HTTPError, "Failed with #{@code}: #{@message}"
           when 409
-            raise StandardError, "#{@message}"
+            raise HTTPError, "Failed with #{@code}: #{@message}"
           when 422
-            raise StandardError, "#{@message}"
+            raise HTTPError, "Failed with #{@code}: #{@message}"
           when 401...500
-            raise StandardError, "#{@message}"
+            raise HTTPError, "Failed with #{@code}: #{@message}"
           when 500...600
-            raise StandardError, "#{@message}"
+            raise HTTPError, "Failed with #{@code}: #{@message}"
           else
-            raise StandardError, "Unknown response code: #{@code}"
+            raise HTTPError, "Unknown response code: #{@code}"
         end
       end
           
