@@ -25,7 +25,7 @@ module Weary
               :delete => [:delete, :del, :DELETE, :DEL, /\bdelete\b/i],
               :head   => [:head, :HEAD, /\bhead\b/i] }
   
-  # Weary::Query quickly performs a :get request on a URL and parses the request
+  # Weary::Query quickly performs a GET request on a URL and parses the request.
   def self.Query(url)
     req = Weary::Request.new(url, :get).perform
     req.parse
@@ -33,16 +33,28 @@ module Weary
   
   attr_reader :domain, :resources
   
+  # Sets the domain the resource is on. 
+  #
+  # If the domain is not provided and you use a URL pattern that asks for it, 
+  # an exception will be raised.
   def on_domain(domain)
     parse_domain = URI.extract(domain)
     raise ArgumentError, 'The domain must be a URL.' if parse_domain.empty?
     @domain = parse_domain[0]
   end
-
+  
+  # Sets a default format to make your Requests in.
+  # Defaults to JSON.
   def as_format(format)
     @default_format = format.to_sym
   end
   
+  # Construct a URL pattern for your resources to follow.
+  # You can use flags like
+  # * <domain>
+  # * <format>
+  # * <resource>
+  # To aid your construction. Defaults to "<domain><resource>.<format>"
   def construct_url(pattern)
     @url_pattern = pattern.to_s
   end
@@ -53,17 +65,17 @@ module Weary
     return nil
   end
 
-  def declare_resource(resource, options={})
-    # available options:
-    # :via = get, post, etc. defaults to get
-    # :with = paramaters passed to body or query
-    # :requires = members of :with that must be in the action
-    # :authenticates = boolean; uses basic_authentication
-    # :url = a pattern
-    # :format = to set format, defaults to :json
-    # :no_follow = boolean; defaults to false. do not follow redirects
-      
-    
+  # Define a resource.
+  #
+  # Options that are allowed are:
+  # [<tt>:via</tt>] Get, Post, etc. Defaults to a GET request
+  # [<tt>:with</tt>] An array of parameters that will be passed to the body or query of the request.
+  # [<tt>:requires</tt>] Members of <tt>:with</tt> that are required by the resource.
+  # [<tt>:authenticates</tt>] Boolean value; does the resource require authentication?
+  # [<tt>:url</tt>] The url of the resource. You can use the same flags as #construct_url
+  # [<tt>:format</tt>] The format you would like to request.
+  # [<tt>:no_follow</tt>] Boolean; Set to true if you do not want to follow redirects.
+  def declare_resource(resource, options={})    
     @resources ||= []
         
     r = Weary::Resource.new(resource, set_defaults(options))
