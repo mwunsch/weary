@@ -62,12 +62,12 @@ module Weary
     
     def to_hash
       {@name.to_sym => {:via => @via,
-                        :with => @with,
-                        :requires => @requires,
-                        :authenticates => authenticates?,
-                        :format => @format,
-                        :url => @url},
-                        :no_follow => !follows_redirects?}
+                       :with => @with,
+                       :requires => @requires,
+                       :no_follow => !follows_redirects?,
+                       :authenticates => authenticates?,
+                       :format => @format,
+                       :url => @url}}
     end
     
   end
