@@ -13,6 +13,6 @@ The things it do:
 
 + Crack
 
-###
+***
 
 Browse the documentation here: http://rdoc.info/projects/mwunsch/weary
