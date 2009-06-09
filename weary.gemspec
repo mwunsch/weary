@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{weary}
-  s.version = "0.1.0"
+  s.version = "0.1.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Mark Wunsch"]
-  s.date = %q{2009-06-08}
+  s.date = %q{2009-06-09}
   s.description = %q{The Weary need REST: a tiny DSL that makes the consumption of RESTful web services simple.}
   s.email = %q{mark@markwunsch.com}
   s.extra_rdoc_files = [
@@ -19,6 +19,8 @@ Gem::Specification.new do |s|
      "README.md",
      "Rakefile",
      "VERSION",
+     "examples/repo.rb",
+     "examples/status.rb",
      "lib/weary.rb",
      "lib/weary/exceptions.rb",
      "lib/weary/request.rb",
@@ -28,6 +30,7 @@ Gem::Specification.new do |s|
      "spec/weary_spec.rb",
      "weary.gemspec"
   ]
+  s.has_rdoc = true
   s.homepage = %q{http://github.com/mwunsch/weary}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
@@ -36,7 +39,9 @@ Gem::Specification.new do |s|
   s.summary = %q{A little DSL for consuming RESTful web services}
   s.test_files = [
     "spec/weary/request_spec.rb",
-     "spec/weary_spec.rb"
+     "spec/weary_spec.rb",
+     "examples/repo.rb",
+     "examples/status.rb"
   ]
 
   if s.respond_to? :specification_version then
