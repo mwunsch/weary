@@ -38,17 +38,14 @@ module Weary
     raise ArgumentError, 'The domain must be a URL.' if parse_domain.empty?
     @domain = parse_domain[0]
   end
-  alias domain= on_domain
 
   def as_format(format)
     @default_format = format.to_sym
   end
-  alias format= as_format
   
   def construct_url(pattern)
     @url_pattern = pattern.to_s
   end
-  alias url= construct_url
 
   def authenticates_with(username,password)
     @username = username

@@ -15,11 +15,6 @@ describe Weary do
       @test.domain.should == "http://twitter.com/"
     end
     
-    it "should also be set by it's alias" do
-      @test.domain = "http://twitter.com/"
-      @test.domain.should == "http://twitter.com/"
-    end
-    
     it 'should raise an exception when a url is not present' do
       lambda { @test.on_domain("foobar") }.should raise_error
     end
@@ -36,11 +31,6 @@ describe Weary do
       @test.instance_variable_defined?(:@default_format).should == true
     end
     
-    it "should also be set by it's alias" do
-      @test.format = "xml"
-      @test.instance_variable_defined?(:@default_format).should == true
-    end
-    
     it 'should be a symbol' do
       @test.as_format("xml")
       @test.instance_variable_get(:@default_format).class.should == Symbol
@@ -50,11 +40,6 @@ describe Weary do
   describe "default url pattern" do
     it 'can be set' do
       @test.construct_url("<domain><resource>.<format>")
-      @test.instance_variable_defined?(:@url_pattern).should == true
-    end
-    
-    it "should also be set by it's alias" do
-      @test.url = "<domain><resource>.<format>"
       @test.instance_variable_defined?(:@url_pattern).should == true
     end
     
@@ -74,7 +59,7 @@ describe Weary do
   
   describe "resource declaration" do  
     before do
-      @test.domain = "http://twitter.com/"
+      @test.on_domain "http://twitter.com/"
     end
     
     it "should adds a new resource" do
@@ -91,12 +76,12 @@ describe Weary do
     end
     
     it "should use the declared format, if a specific format is not defined" do
-      @test.format = :xml
+      @test.as_format :xml
       @test.declare_resource("resource")[:resource][:format].should == :xml
     end
     
     it "should override the default format with it's own format" do
-      @test.format = :xml
+      @test.as_format :xml
       @test.declare_resource("resource",{:format => :yaml})[:resource][:format].should == :yaml
     end
     
