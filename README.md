@@ -12,3 +12,7 @@ The things it do:
 ## Requirements
 
 + Crack
+
+- - -
+
+Browse the documentation here: http://rdoc.info/projects/mwunsch/weary
