@@ -3,6 +3,15 @@ require 'spec/rake/spectask'
 
 task :default => :spec
 
+require 'rake/rdoctask'
+Rake::RDocTask.new do |rdoc|
+  rdoc.rdoc_dir = 'doc'
+  rdoc.title    = 'weary'
+  rdoc.main     = 'README.md'
+  rdoc.rdoc_files.include('README.*', 'lib/**/*.rb', 'LICENSE')
+  rdoc.options  << '--inline-source'
+end
+
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gemspec|
@@ -13,7 +22,6 @@ begin
     gemspec.homepage = "http://github.com/mwunsch/weary"
     gemspec.description = "The Weary need REST: a tiny DSL that makes the consumption of RESTful web services simple."
     gemspec.authors = "Mark Wunsch"
-    gemspec.has_rdoc = false
   end
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"  
@@ -35,7 +43,7 @@ begin
 
         host = "#{config['username']}@rubyforge.org"
         remote_dir = "/var/www/gforge-projects/weary/"
-        local_dir = 'rdoc'
+        local_dir = 'doc'
 
         Rake::SshDirPublisher.new(host, remote_dir, local_dir).upload
       end
