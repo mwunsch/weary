@@ -124,18 +124,21 @@ module Weary
         end
       end
       unless resource.with.nil?
-        with = %Q\[#{resource.with.collect {|x| ":#{x}"}.join(',')}]\
-        code << "unnecessary = params.keys - #{with} \n"
-        code << "unnecessary.each { |x| params.delete(x) } \n"
+        with = %Q{[#{resource.with.collect {|x| ":#{x}"}.join(',')}]}
+        code << %Q{unnecessary = params.keys - #{with} \n}
+        code << %Q{unnecessary.each { |x| params.delete(x) } \n}
       end
       if resource.via == (:post || :put)
-        code << "options[:body] = params unless params.empty? \n"
+        code << %Q{options[:body] = params unless params.empty? \n}
       else
-        code << "options[:query] = params unless params.empty? \n"
+        code << %Q{options[:query] = params unless params.empty? \n}
         code << %Q{url << "?" + options[:query].to_params unless options[:query].nil? \n}
       end
       if resource.authenticates?
         code << %Q{options[:basic_auth] = {:username => "#{@username}", :password => "#{@password}"} \n}
+      end
+      unless resource.follows_redirects?
+        code << %Q{options[:no_follow] = true \n}
       end
       code << %Q{
           Weary::Request.new(url, :#{resource.via}, options).perform
