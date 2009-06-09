@@ -1,11 +1,9 @@
 require File.join(File.dirname(__FILE__), '..', 'lib', 'weary')
-require 'pp'
 
 class Status
   extend Weary
   
-  on_domain 'http://twitter.com/statuses/'
-  format = :json
+  on_domain "http://twitter.com/statuses/"
   
   get "user_timeline",
       :requires => [:id],
