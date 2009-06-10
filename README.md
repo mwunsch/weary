@@ -52,3 +52,7 @@ So this would form a method:
 	x.foo(:id => "mwunsch", :bar => 123)
 	
 That method would return a Weary::Response object that you could then parse or examine.
+
+### Shortcuts
+
+Of course, you don't always have to use `declare_resource`; that is a little too verbose. You can also use `get`, `post`, `delete`, etc. Those do the obvious (_hint: you don't need to use the `:via` option_)
