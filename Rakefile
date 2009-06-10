@@ -22,6 +22,7 @@ begin
     gemspec.homepage = "http://github.com/mwunsch/weary"
     gemspec.description = "The Weary need REST: a tiny DSL that makes the consumption of RESTful web services simple."
     gemspec.authors = "Mark Wunsch"
+    gemspec.add_dependency('crack', '>= 0.1.2')
   end
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"  
