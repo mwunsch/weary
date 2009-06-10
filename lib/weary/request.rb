@@ -34,7 +34,7 @@ module Weary
     def method
       @http_verb
     end
-  
+    
     def perform
       req = http.request(request)
       response = Response.new(req, @http_verb)

@@ -20,7 +20,7 @@ module Weary
     def redirected?
       @raw.is_a?(Net::HTTPRedirection)
     end
-
+    
     def success?
       (200..299).include?(@code)
     end
@@ -54,6 +54,7 @@ module Weary
       end
     end
     
+    # Parse the body with Crack parsers (if XML/HTML) or Yaml parser
     def parse
       raise StandardError, "The Response has no body. #{@method.to_s.upcase} request sent." unless @body
       handle_errors
@@ -69,6 +70,7 @@ module Weary
       end
     end
     
+    # Search the body with a CSS/XPath selector with Nokogiri
     def search(selector)
       raise ArgumentError, "Search can only be used with an XML or HTML document." unless @format != (:xml || :html)
       doc = Nokogiri.parse(@body)
@@ -79,27 +81,27 @@ module Weary
       def handle_errors
         case @code
           when 301,302
-            raise HTTPError, "#{@message} to #{@raw['location']}"
+            raise RedirectionError, "#{@message} to #{@raw['location']}"
           when 200...400
             return
           when 400
-            raise HTTPError, "Failed with #{@code}: #{@message}"
+            raise BadRequest, "Failed with #{@code}: #{@message}"
           when 401
-            raise HTTPError, "Failed with #{@code}: #{@message}"
+            raise Unauthorized, "Failed with #{@code}: #{@message}"
           when 403
-            raise HTTPError, "Failed with #{@code}: #{@message}"
+            raise Forbidden, "Failed with #{@code}: #{@message}"
           when 404
-            raise HTTPError, "Failed with #{@code}: #{@message}"
+            raise NotFound, "Failed with #{@code}: #{@message}"
           when 405
-            raise HTTPError, "Failed with #{@code}: #{@message}"
+            raise MethodNotAllowed, "Failed with #{@code}: #{@message}"
           when 409
-            raise HTTPError, "Failed with #{@code}: #{@message}"
+            raise ResourceConflict, "Failed with #{@code}: #{@message}"
           when 422
-            raise HTTPError, "Failed with #{@code}: #{@message}"
+            raise UnprocessableEntity, "Failed with #{@code}: #{@message}"
           when 401...500
-            raise HTTPError, "Failed with #{@code}: #{@message}"
+            raise ClientError, "Failed with #{@code}: #{@message}"
           when 500...600
-            raise HTTPError, "Failed with #{@code}: #{@message}"
+            raise ServerError, "Failed with #{@code}: #{@message}"
           else
             raise HTTPError, "Unknown response code: #{@code}"
         end
