@@ -16,6 +16,12 @@ Browse the documentation here: [http://rdoc.info/projects/mwunsch/weary](http://
 + Crack >= 0.1.2
 + Nokogiri >= 1.3.1 (if you want to use the #search method)
 
+## Installation
+
+You do have Rubygems right?
+
+	sudo gem install weary
+
 ## How it works
 
 Create a class and `extend Weary` to give it methods to craft a resource request:
