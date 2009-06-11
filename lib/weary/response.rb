@@ -1,7 +1,7 @@
 module Weary
   class Response
   
-    attr_reader :raw, :method, :code, :message, :header, :content_type, :cookie, :body
+    attr_reader :raw, :method, :code, :message, :header, :content_type, :cookie, :body, :format
     alias mime_type content_type
     
     def initialize(http_response, http_method)
@@ -40,10 +40,6 @@ module Weary
         else
           nil
       end
-    end
-    
-    def format
-      @format
     end
     
     def follow_redirect
