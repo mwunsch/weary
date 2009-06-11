@@ -1,9 +1,10 @@
 module Weary
   class Resource
-    attr_accessor :name, :domain, :with, :requires, :via, :format, :url, :authenticates, :follows
+    attr_reader :name
+    attr_accessor :domain, :with, :requires, :via, :format, :url, :authenticates, :follows
     
     def initialize(name)
-      self.name = name
+      @name = name
       self.via = :get
       self.authenticates = false
       self.follows = true
@@ -33,21 +34,21 @@ module Weary
       pattern = pattern.gsub("<format>", @format.to_s)
       @url = pattern
     end
-
+    
     def authenticates?
-      @authenticates
+      @authenticates == true
     end
     
     def follows_redirects?
-      @follows
+      @follows == true
     end
 
     def to_hash
       {@name.to_sym => { :via => @via,
                          :with => @with,
                          :requires => @requires,
-                         :follows => @follows,
-                         :authenticates => @authenticates,
+                         :follows => follows_redirects?,
+                         :authenticates => authenticates?,
                          :format => @format,
                          :url => @url,
                          :domain => @domain}}
