@@ -42,6 +42,7 @@ module Weary
     parse_domain = URI.extract(domain)
     raise ArgumentError, 'The domain must be a URL.' if parse_domain.empty?
     @domain = parse_domain[0]
+    return @domain
   end
   
   # Sets a default format to make your Requests in.
@@ -76,66 +77,77 @@ module Weary
   # [<tt>:url</tt>] The url of the resource. You can use the same flags as #construct_url
   # [<tt>:format</tt>] The format you would like to request.
   # [<tt>:no_follow</tt>] Boolean; Set to true if you do not want to follow redirects.
-  def declare_resource(name)    
-  #  @resources ||= []
-    resource = Weary::Resource.new(name)
+  def declare(name,via = :get)
+    @resources ||= []
+    resource = prepare_resource(name,via)
     yield resource if block_given?
-    
-   # resource_hash = resource.to_hash
-   # @resource << resource.to_hash 
-   # craft_methods(r)
-   pp resource
-   return resource
+    construct(resource)
+    return resource
   end
   
   def get(name)
-    resource = Weary::Resource.new(name)
-    resource.via = :get
-    yield resource if block_given?
-    
-    pp resource
+    if block_given?
+      resource = prepare_resource(name, :get)
+      yield resource
+    else
+      resource = declare(name, :get)
+    end
+    construct(resource)
+    return resource
   end
   
   def post(name)
-    resource = Weary::Resource.new(name)
-    resource.via = :post
-    yield resource if block_given?
-    
-    pp resource
+    if block_given?
+      resource = prepare_resource(name, :post)
+      yield resource
+    else
+      resource = declare(name, :post)
+    end
+    construct(resource)
+    return resource
   end
   
   def put(name)
-    resource = Weary::Resource.new(name)
-    resource.via = :put
-    yield resource if block_given?
-    
-    pp resource
+    if block_given?
+      resource = prepare_resource(name, :put)
+      yield resource
+    else
+      resource = declare(name, :put)
+    end
+    construct(resource)
+    return resource
   end
   
   def delete(name)
-    resource = Weary::Resource.new(name)
-    resource.via = :delete
-    yield resource if block_given?
-    
-    pp resource
+    if block_given?
+      resource = prepare_resource(name, :delete)
+      yield resource
+    else
+      resource = declare(name, :delete)
+    end
+    construct(resource)
+    return resource
   end
 
   private
+  
+    def prepare_resource(name,via)
+      preparation = Weary::Resource.new(name)
+      preparation.via = via
+      preparation.format = (@default_format || :json)
+      preparation.domain = @domain
+      preparation.url = (@url_pattern || "<domain><resource>.<format>")
+      return preparation
+    end
     
-    def set_defaults(hash)
-      hash[:domain] = @domain
-      hash[:via] ||= :get
-      hash[:with] ||= []
-      hash[:with] = hash[:with] | hash[:requires] unless hash[:requires].nil?
-      hash[:format] ||= (@default_format || :json)
-      hash[:authenticates] ||= false
-      hash[:authenticates] = false if hash[:authenticates] == "false"
-      if hash[:authenticates]
+    def construct(resource)
+      if resource.authenticates?
         raise StandardError, "Can not authenticate unless username and password are defined" unless (@username && @password)
       end
-      hash[:url] ||= (@url_pattern || "<domain><resource>.<format>")
-      hash[:no_follow] ||= false
-      return hash
+      @resources ||= []      
+      @resources << resource.to_hash 
+      craft_methods(resource)
+      return resource.to_hash
     end
     
     def craft_methods(resource)
@@ -149,7 +161,7 @@ module Weary
           code << %Q{raise ArgumentError, "This resource requires parameter: ':#{required}'" unless params.has_key?(:#{required}) \n}
         end
       end
-      unless resource.with.nil?
+      unless resource.with.empty?
         with = %Q{[#{resource.with.collect {|x| ":#{x}"}.join(',')}]}
         code << %Q{unnecessary = params.keys - #{with} \n}
         code << %Q{unnecessary.each { |x| params.delete(x) } \n}
