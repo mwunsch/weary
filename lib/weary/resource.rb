@@ -8,6 +8,7 @@ module Weary
       self.authenticates = false
       self.follows = true
       self.with = []
+      self.requires
     end
         
     def with=(params)

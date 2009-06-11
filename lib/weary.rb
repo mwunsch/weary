@@ -81,7 +81,7 @@ module Weary
   def declare(name)
     resource = prepare_resource(name,:get)
     yield resource if block_given?
-    construct(resource)
+    form_resource(resource)
     return resource
   end
   alias get declare
@@ -89,21 +89,21 @@ module Weary
   def post(name)
     resource = prepare_resource(name,:post)
     yield resource if block_given?
-    construct(resource)
+    form_resource(resource)
     return resource
   end
   
   def put(name)
     resource = prepare_resource(name,:put)
     yield resource if block_given?
-    construct(resource)
+    form_resource(resource)
     return resource
   end
   
   def delete(name)
     resource = prepare_resource(name,:delete)
     yield resource if block_given?
-    construct(resource)
+    form_resource(resource)
     return resource
   end
 
@@ -118,7 +118,7 @@ module Weary
       return preparation
     end
     
-    def construct(resource)
+    def form_resource(resource)
       if resource.authenticates?
         raise StandardError, "Can not authenticate unless username and password are defined" unless (@username && @password)
       end
@@ -134,7 +134,7 @@ module Weary
           options ||= {}
           url = "#{resource.url}"
       }
-      unless resource.requires.nil?
+      unless resource.requires.empty?
         resource.requires.each do |required|
           code << %Q{raise ArgumentError, "This resource requires parameter: ':#{required}'" unless params.has_key?(:#{required}) \n}
         end
