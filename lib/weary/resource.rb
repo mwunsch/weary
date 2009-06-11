@@ -1,15 +1,19 @@
 module Weary
   class Resource
-    attr_reader :name
-    attr_accessor :domain, :with, :requires, :via, :format, :url, :authenticates, :follows
+    attr_accessor :name, :domain, :with, :requires, :via, :format, :url, :authenticates, :follows
     
     def initialize(name)
-      @name = name
+      self.name = name
       self.via = :get
       self.authenticates = false
       self.follows = true
       self.with = []
-      self.requires
+      self.requires = []
+    end
+    
+    def name=(resource_name)
+      resource_name = resource_name.to_s unless resource_name.is_a?(String)
+      @name = resource_name.downcase.strip.gsub(/\s/,'_')
     end
         
     def with=(params)
@@ -36,11 +40,19 @@ module Weary
     end
     
     def authenticates?
-      @authenticates == true
+      if @authenticates
+        true
+      else
+        false
+      end
     end
     
     def follows_redirects?
-      @follows == true
+      if @follows
+        true
+      else
+        false
+      end
     end
 
     def to_hash

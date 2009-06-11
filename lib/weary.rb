@@ -147,8 +147,10 @@ module Weary
       if resource.via == (:post || :put)
         code << %Q{options[:body] = params unless params.empty? \n}
       else
-        code << %Q{options[:query] = params unless params.empty? \n}
-        code << %Q{url << "?" + options[:query].to_params unless options[:query].nil? \n}
+        code << %Q{
+          options[:query] = params unless params.empty?
+          url << "?" + options[:query].to_params unless options[:query].nil?
+        }
       end
       if resource.authenticates?
         code << %Q{options[:basic_auth] = {:username => "#{@username}", :password => "#{@password}"} \n}
@@ -161,6 +163,7 @@ module Weary
         end
       }
       class_eval code
+      return code
     end
 
 end
