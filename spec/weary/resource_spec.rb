@@ -39,4 +39,10 @@ describe Weary::Resource do
     @test.name = "foo bar \n"
     @test.name.should == "foo_bar"
   end
+  
+  it 'should only allow specified http methods' do
+    @test.via = "Post"
+    @test.via.should == :post
+    lambda { @test.via = :foobar }.should raise_error
+  end
 end

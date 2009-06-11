@@ -15,6 +15,21 @@ module Weary
       resource_name = resource_name.to_s unless resource_name.is_a?(String)
       @name = resource_name.downcase.strip.gsub(/\s/,'_')
     end
+    
+    def via=(http_verb)
+      @via = case http_verb
+        when *Methods[:get]
+          :get
+        when *Methods[:post]
+          :post
+        when *Methods[:put]
+          :put
+        when *Methods[:delete]
+          :delete
+        else
+          raise ArgumentError, "#{http_verb} is not a supported method"
+      end
+    end
         
     def with=(params)
       unless @requires.nil?
