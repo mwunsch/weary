@@ -1,74 +1,69 @@
 module Weary
   class Resource
-    attr_reader :name, :with, :requires, :via, :format, :url
+    attr_accessor :name, :domain, :with, :requires, :via, :format, :url, :authenticates, :follows
     
-    def initialize(name,options={})
-      @domain = options[:domain]
+    def initialize(name)
       self.name = name
-      self.via = options[:via]
-      self.with = options[:with]
-      self.requires = options[:requires]
-      self.format = options[:format]
-      self.url = options[:url]
-      @authenticates = (options[:authenticates] != false)
-      @follows = (options[:no_follow] == false)
+      self.via = :get
+      self.format = :json
+      self.authenticates = false
+      self.follows = true
+      self.with = []
+      self.requires = []
     end
-    
-    def name=(resource)
-      @name = resource.to_s
-    end
-    
-    def via=(verb)
-      @via = verb
-    end
-    
+        
     def with=(params)
-      if params.empty?
-        @with = nil
+      unless @requires.nil?
+        @with = params.collect {|x| x.to_sym} | @requires
       else
-        @with = params.collect {|x| x.to_sym }
+        @with = params.collect {|x| x.to_sym}
       end
-    end
-    
-    def url=(pattern)
-      if pattern.index("<domain>")
-        raise StandardError, "Domain flag found but the domain is not defined" if @domain.nil?
-        pattern = pattern.gsub("<domain>", @domain)
-      end
-      pattern = pattern.gsub("<resource>", @name)
-      pattern = pattern.gsub("<format>", @format.to_s)
-      @url = pattern
     end
     
     def requires=(params)
-      if (params.nil? || params.empty?)
-        @requires = nil
-      else
-        @requires = params
-      end
+      @with = @with | params.collect {|x| x.to_sym}
+      @requires = params.collect {|x| x.to_sym}
     end
     
-    def format=(type)
-      @format = type
-    end
-    
-    def authenticates?
-      @authenticates
-    end
-    
-    def follows_redirects?
-      @follows
-    end
-    
-    def to_hash
-      {@name.to_sym => {:via => @via,
-                       :with => @with,
-                       :requires => @requires,
-                       :no_follow => !follows_redirects?,
-                       :authenticates => authenticates?,
-                       :format => @format,
-                       :url => @url}}
-    end
+    # def url=(pattern)
+    #   if pattern.index("<domain>")
+    #     raise StandardError, "Domain flag found but the domain is not defined" if @domain.nil?
+    #     pattern = pattern.gsub("<domain>", @domain)
+    #   end
+    #   pattern = pattern.gsub("<resource>", @name)
+    #   pattern = pattern.gsub("<format>", @format.to_s)
+    #   @url = pattern
+    # end
+    # 
+    # def requires=(params)
+    #   if (params.nil? || params.empty?)
+    #     @requires = nil
+    #   else
+    #     @requires = params
+    #   end
+    # end
+    # 
+    # def format=(type)
+    #   @format = type
+    # end
+    # 
+    # def authenticates?
+    #   @authenticates
+    # end
+    # 
+    # def follows_redirects?
+    #   @follows
+    # end
+    # 
+    # def to_hash
+    #   {@name.to_sym => {:via => @via,
+    #                    :with => @with,
+    #                    :requires => @requires,
+    #                    :no_follow => !follows_redirects?,
+    #                    :authenticates => authenticates?,
+    #                    :format => @format,
+    #                    :url => @url}}
+    # end
     
   end
 end

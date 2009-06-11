@@ -24,6 +24,7 @@ module Weary
               :put    => [:put, :PUT, /\bput\b/i],
               :delete => [:delete, :del, :DELETE, :DEL, /\bdelete\b/i],
               :head   => [:head, :HEAD, /\bhead\b/i] }
+  UserAgents = { } # will be a collection of user agent strings            
   
   # Weary::Query quickly performs a GET request on a URL and parses the request.
   def self.Query(url)
@@ -75,39 +76,52 @@ module Weary
   # [<tt>:url</tt>] The url of the resource. You can use the same flags as #construct_url
   # [<tt>:format</tt>] The format you would like to request.
   # [<tt>:no_follow</tt>] Boolean; Set to true if you do not want to follow redirects.
-  def declare_resource(resource, options={})    
-    @resources ||= []
-        
-    r = Weary::Resource.new(resource, set_defaults(options))
-    declaration = r.to_hash
+  def declare_resource(name)    
+  #  @resources ||= []
+    resource = Weary::Resource.new(name)
+    yield resource if block_given?
     
-    @resources << declaration
+   # resource_hash = resource.to_hash
+   # @resource << resource.to_hash 
+   # craft_methods(r)
+   pp resource
+   return resource
+  end
+  
+  def get(name)
+    resource = Weary::Resource.new(name)
+    resource.via = :get
+    yield resource if block_given?
     
-    craft_methods(r)
-    return declaration
+    pp resource
   end
   
-  def get(resource,options={})
-    options[:via] = :get
-    declare_resource(resource,options)
+  def post(name)
+    resource = Weary::Resource.new(name)
+    resource.via = :post
+    yield resource if block_given?
+    
+    pp resource
   end
   
-  def post(resource,options={})
-    options[:via] = :post
-    declare_resource(resource,options)
+  def put(name)
+    resource = Weary::Resource.new(name)
+    resource.via = :put
+    yield resource if block_given?
+    
+    pp resource
   end
   
-  def put(resource,options={})
-    options[:via] = :put
-    declare_resource(resource,options)
-  end
-  
-  def delete(resource,options={})
-    options[:via] = :delete
-    declare_resource(resource,options)
+  def delete(name)
+    resource = Weary::Resource.new(name)
+    resource.via = :delete
+    yield resource if block_given?
+    
+    pp resource
   end
 
   private
+    
     def set_defaults(hash)
       hash[:domain] = @domain
       hash[:via] ||= :get
