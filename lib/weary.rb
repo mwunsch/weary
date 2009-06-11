@@ -67,64 +67,42 @@ module Weary
     return nil
   end
 
-  # Define a resource.
+  # Declare a resource. Use it with a block to setup the resource
   #
-  # Options that are allowed are:
-  # [<tt>:via</tt>] Get, Post, etc. Defaults to a GET request
-  # [<tt>:with</tt>] An array of parameters that will be passed to the body or query of the request.
-  # [<tt>:requires</tt>] Members of <tt>:with</tt> that are required by the resource.
-  # [<tt>:authenticates</tt>] Boolean value; does the resource require authentication?
-  # [<tt>:url</tt>] The url of the resource. You can use the same flags as #construct_url
-  # [<tt>:format</tt>] The format you would like to request.
-  # [<tt>:no_follow</tt>] Boolean; Set to true if you do not want to follow redirects.
-  def declare(name,via = :get)
-    @resources ||= []
-    resource = prepare_resource(name,via)
+  # Methods that are understood are:
+  # [<tt>via</tt>] Get, Post, etc. Defaults to a GET request
+  # [<tt>with</tt>] An array of parameters that will be passed to the body or query of the request.
+  # [<tt>requires</tt>] Members of <tt>:with</tt> that are required by the resource.
+  # [<tt>authenticates</tt>] Boolean value; does the resource require authentication?
+  # [<tt>url</tt>] The url of the resource. You can use the same flags as #construct_url
+  # [<tt>format</tt>] The format you would like to request. Defaults to json
+  # [<tt>follows</tt>] Boolean; Does this follow redirects? Defaults to true
+  # [<tt>domain</tt>] Sets the domain you would like this individual resource to be on (if you include the domain flag in <tt>url</tt>)
+  def declare(name)
+    resource = prepare_resource(name,:get)
+    yield resource if block_given?
+    construct(resource)
+    return resource
+  end
+  alias get declare
+  
+  def post(name)
+    resource = prepare_resource(name,:post)
     yield resource if block_given?
     construct(resource)
     return resource
   end
   
-  def get(name)
-    if block_given?
-      resource = prepare_resource(name, :get)
-      yield resource
-    else
-      resource = declare(name, :get)
-    end
-    construct(resource)
-    return resource
-  end
-  
-  def post(name)
-    if block_given?
-      resource = prepare_resource(name, :post)
-      yield resource
-    else
-      resource = declare(name, :post)
-    end
-    construct(resource)
-    return resource
-  end
-  
   def put(name)
-    if block_given?
-      resource = prepare_resource(name, :put)
-      yield resource
-    else
-      resource = declare(name, :put)
-    end
+    resource = prepare_resource(name,:put)
+    yield resource if block_given?
     construct(resource)
     return resource
   end
   
   def delete(name)
-    if block_given?
-      resource = prepare_resource(name, :delete)
-      yield resource
-    else
-      resource = declare(name, :delete)
-    end
+    resource = prepare_resource(name,:delete)
+    yield resource if block_given?
     construct(resource)
     return resource
   end

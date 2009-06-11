@@ -1,13 +1,16 @@
 require File.join(File.dirname(__FILE__), '..', 'lib', 'weary')
+require 'pp'
 
-class Status
+class Test
   extend Weary
   
   on_domain "http://twitter.com/statuses/"
   
-  get "user_timeline" do |resource|
+  declare "user_timeline" do |resource|
     resource.requires = [:id]
     resource.with = [:user_id, :screen_name, :since_id, :max_id, :count, :page]
   end
-  
+    
 end
+
+pp Test.resources
