@@ -24,6 +24,11 @@ module Weary
               :put    => [:put, :PUT, /\bput\b/i],
               :delete => [:delete, :del, :DELETE, :DEL, /\bdelete\b/i],
               :head   => [:head, :HEAD, /\bhead\b/i] }
+  ContentTypes = { :json  => [:json, 'json', 'application/json', 'text/json', 'application/javascript', 'text/javascript'],
+                   :xml   => [:xml, 'xml', 'text/xml', 'application/xml'],
+                   :html  => [:html, 'html', 'text/html'],
+                   :yaml  => [:yaml, 'yaml', 'application/x-yaml', 'text/yaml'],
+                   :plain => [:plain, 'plain', 'text/plain'] }
   UserAgents = { } # will be a collection of user agent strings            
   
   # Weary::Query quickly performs a GET request on a URL and parses the request.
