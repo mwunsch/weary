@@ -30,6 +30,24 @@ module Weary
           raise ArgumentError, "#{http_verb} is not a supported method"
       end
     end
+    
+    def format=(type)
+      type = type.downcase if type.is_a?(String)
+      @format = case type
+        when *ContentTypes[:json]
+          :json
+        when *ContentTypes[:xml]
+          :xml
+        when *ContentTypes[:html]
+          :html
+        when *ContentTypes[:yaml]
+          :yaml
+        when *ContentTypes[:plain]
+          :plain
+        else
+          raise ArgumentError, "#{type} is not a recognized format."
+      end
+    end
         
     def with=(params)
       unless @requires.nil?

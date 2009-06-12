@@ -27,17 +27,15 @@ describe Weary do
   
   describe 'default format' do
     it 'can be set' do
-      @test.as_format("xml")
-      @test.instance_variable_defined?(:@default_format).should == true
+      @test.as_format(:xml)
+      @test.instance_variable_get(:@default_format).should == :xml
     end
     
-    it 'should be a symbol' do
-      @test.as_format("xml")
-      @test.instance_variable_get(:@default_format).class.should == Symbol
+    it 'should be a recognized format' do
+      @test.as_format('text/yaml')
+      @test.on_domain('http://foobar.com/')
+      @test.get('foobar').format.should == :yaml
     end
-    
-    # need to create a ContentTypes constant that contains a map of keys to restricted formats
-    it 'should be an allowed format'
   end
   
   describe 'default url pattern' do

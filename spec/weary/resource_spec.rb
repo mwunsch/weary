@@ -45,4 +45,17 @@ describe Weary::Resource do
     @test.via.should == :post
     lambda { @test.via = :foobar }.should raise_error
   end
+  
+    
+    it 'format should be a symbol' do
+      @test.format = "xml"
+      @test.format.class.should == Symbol
+    end
+    
+    it 'format should be an allowed format' do
+      @test.format = 'text/json'
+      @test.format.should == :json
+      lambda { @test.format = :foobar }.should raise_error
+    end
+  
 end

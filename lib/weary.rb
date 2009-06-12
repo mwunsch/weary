@@ -52,8 +52,8 @@ module Weary
   
   # Sets a default format to make your Requests in.
   # Defaults to JSON.
-  def as_format(format)
-    @default_format = format.to_sym
+  def as_format(format) 
+    @default_format = format
   end
   
   # Construct a URL pattern for your resources to follow.
