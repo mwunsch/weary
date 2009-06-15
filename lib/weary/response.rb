@@ -27,15 +27,15 @@ module Weary
     
     def format=(type)
       @format = case type
-        when 'text/xml', 'application/xml'
-          :xml
-        when 'application/json', 'text/json', 'application/javascript', 'text/javascript'
+        when *ContentTypes[:json]
           :json
-        when 'text/html'
+        when *ContentTypes[:xml]
+          :xml
+        when *ContentTypes[:html]
           :html
-        when 'application/x-yaml', 'text/yaml'
+        when *ContentTypes[:yaml]
           :yaml
-        when 'text/plain'
+        when *ContentTypes[:plain]
           :plain
         else
           nil
