@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{weary}
-  s.version = "0.2.1"
+  s.version = "0.2.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Mark Wunsch"]
-  s.date = %q{2009-06-12}
+  s.date = %q{2009-06-15}
   s.description = %q{The Weary need REST: a tiny DSL that makes the consumption of RESTful web services simple.}
   s.email = %q{mark@markwunsch.com}
   s.extra_rdoc_files = [
@@ -26,8 +26,13 @@ Gem::Specification.new do |s|
      "lib/weary/request.rb",
      "lib/weary/resource.rb",
      "lib/weary/response.rb",
+     "spec/fixtures/github.yml",
+     "spec/fixtures/twitter.xml",
+     "spec/fixtures/vimeo.json",
+     "spec/spec_helper.rb",
      "spec/weary/request_spec.rb",
      "spec/weary/resource_spec.rb",
+     "spec/weary/response_spec.rb",
      "spec/weary_spec.rb",
      "weary.gemspec"
   ]
@@ -38,8 +43,10 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.4}
   s.summary = %q{A little DSL for consuming RESTful web services}
   s.test_files = [
-    "spec/weary/request_spec.rb",
+    "spec/spec_helper.rb",
+     "spec/weary/request_spec.rb",
      "spec/weary/resource_spec.rb",
+     "spec/weary/response_spec.rb",
      "spec/weary_spec.rb",
      "examples/repo.rb",
      "examples/status.rb"
