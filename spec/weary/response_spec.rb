@@ -47,6 +47,11 @@ describe Weary::Response do
     test.search("status:first > id").text.should == "2186350626"
   end
   
+  it 'should use [] to parse the document' do
+    test = Weary::Response.new(mock_response(:get, 200, {'content-type' => 'text/xml'}, get_fixture("twitter.xml")), :get).parse
+    test['statuses'][0]['id'].should == "2186350626"
+  end
+  
   it 'should parse the document to a hash if we try to search a non-XMLish document' do
     test = Weary::Response.new(mock_response(:get, 200, {'content-type' => 'text/yaml'}, get_fixture("github.yml")), :get)
     test.search("foo bar").class.should == Hash

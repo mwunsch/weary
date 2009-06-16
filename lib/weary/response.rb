@@ -66,6 +66,10 @@ module Weary
       end
     end
     
+    def [](key)
+      parse[key]
+    end
+    
     # Search the body with a CSS/XPath selector with Nokogiri
     def search(selector)
       if @format == (:xml || :html)
