@@ -1,7 +1,4 @@
-require 'rubygems'
-gem 'rspec'
-require 'spec'
-require File.join(File.dirname(__FILE__), '../..', 'lib', 'weary')
+require File.join(File.dirname(__FILE__), '..', 'spec_helper')
 
 describe Weary::Request do
   
@@ -20,7 +17,15 @@ describe Weary::Request do
     test.class.should == Net::HTTP
   end
   
-  it "should follow redirects" do
-    pending "Not sure how to test this"
+  it "should perform the request and retrieve a response" do
+    test = Weary::Request.new("http://foo.bar")
+    method = test.method   
+    response = mock_response(method, 301, {'Location' => 'http://bar.foo'})
+    response.stub!(:follow_redirect).and_return mock_response(method, 200, {})
+    test.stub!(:perform).and_return(response)
+    test.perform.code.should == 301
+    test.perform.redirected?.should == true
+    test.perform.follow_redirect.code.should == 200
+    # not exactly kosher.
   end
 end
