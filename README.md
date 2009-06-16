@@ -15,12 +15,33 @@ Browse the documentation here: [http://rdoc.info/projects/mwunsch/weary](http://
 
 + Crack >= 0.1.2
 + Nokogiri >= 1.3.1 (if you want to use the #search method)
++ Rspec (for running the tests)
 
 ## Installation
 
 You do have Rubygems right?
 
 	sudo gem install weary
+	
+## Quick Start
+	
+	# http://apiwiki.twitter.com/Twitter-REST-API-Method%3A-users%C2%A0show
+	class TwitterUser
+		extend Weary
+		
+		on_domain "http://twitter.com/users/"
+		
+		get "show" do |resource|
+			resource.with = [:id, :user_id, :screen_name]
+		end
+	end
+	
+	user = TwitterUser.new
+	me = user.show(:id => "markwunsch")
+	puts me["name"]
+	
+Hey, that's me!	
+	
 
 ## How it works
 
@@ -54,6 +75,22 @@ So this would form a method:
 	x.foo(:id => "mwunsch", :bar => 123)
 	
 That method would return a Weary::Response object that you could then parse or examine.
+
+### Parsing the Body
+
+Once you make your request with the fancy method that Weary created for you, you can do stuff with what it returns...which could be a good reason you're using Weary in the first place. Let's look at the above example:
+
+	x = Foo.new
+	y = x.foo(:id => "mwunsch", :bar => 123).parse
+	y["foos"]["user"]
+	
+Weary parses with Crack. If you have some XML or HTML and want to search it with XPath or CSS selectors, you can use Nokogiri magic:
+
+	x = Foo.new
+	y = x.foo(:id => "mwunsch", :bar => 123)
+	y.search("foos > user")
+	
+If you try to #search a non-XMLesque document, Weary will just throw the selector away and use the #parse method.
 
 ### Shortcuts
 
