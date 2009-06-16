@@ -20,12 +20,22 @@ describe Weary::Request do
   it "should perform the request and retrieve a response" do
     test = Weary::Request.new("http://foo.bar")
     method = test.method   
-    response = mock_response(method, 301, {'Location' => 'http://bar.foo'})
-    response.stub!(:follow_redirect).and_return mock_response(method, 200, {})
+    response = Weary::Response.new(mock_response(method, 301, {'Location' => 'http://bar.foo'}), method)
+    test.stub!(:perform).and_return(response)
+    test.perform.code.should == 301
+    test.perform.redirected?.should == true
+  end
+  
+  it "should follow redirects" do
+    test = Weary::Request.new("http://foo.bar")
+    method = test.method   
+    response = Weary::Response.new(mock_response(method, 301, {'Location' => 'http://bar.foo'}), method)
+    response.stub!(:follow_redirect).and_return Weary::Response.new(mock_response(method, 200, {}), method)
     test.stub!(:perform).and_return(response)
     test.perform.code.should == 301
     test.perform.redirected?.should == true
     test.perform.follow_redirect.code.should == 200
     # not exactly kosher.
   end
+  
 end

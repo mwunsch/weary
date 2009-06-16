@@ -68,9 +68,12 @@ module Weary
     
     # Search the body with a CSS/XPath selector with Nokogiri
     def search(selector)
-      raise ArgumentError, "Search can only be used with an XML or HTML document." unless @format != (:xml || :html)
-      doc = Nokogiri.parse(@body)
-      doc.search(selector)
+      if @format == (:xml || :html)
+        doc = Nokogiri.parse(@body)
+        doc.search(selector)
+      else
+        parse
+      end
     end
     
     private

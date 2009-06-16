@@ -42,12 +42,13 @@ def mock_response(request_method = :get, code=200, header={}, body=nil)
   response.stub!(:body).and_return(body)
   response.stub!(:message).and_return(message)
   
-  Weary::Response.new(response, request_method)
+  response
 end
 
 def mock_request(url, method = :get, options={}, mock_header={}, mock_body=nil)
   request = Weary::Request.new(url, method, options)
-  request.stub!(:perform).and_return mock_response(method, 200, mock_header, mock_body)
+  http_response = mock_response(method, 200, mock_header, mock_body)
+  request.stub!(:perform).and_return Weary::Response.new(http_response, method)
   
   request
 end
