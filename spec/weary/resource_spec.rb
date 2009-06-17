@@ -18,6 +18,8 @@ describe Weary::Resource do
     @test.with.should == [:foo, :bar]
   end
   
+  it 'with and requires params could be a hash'
+  
   it 'authenticates? should be boolean' do
     @test.authenticates = "foobar"
     @test.authenticates?.should == true

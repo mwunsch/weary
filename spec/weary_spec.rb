@@ -6,7 +6,7 @@ describe Weary do
     @test.instance_eval { extend Weary }
   end
   
-  describe 'default domain' do
+  describe 'Default Domain' do
     it 'should be set with a url' do
       @test.on_domain 'http://twitter.com/'
       @test.domain.should == 'http://twitter.com/'
@@ -22,7 +22,7 @@ describe Weary do
     end
   end
   
-  describe 'default format' do
+  describe 'Default Format' do
     it 'can be set' do
       @test.as_format(:xml)
       @test.instance_variable_get(:@default_format).should == :xml
@@ -35,7 +35,7 @@ describe Weary do
     end
   end
   
-  describe 'default url pattern' do
+  describe 'Default URL Pattern' do
     it 'can be set' do
       @test.construct_url("<domain><resource>.<format>")
       @test.instance_variable_defined?(:@url_pattern).should == true
@@ -47,7 +47,7 @@ describe Weary do
     end
   end
   
-  describe "basic authentication credentials" do
+  describe "Basic Authentication Credentials" do
     # i want to change this to be more specific about it being
     # basic authentication
     it "should accept a username and password" do
@@ -57,7 +57,20 @@ describe Weary do
     end
   end
   
-  describe 'resource declaration' do
+  describe "Set Headers" do
+    it "should be a hash of values to pass in the Request head"
+  end
+  
+  describe "Common Request Paramaters" do
+    it "should define with/requires params that every resource inherits"
+      # #always_with && #always_requires methods will set with/requires in
+      # the prepare_resource method of Weary
+    
+    it "should be able to be a hash"
+      # new feature of Resources
+  end
+  
+  describe 'Resource Declaration' do
     before do
       @test.on_domain "http://foobar.com/"
     end

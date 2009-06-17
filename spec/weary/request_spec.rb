@@ -19,7 +19,7 @@ describe Weary::Request do
   
   it "should perform the request and retrieve a response" do
     test = Weary::Request.new("http://foo.bar")
-    method = test.method   
+    method = test.method
     response = Weary::Response.new(mock_response(method, 301, {'Location' => 'http://bar.foo'}), method)
     test.stub!(:perform).and_return(response)
     test.perform.code.should == 301
