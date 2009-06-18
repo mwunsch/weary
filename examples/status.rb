@@ -13,5 +13,5 @@ class Status
 end
 
 toots = Status.new
-recent_toot = toots.user_timeline(:id => "markwunsch", :count => 1).parse
-puts "@" + recent_toot[0]["user"]["screen_name"] + ": " + "\"#{recent_toot[0]['text']}\""
+recent_toot = toots.user_timeline(:id => "markwunsch")[0]
+puts "@" + recent_toot["user"]["screen_name"] + ": " + "\"#{recent_toot['text']}\""
