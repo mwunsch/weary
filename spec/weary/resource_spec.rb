@@ -8,6 +8,7 @@ describe Weary::Resource do
   it 'defaults to a GET request' do
     @test.via.should == :get
   end
+  
   it 'should add requirements to the "with" array' do
     @test.requires = [:foo, :bar]
     @test.with.should == [:foo, :bar]
@@ -18,7 +19,14 @@ describe Weary::Resource do
     @test.with.should == [:foo, :bar]
   end
   
-  it 'with and requires params could be a hash'
+  it 'with params could be a hash' do
+    @test.with = {:foo => "Foo", :bar => "Bar"}
+    @test.with.should == {:foo => "Foo", :bar => "Bar"}
+    @test.requires = [:id, :user]
+    @test.with.should == {:bar=>"Bar", :user => nil, :foo => "Foo", :id => nil}
+    @test.with = [:foo, :bar]
+    @test.with.should == [:foo, :bar, :id, :user]
+  end
   
   it 'authenticates? should be boolean' do
     @test.authenticates = "foobar"

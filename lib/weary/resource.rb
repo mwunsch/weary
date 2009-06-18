@@ -50,16 +50,26 @@ module Weary
     end
         
     def with=(params)
-      unless @requires.nil?
-        @with = params.collect {|x| x.to_sym} | @requires
+      if params.is_a?(Hash)
+        @requires.each { |key| params[key] = nil unless params.has_key?(key) }
+        @with = params
       else
-        @with = params.collect {|x| x.to_sym}
+        unless @requires.nil?
+          @with = params.collect {|x| x.to_sym} | @requires
+        else
+          @with = params.collect {|x| x.to_sym}
+        end
       end
     end
     
-    def requires=(params)
-      @with = @with | params.collect {|x| x.to_sym}
-      @requires = params.collect {|x| x.to_sym}
+    def requires=(params)        
+      if @with.is_a?(Hash)
+        params.each { |key| @with[key] = nil unless @with.has_key?(key) }
+        @requires = params.collect {|x| x.to_sym}
+      else
+        @with = @with | params.collect {|x| x.to_sym}
+        @requires = params.collect {|x| x.to_sym}
+      end
     end
     
     def url=(pattern)

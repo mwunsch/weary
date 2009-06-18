@@ -127,7 +127,7 @@ module Weary
       if resource.authenticates?
         raise StandardError, "Can not authenticate unless username and password are defined" unless (@username && @password)
       end
-      @resources ||= []      
+      @resources ||= []
       @resources << resource.to_hash 
       craft_methods(resource)
       return resource.to_hash
@@ -139,15 +139,34 @@ module Weary
           options ||= {}
           url = "#{resource.url}"
       }
-      unless resource.requires.empty?
-        resource.requires.each do |required|
-          code << %Q{raise ArgumentError, "This resource requires parameter: ':#{required}'" unless params.has_key?(:#{required}) \n}
+      if resource.with.is_a?(Hash)
+        hash_string = ""
+        resource.with.each_pair {|k,v| hash_string << ":#{k} => '#{v}',"}
+        code << %Q{
+          params = {#{hash_string.chop}}.delete_if {|key,value| value.empty? }.merge(params)
+        }
+      end
+      unless resource.requires.nil?
+        if resource.requires.is_a?(Array)
+          resource.requires.each do |required|
+            code << %Q{  raise ArgumentError, "This resource requires parameter: ':#{required}'" unless params.has_key?(:#{required}) \n}
+          end
+        else
+          resource.requires.each_key do |required|
+            code << %Q{  raise ArgumentError, "This resource requires parameter: ':#{required}'" unless params.has_key?(:#{required}) \n}
+          end
         end
       end
       unless resource.with.empty?
-        with = %Q{[#{resource.with.collect {|x| ":#{x}"}.join(',')}]}
-        code << %Q{unnecessary = params.keys - #{with} \n}
-        code << %Q{unnecessary.each { |x| params.delete(x) } \n}
+        if resource.with.is_a?(Array)
+          with = %Q{[#{resource.with.collect {|x| ":#{x}"}.join(',')}]}
+        else
+          with = %Q{[#{resource.with.keys.collect {|x| ":#{x}"}.join(',')}]}
+        end
+        code << %Q{ 
+          unnecessary = params.keys - #{with} 
+          unnecessary.each { |x| params.delete(x) } 
+        }
       end
       if resource.via == (:post || :put)
         code << %Q{options[:body] = params unless params.empty? \n}

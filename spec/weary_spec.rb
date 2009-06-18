@@ -62,7 +62,7 @@ describe Weary do
   end
   
   describe "Common Request Paramaters" do
-    it "should define with/requires params that every resource inherits"
+    it "should define with params that every resource inherits"
       # #always_with && #always_requires methods will set with/requires in
       # the prepare_resource method of Weary
     
