@@ -76,8 +76,8 @@ module Weary
   #
   # Methods that are understood are:
   # [<tt>via</tt>] Get, Post, etc. Defaults to a GET request
-  # [<tt>with</tt>] An array of parameters that will be passed to the body or query of the request.
-  # [<tt>requires</tt>] Members of <tt>:with</tt> that are required by the resource.
+  # [<tt>with</tt>] An array of parameters that will be passed to the body or query of the request. If you pass a hash, it will define default <tt>values</tt> for params <tt>keys</tt>
+  # [<tt>requires</tt>] Array of members of <tt>:with</tt> that are required by the resource.
   # [<tt>authenticates</tt>] Boolean value; does the resource require authentication?
   # [<tt>url</tt>] The url of the resource. You can use the same flags as #construct_url
   # [<tt>format</tt>] The format you would like to request. Defaults to json
