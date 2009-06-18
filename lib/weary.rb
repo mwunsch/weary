@@ -71,6 +71,10 @@ module Weary
     @password = password
     return nil
   end
+  
+  def always_with(params)
+    @always_with = params
+  end
 
   # Declare a resource. Use it with a block to setup the resource
   #
@@ -120,6 +124,7 @@ module Weary
       preparation.format = (@default_format || :json)
       preparation.domain = @domain
       preparation.url = (@url_pattern || "<domain><resource>.<format>")
+      preparation.with = @always_with unless @always_with.nil?
       return preparation
     end
     

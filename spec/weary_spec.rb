@@ -62,12 +62,23 @@ describe Weary do
   end
   
   describe "Common Request Paramaters" do
-    it "should define with params that every resource inherits"
-      # #always_with && #always_requires methods will set with/requires in
-      # the prepare_resource method of Weary
+    it "should define with params that every resource inherits" do
+      @test.on_domain "http://foo.bar"
+      @test.always_with [:login, :token]
+      r = @test.get "resource"
+      r.with.should == [:login, :token]
+      r.requires = [:foobar]
+      r.with.should == [:login, :token, :foobar]
+    end
     
-    it "should be able to be a hash"
-      # new feature of Resources
+    it "should be able to be a hash" do
+      @test.on_domain "http://foo.bar"
+      @test.always_with :foo => "Foo", :bar => "Bar"
+      r = @test.get "resource"
+      r.with.should == {:foo => "Foo", :bar => "Bar"}
+      r.requires = [:foobar]
+      r.with.should == {:foo => "Foo", :bar => "Bar", :foobar => nil}
+    end
   end
   
   describe 'Resource Declaration' do
