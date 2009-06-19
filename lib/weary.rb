@@ -146,7 +146,14 @@ module Weary
       }
       if resource.with.is_a?(Hash)
         hash_string = ""
-        resource.with.each_pair {|k,v| hash_string << ":#{k} => '#{v}',"}
+        resource.with.each_pair {|k,v| 
+          if k.is_a?(Symbol)
+            k_string = ":#{k}"
+          else
+            k_string = "'#{k}'"
+          end
+          hash_string << "#{k_string} => '#{v}',"
+        }
         code << %Q{
           params = {#{hash_string.chop}}.delete_if {|key,value| value.empty? }.merge(params)
         }
