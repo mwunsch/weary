@@ -73,6 +73,11 @@ module Weary
         end
         prepare.body = options[:body].is_a?(Hash) ? options[:body].to_params : options[:body] if options[:body]
         prepare.basic_auth(options[:basic_auth][:username], options[:basic_auth][:password]) if options[:basic_auth]
+        if options[:headers]
+          options[:headers].each_pair do |key, value|
+            prepare[key] = value
+          end
+        end
         prepare
       end
 
