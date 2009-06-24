@@ -76,6 +76,7 @@ module Weary
     @always_with = params
   end
   
+  # Set custom Headers for your Request
   def set_headers(headers)
     @headers = headers
   end

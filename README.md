@@ -61,12 +61,13 @@ Besides the name of the resource, you can also give `declare_resource` a block l
 
 	declare "foo" do |r|
 		r.url = "path/to/foo"
-		r.via = :post 				# defaults to :get
-		r.format = :xml 			# defaults to :json
-		r.requires = [:id, :bar] 	# an array of params that the resource requires to be in the query/body
-		r.with = [:blah]			# an array of params that you can optionally send to the resource
-		r.authenticates = false		# does the method require basic authentication? defaults to false
-		r.follows = false			# if this is set to false, the formed request will not follow redirects.
+		r.via = :post 							# defaults to :get
+		r.format = :xml 						# defaults to :json
+		r.requires = [:id, :bar] 				# an array of params that the resource requires to be in the query/body
+		r.with = [:blah]						# an array of params that you can optionally send to the resource
+		r.authenticates = false					# does the method require basic authentication? defaults to false
+		r.follows = false						# if this is set to false, the formed request will not follow redirects.
+		r.headers = {'Accept' => 'text/html'}	# send custom headers. defaults to nil.
 	end
 					
 So this would form a method:
