@@ -177,9 +177,9 @@ module Weary
       end
       unless resource.with.empty?
         if resource.with.is_a?(Array)
-          with = %Q{[#{resource.with.collect {|x| ":#{x}"}.join(',')}]}
+          with = %Q{[#{resource.with.collect {|x| x.is_a?(Symbol) ? ":#{x}" : "'#{x}'" }.join(',')}]}
         else
-          with = %Q{[#{resource.with.keys.collect {|x| ":#{x}"}.join(',')}]}
+          with = %Q{[#{resource.with.keys.collect {|x| x.is_a?(Symbol) ? ":#{x}" : "'#{x}'"}.join(',')}]}
         end
         code << %Q{ 
           unnecessary = params.keys - #{with} 
