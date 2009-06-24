@@ -58,7 +58,12 @@ describe Weary do
   end
   
   describe "Set Headers" do
-    it "should be a hash of values to pass in the Request head"
+    it "should be a hash of values to pass in the Request head" do
+      @test.on_domain "http://foo.bar"
+      @test.set_headers "Content-Type" => "text/html"
+      r = @test.get "resource"
+      r.headers.should == {"Content-Type"=>'text/html'}
+    end
   end
   
   describe "Common Request Paramaters" do

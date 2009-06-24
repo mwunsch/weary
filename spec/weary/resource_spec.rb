@@ -64,6 +64,9 @@ describe Weary::Resource do
     lambda { @test.format = :foobar }.should raise_error
   end
   
-  it 'should be able to set Headers'
+  it 'should be able to set Headers' do
+    @test.headers = {'Content-Type' => 'text/html'}
+    @test.headers.should == {'Content-Type' => 'text/html'}
+  end
   
 end

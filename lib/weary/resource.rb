@@ -1,6 +1,6 @@
 module Weary
   class Resource
-    attr_accessor :name, :domain, :with, :requires, :via, :format, :url, :authenticates, :follows
+    attr_accessor :name, :domain, :with, :requires, :via, :format, :url, :authenticates, :follows, :headers
     
     def initialize(name)
       self.name = name
@@ -106,7 +106,8 @@ module Weary
                          :authenticates => authenticates?,
                          :format => @format,
                          :url => @url,
-                         :domain => @domain}}
+                         :domain => @domain,
+                         :headers => @headers}}
     end
     
   end

@@ -75,6 +75,10 @@ module Weary
   def always_with(params)
     @always_with = params
   end
+  
+  def set_headers(headers)
+    @headers = headers
+  end
 
   # Declare a resource. Use it with a block to setup the resource
   #
@@ -125,6 +129,7 @@ module Weary
       preparation.domain = @domain
       preparation.url = (@url_pattern || "<domain><resource>.<format>")
       preparation.with = @always_with unless @always_with.nil?
+      preparation.headers = @headers unless (@headers.nil? || @headers.empty?)
       return preparation
     end
     
@@ -187,6 +192,13 @@ module Weary
           options[:query] = params unless params.empty?
           url << "?" + options[:query].to_params unless options[:query].nil?
         }
+      end
+      unless (resource.headers.nil? || resource.headers.empty?)
+        header_hash = ""
+        resource.headers.each_pair {|k,v|
+          header_hash << "'#{k}' => '#{v}',"
+        }
+        code << %Q{ options[:headers] = {#{header_hash.chop}} \n}
       end
       if resource.authenticates?
         code << %Q{options[:basic_auth] = {:username => "#{@username}", :password => "#{@password}"} \n}
