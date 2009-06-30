@@ -6,8 +6,8 @@ class Repository
   @gh_user = "mwunsch"
   @gh_repo = "weary"
   
-  on_domain "http://github.com/api/v2/"
-  as_format :yaml
+  domain "http://github.com/api/v2/"
+  format :yaml
   
   get "show" do |r|
     r.url = "<domain><format>/repos/show/#{@gh_user}/#{@gh_repo}"

@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'weary')
 class Status
   extend Weary
   
-  on_domain "http://twitter.com/statuses/"
+  domain "http://twitter.com/statuses/"
   
   get "user_timeline" do |resource|
     resource.requires = [:id]

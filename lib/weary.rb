@@ -37,18 +37,22 @@ module Weary
     req.parse
   end
   
-  attr_reader :domain, :resources
+  attr_reader :resources
   
   # Sets the domain the resource is on. 
   #
   # If the domain is not provided and you use a URL pattern that asks for it, 
   # an exception will be raised.
-  def on_domain(domain)
-    parse_domain = URI.extract(domain)
-    raise ArgumentError, 'The domain must be a URL.' if parse_domain.empty?
-    @domain = parse_domain[0]
+  def domain(dom=nil)
+    raise ArgumentError, 'No domain provided' if (dom.nil? && @domain.nil?)
+    if (!dom.nil?)
+      parse_domain = URI.extract(dom)
+      raise ArgumentError, 'The domain must be a URL.' if parse_domain.empty?
+      @domain = parse_domain[0]
+    end
     return @domain
   end
+  alias on_domain domain
   
   # Sets a default format to make your Requests in.
   # Defaults to JSON.
