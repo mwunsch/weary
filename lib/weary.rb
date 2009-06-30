@@ -52,9 +52,10 @@ module Weary
   
   # Sets a default format to make your Requests in.
   # Defaults to JSON.
-  def as_format(format) 
+  def format(format) 
     @default_format = format
   end
+  alias as_format format
   
   # Construct a URL pattern for your resources to follow.
   # You can use flags like
@@ -62,24 +63,28 @@ module Weary
   # * <format>
   # * <resource>
   # To aid your construction. Defaults to "<domain><resource>.<format>"
-  def construct_url(pattern)
+  def url(pattern)
     @url_pattern = pattern.to_s
   end
+  alias construct_url url
 
-  def authenticates_with(username,password)
+  def authenticates(username,password)
     @username = username
     @password = password
     return nil
   end
+  alias authenticates_with authenticates
   
-  def always_with(params)
+  def with(params)
     @always_with = params
   end
+  alias always_with with
   
   # Set custom Headers for your Request
-  def set_headers(headers)
+  def headers(headers)
     @headers = headers
   end
+  alias set_headers headers
 
   # Declare a resource. Use it with a block to setup the resource
   #
