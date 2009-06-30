@@ -54,10 +54,10 @@ module Weary
         @requires.each { |key| params[key] = nil unless params.has_key?(key) }
         @with = params
       else
-        unless @requires.nil?
-          @with = params.collect {|x| x.to_sym} | @requires
-        else
+        if @requires.nil?
           @with = params.collect {|x| x.to_sym}
+        else
+          @with = params.collect {|x| x.to_sym} | @requires
         end
       end
     end
