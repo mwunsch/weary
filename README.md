@@ -29,7 +29,7 @@ You do have Rubygems right?
 	class TwitterUser
 		extend Weary
 		
-		on_domain "http://twitter.com/users/"
+		domain "http://twitter.com/users/"
 		
 		get "show" do |resource|
 			resource.with = [:id, :user_id, :screen_name]
@@ -106,9 +106,9 @@ There are many ways to form URLs in Weary. You can define URLs for the entire cl
 	class Foo
 		extend Weary
 		
-		on_domain "http://foo.bar/"
-		construct_url "<domain><resource>.<format>"
-		as_format :xml
+		domain "http://foo.bar/"
+		url "<domain><resource>.<format>"
+		format :xml
 		
 		get "show_users"
 	end
