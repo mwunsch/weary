@@ -39,7 +39,8 @@ module Weary
   
   attr_reader :resources
   
-  # Sets the domain the resource is on. 
+  # Sets the domain the resource is on or use it to retrieve a domain you've already set.
+  # It's a getter and a setter. It's an attribute!
   #
   # If the domain is not provided and you use a URL pattern that asks for it, 
   # an exception will be raised.
