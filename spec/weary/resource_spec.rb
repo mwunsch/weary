@@ -35,9 +35,32 @@ describe Weary::Resource do
     @test.authenticates?.should == false
   end
   
-  it "oauth should be boolean"
-  it "oauth should override basic authentication"
-  it "access token should contain an oauth token"
+  it "oauth should be boolean" do
+    @test.oauth = "foobar"
+    @test.oauth?.should == true
+    @test.oauth = false
+    @test.oauth?.should == false    
+  end
+  
+  it "oauth should override basic authentication" do
+    @test.authenticates = true
+    @test.oauth = true
+    @test.authenticates?.should == false
+    @test.oauth?.should == true
+  end
+  
+  it "providing an access token should set oauth to true" do
+    consumer = OAuth::Consumer.new("consumer_token","consumer_secret",{:site => 'http://foo.bar'})
+    token = OAuth::AccessToken.new(consumer, "token", "secret")
+    @test.oauth = false
+    @test.access_token = token
+    @test.oauth?.should == true
+    @test.access_token.should == token
+  end
+  
+  it "an access token must contain an OAuth::AccessToken" do
+    lambda { @test.access_token = "foobar" }.should raise_error
+  end
   
   it 'follows_redirects? should be boolean' do
     @test.follows = "false"

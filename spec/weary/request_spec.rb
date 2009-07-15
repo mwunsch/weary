@@ -38,6 +38,12 @@ describe Weary::Request do
     # not exactly kosher.
   end
   
-  it "should prepare an oauth scheme if a token is provided"
+  it "should prepare an oauth scheme if a token is provided" do
+    consumer = OAuth::Consumer.new("consumer_token","consumer_secret",{:site => 'http://foo.bar'})
+    token = OAuth::AccessToken.new(consumer, "token", "secret")
+    test = Weary::Request.new("http://foo.bar", :post, {:oauth => token})
+    test.send(:request).oauth_helper.options[:token].should == token
+    # seems a good a way as any to test if OAuth helpers have been added to the request
+  end
   
 end

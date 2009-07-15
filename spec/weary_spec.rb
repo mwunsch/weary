@@ -58,10 +58,36 @@ describe Weary do
   end
   
   describe "OAuth" do
-    it "should accept an OAuth Access Token"
-    it "should notify the Resource that this is using OAuth"
-    it "should not allow a Resource to use both Basic Authentication and OAuth"
-    it "should prepare the Request to use the access token"
+    before do
+      consumer = OAuth::Consumer.new("consumer_token","consumer_secret",{:site => 'http://foo.bar'})
+      @token = OAuth::AccessToken.new(consumer, "token", "secret")
+      @test.oauth @token
+    end
+    
+    it "should accept an OAuth Access Token" do
+      @test.instance_variable_get(:@oauth).should == @token
+      lambda { @test.oauth "foobar" }.should raise_error
+    end
+    it "should notify the Resource that this is using OAuth" do
+      @test.domain "http://foo.bar"
+      r = @test.declare("show")
+      r.oauth?.should == true
+      r.access_token.should == @token
+    end
+    it "should be able to handle tokens set within the resource intelligently" do
+      test = Class.new
+      test.instance_eval { extend Weary }
+      test.domain "http://foo.bar"
+      r = test.declare("show")
+      r.oauth?.should == false
+      r.access_token.should == nil
+      r.oauth = true
+      lambda { test.send(:form_resource, r) }.should raise_error
+      r.access_token = @token
+      r.access_token.should == @token
+      test.send(:form_resource, r)[:show][:oauth].should == true
+      test.send(:form_resource, r)[:show][:access_token].should == @token
+    end
   end
   
   describe "Set Headers" do
