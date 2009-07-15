@@ -35,6 +35,10 @@ describe Weary::Resource do
     @test.authenticates?.should == false
   end
   
+  it "oauth should be boolean"
+  it "oauth should override basic authentication"
+  it "access token should contain an oauth token"
+  
   it 'follows_redirects? should be boolean' do
     @test.follows = "false"
     @test.follows_redirects?.should == true

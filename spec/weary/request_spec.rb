@@ -38,4 +38,6 @@ describe Weary::Request do
     # not exactly kosher.
   end
   
+  it "should prepare an oauth scheme if a token is provided"
+  
 end

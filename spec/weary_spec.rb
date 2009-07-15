@@ -57,6 +57,13 @@ describe Weary do
     end
   end
   
+  describe "OAuth" do
+    it "should accept an OAuth Access Token"
+    it "should notify the Resource that this is using OAuth"
+    it "should not allow a Resource to use both Basic Authentication and OAuth"
+    it "should prepare the Request to use the access token"
+  end
+  
   describe "Set Headers" do
     it "should be a hash of values to pass in the Request head" do
       @test.on_domain "http://foo.bar"
