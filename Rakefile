@@ -54,6 +54,11 @@ rescue LoadError
   puts "Rake SshDirPublisher is unavailable or your rubyforge environment is not configured."
 end
 
+desc "Open an irb session preloaded with this library"
+task :console do
+  sh "irb -rubygems -I lib -r weary.rb"
+end
+
 Spec::Rake::SpecTask.new do |t|
   t.spec_files = FileList['spec/**/*_spec.rb']
   t.spec_opts = ['--color','--format nested']
