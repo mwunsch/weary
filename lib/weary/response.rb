@@ -17,14 +17,17 @@ module Weary
       self.format = http_response.content_type
     end
     
+    # Is this an HTTP redirect?
     def redirected?
       @raw.is_a?(Net::HTTPRedirection)
     end
     
+    # Was this Request successful?
     def success?
       (200..299).include?(@code)
     end
     
+    # Returns a symbol corresponding to the Response's Content Type
     def format=(type)
       @format = case type
         when *ContentTypes[:json]
@@ -42,6 +45,7 @@ module Weary
       end
     end
     
+    # Follow the Redirect
     def follow_redirect
       if redirected?
         Request.new(@raw['location'], @method).perform
@@ -66,11 +70,13 @@ module Weary
       end
     end
     
+    # Same as parse[key]
     def [](key)
       parse[key]
     end
     
-    # Search the body with a CSS/XPath selector with Nokogiri
+    # Search the body with a CSS/XPath selector with Nokogiri.
+    # If the document is not XMLish, fall back to #parse and ditch the selector.
     def search(selector)
       if @format == (:xml || :html)
         doc = Nokogiri.parse(@body)
