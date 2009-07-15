@@ -1,6 +1,6 @@
 module Weary
   class Resource
-    attr_accessor :name, :domain, :with, :requires, :via, :format, :url, :authenticates, :follows, :headers
+    attr_accessor :name, :domain, :with, :requires, :via, :format, :url, :authenticates, :follows, :headers, :oauth, :access_token
     
     def initialize(name)
       self.name = name
@@ -9,6 +9,7 @@ module Weary
       self.follows = true
       self.with = []
       self.requires = []
+      self.oauth = false
     end
     
     def name=(resource_name)
@@ -82,12 +83,36 @@ module Weary
       @url = pattern
     end
     
-    def authenticates?
-      if @authenticates
+    def oauth=(bool)
+      @authenticates = false if bool
+      @oauth = if bool
         true
       else
         false
       end
+    end
+    
+    def authenticates=(bool)
+      @oauth = false if bool
+      @authenticates = if bool
+        true
+      else
+        false
+      end
+    end
+    
+    def authenticates?
+      @authenticates
+    end
+    
+    def oauth?
+      @oauth
+    end
+    
+    def access_token=(token)
+      raise ArgumentError, "Token needs to be an OAuth::AccessToken object" unless token.is_a?(OAuth::AccessToken)
+      @oauth = true
+      @access_token = token
     end
     
     def follows_redirects?
@@ -107,7 +132,9 @@ module Weary
                          :format => @format,
                          :url => @url,
                          :domain => @domain,
-                         :headers => @headers}}
+                         :headers => @headers,
+                         :oauth => oauth?,
+                         :access_token => @access_token}}
     end
     
   end

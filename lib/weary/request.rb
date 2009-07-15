@@ -78,6 +78,9 @@ module Weary
             prepare[key] = value
           end
         end
+        if options[:oauth]
+          options[:oauth].sign!(prepare)
+        end
         prepare
       end
 
