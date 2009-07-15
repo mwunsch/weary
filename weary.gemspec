@@ -49,7 +49,6 @@ Gem::Specification.new do |s|
      "spec/weary/resource_spec.rb",
      "spec/weary/response_spec.rb",
      "spec/weary_spec.rb",
-     "examples/oauth.rb",
      "examples/repo.rb",
      "examples/status.rb"
   ]
