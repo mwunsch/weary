@@ -8,8 +8,10 @@ require 'rubygems'
 require 'crack'
 
 gem 'nokogiri'
+gem 'oauth'
 autoload :Yaml, 'yaml'
 autoload :Nokogiri, 'nokogiri'
+autoload :OAuth, 'oauth'
 
 require 'weary/request'
 require 'weary/response'
@@ -90,6 +92,14 @@ module Weary
     @headers = headers
   end
   alias set_headers headers
+  
+  # Set the Access Token for OAuth. This must be an OAuth::AccessToken object.
+  # See http://github.com/mojodna/oauth/ to learn how to create Tokens
+  # Setting this will make resources use OAuth and this token by default.
+  def oauth(token)
+    raise ArgumentError, "Token needs to be an OAuth::AccessToken object" unless token.is_a?(OAuth::AccessToken)
+    @oauth = token
+  end
 
   # Declare a resource. Use it with a block to setup the resource
   #
@@ -98,10 +108,13 @@ module Weary
   # [<tt>with</tt>] An array of parameters that will be passed to the body or query of the request. If you pass a hash, it will define default <tt>values</tt> for params <tt>keys</tt>
   # [<tt>requires</tt>] Array of members of <tt>:with</tt> that are required by the resource.
   # [<tt>authenticates</tt>] Boolean value; does the resource require authentication?
+  # [<tt>oauth</tt>] Boolean value; does the resource use OAuth?
+  # [<tt>access_token</tt>] Provide the Token for OAuth. Must be an OAuth::AccessToken object.
   # [<tt>url</tt>] The url of the resource. You can use the same flags as #construct_url
   # [<tt>format</tt>] The format you would like to request. Defaults to json
   # [<tt>follows</tt>] Boolean; Does this follow redirects? Defaults to true
   # [<tt>domain</tt>] Sets the domain you would like this individual resource to be on (if you include the domain flag in <tt>url</tt>)
+  # [<tt>headers</tt>] Set headers for the HTTP Request
   def declare(name)
     resource = prepare_resource(name,:get)
     yield resource if block_given?
@@ -141,12 +154,22 @@ module Weary
       preparation.url = (@url_pattern || "<domain><resource>.<format>")
       preparation.with = @always_with unless @always_with.nil?
       preparation.headers = @headers unless (@headers.nil? || @headers.empty?)
+      if !@oauth.nil?
+        preparation.oauth = true
+        preparation.access_token = @oauth
+      end
       return preparation
     end
     
     def form_resource(resource)
       if resource.authenticates?
         raise StandardError, "Can not authenticate unless username and password are defined" unless (@username && @password)
+      end
+      if resource.oauth?
+        if resource.access_token.nil?
+          raise StandardError, "Access Token is not provided" if @oauth.nil?
+          resource.access_token = @oauth
+        end
       end
       @resources ||= []
       @resources << resource.to_hash 
@@ -213,6 +236,24 @@ module Weary
       end
       if resource.authenticates?
         code << %Q{options[:basic_auth] = {:username => "#{@username}", :password => "#{@password}"} \n}
+      end
+      if resource.oauth?
+        consumer_options = ""
+        resource.access_token.consumer.options.each_pair {|k,v| 
+          if k.is_a?(Symbol)
+            k_string = ":#{k}"
+          else
+            k_string = "'#{k}'"
+          end
+          if v.is_a?(Symbol)
+            v_string = ":#{v}"
+          else
+            v_string = "'#{v}'"
+          end
+          consumer_options << "#{k_string} => #{v_string},"
+        }
+        code << %Q{ oauth_consumer = OAuth::Consumer.new("#{resource.access_token.consumer.key}","#{resource.access_token.consumer.secret}",#{consumer_options.chop}) \n}
+        code << %Q{ options[:oauth] = OAuth::AccessToken.new(oauth_consumer, "#{resource.access_token.token}", "#{resource.access_token.secret}") \n}
       end
       unless resource.follows_redirects?
         code << %Q{options[:no_follow] = true \n}

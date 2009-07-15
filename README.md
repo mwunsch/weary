@@ -8,14 +8,18 @@ The things it do:
 
 + Quickly build an interface to your favorite REST API.
 + Parse XML and JSON with the [Crack](http://github.com/jnunemaker/crack) library.
++ Authenticate, basically, with Basic Authentication.
++ Consume with OAuth
 
 Browse the documentation here: [http://rdoc.info/projects/mwunsch/weary](http://rdoc.info/projects/mwunsch/weary)
+Peruse the [Wiki](http://wiki.github.com/mwunsch/weary) to discover libraries built with Weary and a more thorough review of the API.
 
 ## Requirements
 
-+ Crack >= 0.1.2
-+ Nokogiri >= 1.3.1 (if you want to use the #search method)
-+ Rspec (for running the tests)
++ [Crack](http://github.com/jnunemaker/crack) >= 0.1.2
++ [Nokogiri](http://github.com/tenderlove/nokogiri) >= 1.3.1 (if you want to use the #search method)
++ [OAuth](http://github.com/mojodna/oauth) >= 0.3.5 (if you want to use OAuth)
++ [RSpec](http://rspec.info/) (for running the tests)
 
 ## Installation
 
@@ -66,6 +70,8 @@ Besides the name of the resource, you can also give `declare_resource` a block l
 		r.requires = [:id, :bar] 				# an array of params that the resource requires to be in the query/body
 		r.with = [:blah]						# an array of params that you can optionally send to the resource
 		r.authenticates = false					# does the method require basic authentication? defaults to false
+		r.oauth = false							# does this resource use OAuth to authorize you? it's boolean
+		r.access_token = nil					# if you're using OAuth, you should provide the user's access token.
 		r.follows = false						# if this is set to false, the formed request will not follow redirects.
 		r.headers = {'Accept' => 'text/html'}	# send custom headers. defaults to nil.
 	end
@@ -117,3 +123,22 @@ The string `<domain><resource>.<format>` helps define a simple pattern for creat
 	
 If you use the `<domain>` flag but don't define a domain, an exception will be raised.
 	
+### Weary DSL
+
+You can create some defaults for all of our resources easily:
+
+	class Foo
+		extend Weary
+
+		domain "http://foo.bar/"
+		url "<domain><resource>.<format>"
+		format :xml
+		headers {'Accept' => 'text/html'}							# set headers
+		authenticates "basic_username","basic_password"				# basic authentication
+		with [:login, :token]										# params that should be sent with every request
+		oauth OAuth::AccessToken.new(consumer, "token", "secret")	# an access token for OAuth
+		
+		post "update"	# uses the defaults defined above!			
+	end
+	
+There's more to discover in the Wiki.	
