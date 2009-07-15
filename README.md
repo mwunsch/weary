@@ -9,7 +9,7 @@ The things it do:
 + Quickly build an interface to your favorite REST API.
 + Parse XML and JSON with the [Crack](http://github.com/jnunemaker/crack) library.
 + Authenticate, basically, with Basic Authentication.
-+ Consume with OAuth
++ Consume with [OAuth](http://oauth.net/)
 
 Browse the documentation here: [http://rdoc.info/projects/mwunsch/weary](http://rdoc.info/projects/mwunsch/weary)
 Peruse the [Wiki](http://wiki.github.com/mwunsch/weary) to discover libraries built with Weary and a more thorough review of the API.

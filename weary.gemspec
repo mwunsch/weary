@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{weary}
-  s.version = "0.4.3"
+  s.version = "0.5.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Mark Wunsch"]
-  s.date = %q{2009-06-30}
+  s.date = %q{2009-07-15}
   s.description = %q{The Weary need REST: a tiny DSL that makes the consumption of RESTful web services simple.}
   s.email = %q{mark@markwunsch.com}
   s.extra_rdoc_files = [
@@ -49,6 +49,7 @@ Gem::Specification.new do |s|
      "spec/weary/resource_spec.rb",
      "spec/weary/response_spec.rb",
      "spec/weary_spec.rb",
+     "examples/oauth.rb",
      "examples/repo.rb",
      "examples/status.rb"
   ]
