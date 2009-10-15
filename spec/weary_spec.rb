@@ -124,6 +124,14 @@ describe Weary do
       @test.on_domain "http://foobar.com/"
     end
     
+    it 'should have a common method for building requests' do
+      block = Proc.new { |r| r.via = :post; r.url = "http://bar.foo/name.json"}
+      test = @test.build_resource('name',:get,block)
+      test.class.should == Weary::Resource
+      test.url.should == "http://bar.foo/name.json"
+      test.via.should == :post
+    end
+    
     it 'should add a new resource' do
       @test.get "resource"
       @test.resources[0].has_key?(:resource).should == true

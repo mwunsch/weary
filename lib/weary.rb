@@ -115,31 +115,26 @@ module Weary
   # [<tt>follows</tt>] Boolean; Does this follow redirects? Defaults to true
   # [<tt>domain</tt>] Sets the domain you would like this individual resource to be on (if you include the domain flag in <tt>url</tt>)
   # [<tt>headers</tt>] Set headers for the HTTP Request
-  def declare(name)
-    resource = prepare_resource(name,:get)
-    yield resource if block_given?
-    form_resource(resource)
-    return resource
+  def declare(name,&block)
+    build_resource(name, :get, block)
   end
   alias get declare
   
-  def post(name)
-    resource = prepare_resource(name,:post)
-    yield resource if block_given?
-    form_resource(resource)
-    return resource
+  def post(name,&block)
+    build_resource(name, :post, block)
   end
   
-  def put(name)
-    resource = prepare_resource(name,:put)
-    yield resource if block_given?
-    form_resource(resource)
-    return resource
+  def put(name,&block)
+    build_resource(name, :put, block)
   end
   
-  def delete(name)
-    resource = prepare_resource(name,:delete)
-    yield resource if block_given?
+  def delete(name,&block)
+    build_resource(name, :delete, block)
+  end
+  
+  def build_resource(name,verb,block=nil)
+    resource = prepare_resource(name,verb)
+    block.call(resource) unless block.nil?
     form_resource(resource)
     return resource
   end
