@@ -138,39 +138,39 @@ module Weary
     form_resource(resource)
     return resource
   end
+  
+  def prepare_resource(name,via)
+    preparation = Weary::Resource.new(name)
+    preparation.via = via
+    preparation.format = (@default_format || :json)
+    preparation.domain = @domain
+    preparation.url = (@url_pattern || "<domain><resource>.<format>")
+    preparation.with = @always_with unless @always_with.nil?
+    preparation.headers = @headers unless (@headers.nil? || @headers.empty?)
+    if !@oauth.nil?
+      preparation.oauth = true
+      preparation.access_token = @oauth
+    end
+    return preparation
+  end
+  
+  def form_resource(resource)
+    if resource.authenticates?
+      raise StandardError, "Can not authenticate unless username and password are defined" unless (@username && @password)
+    end
+    if resource.oauth?
+      if resource.access_token.nil?
+        raise StandardError, "Access Token is not provided" if @oauth.nil?
+        resource.access_token = @oauth
+      end
+    end
+    @resources ||= []
+    @resources << resource.to_hash 
+    craft_methods(resource)
+    return resource.to_hash
+  end
 
   private
-  
-    def prepare_resource(name,via)
-      preparation = Weary::Resource.new(name)
-      preparation.via = via
-      preparation.format = (@default_format || :json)
-      preparation.domain = @domain
-      preparation.url = (@url_pattern || "<domain><resource>.<format>")
-      preparation.with = @always_with unless @always_with.nil?
-      preparation.headers = @headers unless (@headers.nil? || @headers.empty?)
-      if !@oauth.nil?
-        preparation.oauth = true
-        preparation.access_token = @oauth
-      end
-      return preparation
-    end
-    
-    def form_resource(resource)
-      if resource.authenticates?
-        raise StandardError, "Can not authenticate unless username and password are defined" unless (@username && @password)
-      end
-      if resource.oauth?
-        if resource.access_token.nil?
-          raise StandardError, "Access Token is not provided" if @oauth.nil?
-          resource.access_token = @oauth
-        end
-      end
-      @resources ||= []
-      @resources << resource.to_hash 
-      craft_methods(resource)
-      return resource.to_hash
-    end
     
     def craft_methods(resource)
       code = %Q{
