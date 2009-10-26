@@ -15,19 +15,11 @@ module Weary
     end
     
     def method=(http_verb)
-      @http_verb = case http_verb
-        when *Methods[:get]
-          :get
-        when *Methods[:post]
-          :post
-        when *Methods[:put]
-          :put
-        when *Methods[:delete]
-          :delete
-        when *Methods[:head]
-          :head
-        else
-          raise ArgumentError, "Only GET, POST, PUT, DELETE, and HEAD methods are supported"
+      verb = HTTPVerb.new(http_verb).normalize
+      if Methods.include?(verb)
+        @http_verb = verb
+      else
+        @http_verb = :get
       end
     end
     
