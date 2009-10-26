@@ -77,7 +77,8 @@ describe Weary::Resource do
   it 'should only allow specified http methods' do
     @test.via = "Post"
     @test.via.should == :post
-    lambda { @test.via = :foobar }.should raise_error
+    @test.via = :foobar
+    @test.via.should == :get
   end
 
   it 'format should be a symbol' do
