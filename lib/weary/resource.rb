@@ -18,17 +18,11 @@ module Weary
     end
     
     def via=(http_verb)
-      @via = case http_verb
-        when *Methods[:get]
-          :get
-        when *Methods[:post]
-          :post
-        when *Methods[:put]
-          :put
-        when *Methods[:delete]
-          :delete
-        else
-          raise ArgumentError, "#{http_verb} is not a supported method"
+      verb = HTTPVerb.new(http_verb).normalize
+      @via = if Methods.include?(verb)
+        verb
+      else
+        :get
       end
     end
     
