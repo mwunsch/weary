@@ -50,18 +50,9 @@ module Weary
       end
     
       def request
-        prepare = case @http_verb
-          when :get
-            Net::HTTP::Get.new(@uri.request_uri)
-          when :post
-            Net::HTTP::Post.new(@uri.request_uri)
-          when :put
-            Net::HTTP::Put.new(@uri.request_uri)
-          when :delete
-            Net::HTTP::Delete.new(@uri.request_uri)
-          when :head
-            Net::HTTP::Head.new(@uri.request_uri)
-        end
+        request_class = HTTPVerb.new(@http_verb).request_class        
+        prepare = request_class.new(@uri.request_uri)
+        
         prepare.body = options[:body].is_a?(Hash) ? options[:body].to_params : options[:body] if options[:body]
         prepare.basic_auth(options[:basic_auth][:username], options[:basic_auth][:password]) if options[:basic_auth]
         if options[:headers]
