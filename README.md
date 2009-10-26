@@ -23,7 +23,7 @@ Peruse the [Wiki](http://wiki.github.com/mwunsch/weary) to discover libraries bu
 
 ## Installation
 
-You do have Rubygems right?
+You do have Rubygems right? You do use [Gemcutter](http://gemcutter.org/), right?
 
 	sudo gem install weary
 	
