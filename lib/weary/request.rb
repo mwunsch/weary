@@ -16,10 +16,10 @@ module Weary
     
     def method=(http_verb)
       verb = HTTPVerb.new(http_verb).normalize
-      if Methods.include?(verb)
-        @http_verb = verb
+      @http_verb = if Methods.include?(verb)
+        verb
       else
-        @http_verb = :get
+        :get
       end
     end
     
