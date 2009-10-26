@@ -48,7 +48,6 @@ module Weary
         response
       end
     end
-    alias make perform
     
     private
       def http

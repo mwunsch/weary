@@ -63,7 +63,7 @@ module Weary
       end
     end
     
-    def requires=(params)        
+    def requires=(params)
       if @with.is_a?(Hash)
         params.each { |key| @with[key] = nil unless @with.has_key?(key) }
         @requires = params.collect {|x| x.to_sym}
