@@ -13,4 +13,8 @@ describe Weary::HTTPVerb do
     @test.normalize.should == :get
   end
   
+  it 'should know what net/http class to request with' do
+    @test.request_class.should == Net::HTTP::Get
+  end
+  
 end
