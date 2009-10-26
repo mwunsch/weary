@@ -22,11 +22,7 @@ require 'weary/httpverb'
 
 module Weary
   
-  Methods = { :get    => [:get, :GET, /\bget\b/i],
-              :post   => [:post, :POST, /\bpost\b/i],
-              :put    => [:put, :PUT, /\bput\b/i],
-              :delete => [:delete, :del, :DELETE, :DEL, /\bdelete\b/i],
-              :head   => [:head, :HEAD, /\bhead\b/i] }
+  Methods = [:get, :post, :put, :delete, :head]
   ContentTypes = { :json  => [:json, 'json', 'application/json', 'text/json', 'application/javascript', 'text/javascript'],
                    :xml   => [:xml, 'xml', 'text/xml', 'application/xml'],
                    :html  => [:html, 'html', 'text/html'],
