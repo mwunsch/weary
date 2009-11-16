@@ -131,5 +131,117 @@ module Weary
                          :access_token => @access_token}}
     end
     
+    def craft_methods
+      code = %Q{
+        def #{name}(params={})
+          options ||= {}
+          url = "#{url}"
+        }
+
+      if with.is_a?(Hash)
+        hash_string = ""
+        with.each_pair {|k,v| 
+          if k.is_a?(Symbol)
+            k_string = ":#{k}"
+          else
+            k_string = "'#{k}'"
+          end
+          hash_string << "#{k_string} => '#{v}',"
+        }
+        code << %Q{
+          params = {#{hash_string.chop}}.delete_if {|key,value| value.empty? }.merge(params)
+        }
+      end
+      
+      
+      unless requires.nil?
+        if requires.is_a?(Array)
+          requires.each do |required|
+            code << %Q{  raise ArgumentError, "This resource requires parameter: ':#{required}'" unless params.has_key?(:#{required}) \n}
+          end
+        else
+          requires.each_key do |required|
+            code << %Q{  raise ArgumentError, "This resource requires parameter: ':#{required}'" unless params.has_key?(:#{required}) \n}
+          end
+        end
+      end
+      
+      unless with.empty?
+        if with.is_a?(Array)
+          with_params = %Q{[#{with.collect {|x| x.is_a?(Symbol) ? ":#{x}" : "'#{x}'" }.join(',')}]}
+        else
+          with_params = %Q{[#{with.keys.collect {|x| x.is_a?(Symbol) ? ":#{x}" : "'#{x}'"}.join(',')}]}
+        end
+        code << %Q{ 
+          unnecessary = params.keys - #{with_params} 
+          unnecessary.each { |x| params.delete(x) } 
+        }
+      end
+      
+      if via == (:post || :put)
+        code << %Q{options[:body] = params unless params.empty? \n}
+      else
+        code << %Q{
+          options[:query] = params unless params.empty?
+          url << "?" + options[:query].to_params unless options[:query].nil?
+        }
+      end
+      
+      
+      unless (headers.nil? || headers.empty?)
+        header_hash = ""
+        headers.each_pair {|k,v|
+          header_hash << "'#{k}' => '#{v}',"
+        }
+        code << %Q{ options[:headers] = {#{header_hash.chop}} \n}
+      end
+      
+      
+      if authenticates?
+        code << %Q{options[:basic_auth] = {:username => "#{@username}", :password => "#{@password}"} \n}
+      end
+      
+      
+      
+      if oauth?
+        consumer_options = ""
+        access_token.consumer.options.each_pair {|k,v| 
+          if k.is_a?(Symbol)
+            k_string = ":#{k}"
+          else
+            k_string = "'#{k}'"
+          end
+          if v.is_a?(Symbol)
+            v_string = ":#{v}"
+          else
+            v_string = "'#{v}'"
+          end
+          consumer_options << "#{k_string} => #{v_string},"
+        }
+        code << %Q{ oauth_consumer = OAuth::Consumer.new("#{access_token.consumer.key}","#{access_token.consumer.secret}",#{consumer_options.chop}) \n}
+        code << %Q{ options[:oauth] = OAuth::AccessToken.new(oauth_consumer, "#{access_token.token}", "#{access_token.secret}") \n}
+      end
+      
+      
+      
+      
+      
+      
+      unless follows_redirects?
+        code << %Q{options[:no_follow] = true \n}
+      end
+      
+      
+      
+      code << %Q{
+          Weary::Request.new(url, :#{via}, options)
+      }
+      
+      
+      
+      code << "end"
+      return code
+    end
+    
   end
 end

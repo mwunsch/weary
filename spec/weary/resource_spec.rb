@@ -97,4 +97,9 @@ describe Weary::Resource do
     @test.headers.should == {'Content-Type' => 'text/html'}
   end
   
+  it 'should know how to build a method' do
+    @test.requires = [:foo, :bar]
+    puts @test.craft_methods
+  end
+  
 end
