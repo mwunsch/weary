@@ -60,7 +60,7 @@ module Weary
     "Safari 3.2.1 - Windows" => "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-us) AppleWebKit/525.27.1 (KHTML, like Gecko) Version/3.2.1 Safari/525.27.1",
     "Safari 4.0.2 - Mac" => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_7; en-us) AppleWebKit/530.19.2 (KHTML, like Gecko) Version/4.0.2 Safari/530.19",
     "Safari 4.0.2 - Windows" => "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/530.19.2 (KHTML, like Gecko) Version/4.0.2 Safari/530.19.1"
-  }     
+  }
   
   # Weary::Query quickly performs a GET request on a URL and parses the request.
   def self.Query(url)
