@@ -145,6 +145,10 @@ describe Weary::Resource do
       # yeah this needs to be divided up into more testable objects
       @test.craft_methods.class.should == String
     end
+    
+    it "merges defaults in with passed params"
+    
+    it 'uses credentials to authenticate'
   end
   
   it 'can convert to a hash' do
