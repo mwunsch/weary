@@ -129,26 +129,122 @@ describe Weary::Resource do
     end
     
     it "rejects fake url's" do
-      lambda { @test.url = "this is not really a url" }.should raise_error      
+      lambda { @test.url = "this is not really a url" }.should raise_error
     end
   end
   
-  describe 'Method' do
+  describe 'Request Builder' do
     before do
       @test.url = 'http://foo.bar'
       @test.with = :user, :message
-      @test.requires = [:id]
       @test.headers = {"User-Agent" => Weary::UserAgents["Safari 4.0.2 - Mac"]}
     end
     
-    it "prepares a method body to be eval'd" do
-      # yeah this needs to be divided up into more testable objects
-      @test.craft_methods.class.should == String
+    it "merges defaults in with passed params" do
+      params = {:message => "Hello"}
+      defaults = {:user => "me"}
+      @test.setup_parameters(params, defaults).should == {:message => "Hello", :user => "me"}
+      @test.setup_parameters(params).should == {:message => "Hello"}
     end
     
-    it "merges defaults in with passed params"
+    it 'alerts if a required param is missing' do
+      @test.requires = [:id]
+      params = {:user => "me", :message => "Hello"}
+      lambda { @test.find_missing_requirements(params) }.should raise_error
+    end
     
-    it 'uses credentials to authenticate'
+    it 'removes unnecessary parameters' do
+      params = {:message => "Hello", :user => "me", :foo => "bar"}
+      @test.remove_unnecessary_params(params).should == {:message => "Hello", :user => "me"}
+    end
+    
+    it 'prepares param options for the request' do
+      params = {:user => "me", :message => "Hello"}
+      @test.prepare_request_body(params)[:query].should == {:user => "me", :message => "Hello"}
+      @test.prepare_request_body(params).has_key?(:body).should == false
+      @test.via = :post
+      @test.prepare_request_body(params)[:body].should == {:user => "me", :message => "Hello"}
+      @test.prepare_request_body(params).has_key?(:query).should == false
+    end
+    
+    it 'alerts if credentials are missing but authorization is required' do
+      @test.authenticates = true
+      lambda { @test.setup_authentication({}) }.should raise_error
+    end
+    
+    it 'negotiates what form of authentication is used (basic or oauth)' do
+      @test.authenticates = true
+      basic_auth = {:username => "mwunsch", :password => "secret123"}
+      oauth_consumer = OAuth::Consumer.new("consumer_token","consumer_secret",{:site => 'http://foo.bar'})
+      oauth_token = OAuth::AccessToken.new(oauth_consumer, "token", "secret")
+      
+      basic_authentication = @test.setup_authentication({},basic_auth)
+      oauth_authentication = @test.setup_authentication({},oauth_token)
+      
+      basic_authentication.has_key?(:basic_auth).should == true
+      basic_authentication.has_key?(:oauth).should == false
+      basic_authentication[:basic_auth].should == basic_auth
+      
+      oauth_authentication.has_key?(:oauth).should == true
+      oauth_authentication.has_key?(:basic_auth).should == false
+      oauth_authentication[:oauth].should == oauth_token
+    end
+    
+    it 'sets request options' do
+      setup = @test.setup_options({})
+      
+      setup.has_key?(:headers).should == true
+      setup.has_key?(:no_follow).should == false
+      setup[:headers].should == @test.headers
+    end
+    
+    it 'sets redirection following options' do
+      @test.follows = false
+      setup = @test.setup_options({})
+      
+      setup[:no_follow].should == true
+    end
+    
+    it 'sets parameter body options' do
+      params = {:user => "me", :message => "Hello"}
+      setup_get = @test.setup_options({}, params)
+      
+      setup_get.has_key?(:query).should == true
+      setup_get[:query] == params
+      
+      @test.via = :post
+      setup_post = @test.setup_options({}, params)
+      
+      setup_post.has_key?(:query).should == false
+      setup_post.has_key?(:body).should == true
+      setup_post[:body].should == params      
+    end
+    
+    it 'sets up authentication options' do
+      @test.authenticates = true
+      basic_auth = {:username => "mwunsch", :password => "secret123"}
+      oauth_consumer = OAuth::Consumer.new("consumer_token","consumer_secret",{:site => 'http://foo.bar'})
+      oauth_token = OAuth::AccessToken.new(oauth_consumer, "token", "secret")
+      setup_basic = @test.setup_options({}, {}, basic_auth)
+      setup_oauth = @test.setup_options({}, {}, oauth_token)
+      
+      setup_basic[:basic_auth].should == basic_auth
+      setup_oauth[:oauth].should == oauth_token
+    end
+    
+    it 'builds a Request' do
+      @test.authenticates = true
+      @test.requires = [:id]
+      params = {:user => "me", :message => "Hello", :bar => "foo"}
+      defaults = {:id => 1234, :foo => "bar"}
+      basic_auth = {:username => "mwunsch", :password => "secret123"}
+      
+      request = @test.build!(params, defaults, basic_auth)
+      
+      request.class.should == Weary::Request
+      request.method.should == :get
+      request.options[:basic_auth].should == basic_auth
+    end
   end
   
   it 'can convert to a hash' do

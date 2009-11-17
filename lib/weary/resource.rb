@@ -49,7 +49,7 @@ module Weary
     
     # Sets whether the Resource should follow redirection. Always sets to a boolean value.
     def follows=(bool)
-      @follows = bool ? true : false
+      @follows = (bool ? true : false)
     end
     
     # Should the resource follow redirection?
@@ -69,78 +69,61 @@ module Weary
                          :follows => follows?,
                          :authenticates => authenticates?,
                          :url => url,
-                         :headers => @headers}}
+                         :headers => headers}}
     end
     
-    def craft_methods
-      code = %Q{
-        def #{name}(params={})
-          options ||= {}
-          url = "#{url.normalize}"
-          }
-            
-      code << %Q{
-          missing_requirements = #{requires.inspect} - params.keys
-          if !missing_requirements.empty?
-            raise ArgumentError, "This resource is missing required parameters: '\#{missing_requirements.inspect}'"
-          end} if requires
-      
-      code << %Q{
-          params.delete_if {|k,v| !#{with.inspect}.include?(k) }} if with
-      
-      if (via == :post || via == :put)
-        code << %Q{
-          options[:body] = params unless params.empty?}
-      else
-        code << %Q{
-          options[:query] = params unless params.empty?
-          url << "?" + options[:query].to_params if options[:query]}
-      end    
-      
-      if authenticates?
-        # handle authentication
-        # 
-        # here's what it used to look like:
-        # 
-        #         if authenticates?
-        #           code << %Q{options[:basic_auth] = {:username => "#{@username}", :password => "#{@password}"} \n}
-        #         end
-        # 
-        # 
-        # 
-        #         if oauth?
-        #           consumer_options = ""
-        #           access_token.consumer.options.each_pair {|k,v| 
-        #             if k.is_a?(Symbol)
-        #               k_string = ":#{k}"
-        #             else
-        #               k_string = "'#{k}'"
-        #             end
-        #             if v.is_a?(Symbol)
-        #               v_string = ":#{v}"
-        #             else
-        #               v_string = "'#{v}'"
-        #             end
-        #             consumer_options << "#{k_string} => #{v_string},"
-        #           }
-        #           code << %Q{ oauth_consumer = OAuth::Consumer.new("#{access_token.consumer.key}","#{access_token.consumer.secret}",#{consumer_options.chop}) \n}
-        #           code << %Q{ options[:oauth] = OAuth::AccessToken.new(oauth_consumer, "#{access_token.token}", "#{access_token.secret}") \n}
-        #         end
-        # 
+    def build!(params={}, defaults=nil, credentials=nil)
+      uri = @url
+      parameters = setup_parameters(params, defaults)
+      request_opts = setup_options({}, parameters, credentials)
+      uri.query = request_opts[:query].to_params if request_opts[:query]
+      Weary::Request.new(uri.normalize.to_s, @via, request_opts)
+    end
+    
+    def setup_parameters(params={}, defaults=nil)
+      params = defaults ? defaults.merge(params) : params
+      find_missing_requirements(params)
+      remove_unnecessary_params(params)
+    end
+    
+    def find_missing_requirements(params)
+      if (@requires && !@requires.empty?)
+        missing_requirements = @requires - params.keys
+        raise ArgumentError, "This resource is missing required parameters: '#{missing_requirements.inspect}'" unless missing_requirements.empty?
       end
-      
-      
-      code << %Q{
-          options[:no_follow]} if !follows?
-      
-      code << %Q{
-          options[:headers] = #{headers.inspect}} if !headers.blank?
-      
-      code << %Q{\n
-          Weary::Request.new(url, #{via.inspect}, options)
-          
-        end}
-      return code
+    end
+    
+    def remove_unnecessary_params(params)
+      params.delete_if {|k,v| !@with.include?(k) } if (@with && !@with.empty?)
+    end
+    
+    def setup_options(options={}, params={}, credentials=nil)
+      prepare_request_body(params, options)
+      setup_authentication(options, credentials)
+      options[:no_follow] = true if !follows?
+      options[:headers] = @headers if !@headers.blank?
+      options
+    end
+    
+    def prepare_request_body(params, options={})
+      if (@via == :post || @via == :put)
+          options[:body] = params unless params.empty?
+      else
+          options[:query] = params unless params.empty?
+      end
+      options
+    end
+    
+    def setup_authentication(options, credentials=nil)
+      if authenticates?
+        raise ArgumentError, "This resource requires authentication and no credentials were given." if credentials.blank?
+        if credentials.is_a?(OAuth::AccessToken)
+          options[:oauth] = credentials
+        else
+          options[:basic_auth] = credentials
+        end
+      end
+      options
     end
     
   end
