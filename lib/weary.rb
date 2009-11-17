@@ -19,8 +19,6 @@ require 'weary/response'
 require 'weary/resource'
 require 'weary/exceptions'
 require 'weary/httpverb'
-require 'weary/methodcrafter'
-
 
 module Weary
   
