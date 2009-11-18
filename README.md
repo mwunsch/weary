@@ -1,5 +1,10 @@
 # Weary
 
+# Please Note!
+
+**The master branch is currently undergoing heavy development. The specs will fail!!! Everything is broken!**<br />
+**I am currently revising the API and the way you build a Weary interface. This message will be down shortly. In the mean time, the README below is up to date for the most current gem: http://gemcutter.org/gems/weary**
+
 _The Weary need REST_
 
 Weary is a tiny DSL for making the consumption of RESTful web services simple. It is the little brother to [HTTParty](http://github.com/jnunemaker/httparty/ "JNunemaker's HTTParty"). It provides a thin, gossamer-like layer over the Net/HTTP library.
