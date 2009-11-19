@@ -62,6 +62,7 @@ module Weary
       @url = URI.parse(uri)
     end
     
+    # A hash representation of the Resource
     def to_hash
       {@name.to_sym => { :via => via,
                          :with => with,
@@ -72,20 +73,23 @@ module Weary
                          :headers => headers}}
     end
     
+    # Take parameters, default params, and credentials and build a Request object for this Resource
     def build!(params={}, defaults=nil, credentials=nil)
       uri = @url
       parameters = setup_parameters(params, defaults)
-      request_opts = setup_options({}, parameters, credentials)
+      request_opts = setup_options(parameters, credentials)
       uri.query = request_opts[:query].to_params if request_opts[:query]
       Weary::Request.new(uri.normalize.to_s, @via, request_opts)
     end
     
+    # Setup the parameters to make the Request with
     def setup_parameters(params={}, defaults=nil)
       params = defaults ? defaults.merge(params) : params
       find_missing_requirements(params)
       remove_unnecessary_params(params)
     end
     
+    # Search the given parameters to see if they are missing any required params
     def find_missing_requirements(params)
       if (@requires && !@requires.empty?)
         missing_requirements = @requires - params.keys
@@ -93,11 +97,14 @@ module Weary
       end
     end
     
+    # Remove params that have not been specified with #with
     def remove_unnecessary_params(params)
       params.delete_if {|k,v| !@with.include?(k) } if (@with && !@with.empty?)
     end
     
-    def setup_options(options={}, params={}, credentials=nil)
+    # Setup the options to be passed into the Request
+    def setup_options(params={}, credentials=nil)
+      options = {}
       prepare_request_body(params, options)
       setup_authentication(options, credentials)
       options[:no_follow] = true if !follows?
@@ -105,6 +112,7 @@ module Weary
       options
     end
     
+    # Prepare the Request query or body depending on the HTTP method
     def prepare_request_body(params, options={})
       if (@via == :post || @via == :put)
           options[:body] = params unless params.empty?
@@ -114,6 +122,7 @@ module Weary
       options
     end
     
+    # Prepare authentication credentials for the Request
     def setup_authentication(options, credentials=nil)
       if authenticates?
         raise ArgumentError, "This resource requires authentication and no credentials were given." if credentials.blank?

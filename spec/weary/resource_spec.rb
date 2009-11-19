@@ -207,13 +207,13 @@ describe Weary::Resource do
     
     it 'sets parameter body options' do
       params = {:user => "me", :message => "Hello"}
-      setup_get = @test.setup_options({}, params)
+      setup_get = @test.setup_options(params)
       
       setup_get.has_key?(:query).should == true
       setup_get[:query] == params
       
       @test.via = :post
-      setup_post = @test.setup_options({}, params)
+      setup_post = @test.setup_options(params)
       
       setup_post.has_key?(:query).should == false
       setup_post.has_key?(:body).should == true
@@ -225,8 +225,8 @@ describe Weary::Resource do
       basic_auth = {:username => "mwunsch", :password => "secret123"}
       oauth_consumer = OAuth::Consumer.new("consumer_token","consumer_secret",{:site => 'http://foo.bar'})
       oauth_token = OAuth::AccessToken.new(oauth_consumer, "token", "secret")
-      setup_basic = @test.setup_options({}, {}, basic_auth)
-      setup_oauth = @test.setup_options({}, {}, oauth_token)
+      setup_basic = @test.setup_options({}, basic_auth)
+      setup_oauth = @test.setup_options({}, oauth_token)
       
       setup_basic[:basic_auth].should == basic_auth
       setup_oauth[:oauth].should == oauth_token
