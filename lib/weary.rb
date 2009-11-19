@@ -30,7 +30,7 @@ module Weary
                    :plain => [:plain, 'plain', 'text/plain'] 
   }
   # A collection of User Agent strings that I stole from HURL (http://hurl.it)
-  UserAgents = { 
+  UserAgents = {
     "Firefox 1.5.0.12 - Mac" => "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.8.0.12) Gecko/20070508 Firefox/1.5.0.12",
     "Firefox 1.5.0.12 - Windows" => "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.12) Gecko/20070508 Firefox/1.5.0.12",
     "Firefox 2.0.0.12 - Mac" => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1.12) Gecko/20080201 Firefox/2.0.0.12",
