@@ -1,10 +1,5 @@
 # Weary
 
-# Please Note!
-
-**The master branch is currently undergoing heavy development. The specs will fail!!! Everything is broken!**<br />
-**I am currently revising the API and the way you build a Weary interface. This message will be down shortly. In the mean time, the README below is up to date for the most current gem: http://gemcutter.org/gems/weary**
-
 _The Weary need REST_
 
 Weary is a tiny DSL for making the consumption of RESTful web services simple. It is the little brother to [HTTParty](http://github.com/jnunemaker/httparty/ "JNunemaker's HTTParty"). It provides a thin, gossamer-like layer over the Net/HTTP library.
@@ -22,7 +17,6 @@ Peruse the [Wiki](http://wiki.github.com/mwunsch/weary) to discover libraries bu
 ## Requirements
 
 + [Crack](http://github.com/jnunemaker/crack) >= 0.1.2
-+ [Nokogiri](http://github.com/tenderlove/nokogiri) >= 1.3.1 (if you want to use the #search method)
 + [OAuth](http://github.com/mojodna/oauth) >= 0.3.5 (if you want to use OAuth)
 + [RSpec](http://rspec.info/) (for running the tests)
 
@@ -30,13 +24,12 @@ Peruse the [Wiki](http://wiki.github.com/mwunsch/weary) to discover libraries bu
 
 You do have Rubygems right? You do use [Gemcutter](http://gemcutter.org/), right?
 
-	sudo gem install weary
+	gem install weary
 	
 ## Quick Start
 	
 	# http://apiwiki.twitter.com/Twitter-REST-API-Method%3A-users%C2%A0show
-	class TwitterUser
-		extend Weary
+	class TwitterUser < Weary::Base
 		
 		domain "http://twitter.com/users/"
 		
@@ -46,7 +39,7 @@ You do have Rubygems right? You do use [Gemcutter](http://gemcutter.org/), right
 	end
 	
 	user = TwitterUser.new
-	me = user.show(:id => "markwunsch")
+	me = user.show(:id => "markwunsch").perform
 	puts me["name"]
 	
 Hey, that's me!	
@@ -54,10 +47,9 @@ Hey, that's me!
 
 ## How it works
 
-Create a class and `extend Weary` to give it methods to craft a resource request:
+Create a class that inherits from `Weary::Base` to give it methods to craft a resource request:
 
-	class Foo
-		extend Weary
+	class Foo < Weary::Base
 		
 		declare "foo" do |resource|
 			resource.url = "http://path/to/foo"
@@ -71,12 +63,9 @@ Besides the name of the resource, you can also give `declare_resource` a block l
 	declare "foo" do |r|
 		r.url = "path/to/foo"
 		r.via = :post 							# defaults to :get
-		r.format = :xml 						# defaults to :json
 		r.requires = [:id, :bar] 				# an array of params that the resource requires to be in the query/body
 		r.with = [:blah]						# an array of params that you can optionally send to the resource
-		r.authenticates = false					# does the method require basic authentication? defaults to false
-		r.oauth = false							# does this resource use OAuth to authorize you? it's boolean
-		r.access_token = nil					# if you're using OAuth, you should provide the user's access token.
+		r.authenticates = false					# does the method require authentication? defaults to false
 		r.follows = false						# if this is set to false, the formed request will not follow redirects.
 		r.headers = {'Accept' => 'text/html'}	# send custom headers. defaults to nil.
 	end
@@ -86,64 +75,65 @@ So this would form a method:
 	x = Foo.new
 	x.foo(:id => "mwunsch", :bar => 123)
 	
-That method would return a Weary::Response object that you could then parse or examine.
+That method would return a `Weary::Request` object. Use the `perform` method and get a `Weary::Response` that you could parse and/or examine.
 
 ### Parsing the Body
 
 Once you make your request with the fancy method that Weary created for you, you can do stuff with what it returns...which could be a good reason you're using Weary in the first place. Let's look at the above example:
 
 	x = Foo.new
-	y = x.foo(:id => "mwunsch", :bar => 123).parse
+	y = x.foo(:id => "mwunsch", :bar => 123).perform.parse
 	y["foos"]["user"]
 	
-Weary parses with Crack. If you have some XML or HTML and want to search it with XPath or CSS selectors, you can use Nokogiri magic:
+Weary parses with Crack, but you're not beholden to it. You can get the raw Request body to have your way with:
 
 	x = Foo.new
-	y = x.foo(:id => "mwunsch", :bar => 123)
-	y.search("foos > user")
+	y = x.foo(:id => "mwunsch", :bar => 123).perform
+	Nokogiri.parse(y.body)
 	
-If you try to #search a non-XMLesque document, Weary will just throw the selector away and use the #parse method.
+*note: Weary used to have Nokogiri built in, using the `#search` method, but that was dropped.*	
 
 ### Shortcuts
 
 Of course, you don't always have to use `declare`; that is a little too ambiguous. You can also use `get`, `post`, `delete`, etc. Those do the obvious.
 
-The `#requires` and `#with` methods can either be arrays of symbols, or a comma delimited list of strings.
-
 ### Forming URLs
 
 There are many ways to form URLs in Weary. You can define URLs for the entire class by typing:
 
-	class Foo
-		extend Weary
+	class Foo < Weary::Base
 		
 		domain "http://foo.bar/"
-		url "<domain><resource>.<format>"
 		format :xml
 		
 		get "show_users"
 	end
 	
-The string `<domain><resource>.<format>` helps define a simple pattern for creating URLs. These will be filled in by your resource declaration. The above `get` declaration creates a url that looks like: *http://foo.bar/show_users.xml*
-	
-If you use the `<domain>` flag but don't define a domain, an exception will be raised.
+If you don't supply a url when declaring the Resource, Weary will look to see if you've defined a domain, and will make a url for you. The above `get` declaration creates a url that looks like: *http://foo.bar/show_users.xml*
 	
 ### Weary DSL
 
 You can create some defaults for all of our resources easily:
 
-	class Foo
-		extend Weary
+	class Foo < Weary::Base
+	
+		def initialize(username,password)
+			self.credentials username,password	#basic authentication
+			self.defaults = {:user => username}	#parameters that will be passed in every request	 
+		end
 
 		domain "http://foo.bar/"
-		url "<domain><resource>.<format>"
 		format :xml
-		headers {'Accept' => 'text/html'}							# set headers
-		authenticates "basic_username","basic_password"				# basic authentication
-		with [:login, :token]										# params that should be sent with every request
-		oauth OAuth::AccessToken.new(consumer, "token", "secret")	# an access token for OAuth
+		headers {'Accept' => 'text/html'}	# set headers
 		
-		post "update"	# uses the defaults defined above!			
+		post "update" {|r| r.authenticates = true}	# uses the defaults defined above!			
 	end
+	
+Then you can do something like this:
+
+	f = Foo.new('me','secretz')
+	f.update
+	
+Which will create a Request for *http://foo.bar/update.xml* that will authenticate you, using basic authentication, with the username/password of "me"/"secrets" and will send the parameter {:user => "me"}. Eased
 	
 There's more to discover in the Wiki.	
