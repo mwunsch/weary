@@ -1,7 +1,6 @@
 require File.join(File.dirname(__FILE__), '..', 'lib', 'weary')
 
-class Status
-  extend Weary
+class Status < Weary::Base
   
   domain "http://twitter.com/statuses/"
   
@@ -13,5 +12,5 @@ class Status
 end
 
 toots = Status.new
-recent_toot = toots.user_timeline(:id => "markwunsch")[0]
+recent_toot = toots.user_timeline(:id => "markwunsch").perform[0]
 puts "@" + recent_toot["user"]["screen_name"] + ": " + "\"#{recent_toot['text']}\""
