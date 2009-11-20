@@ -27,13 +27,13 @@ module Weary
     
     # Optional params. Should be an array. Merges with requires if that is set.
     def with=(params)
-      @with = params.collect {|x| x.to_sym}
+      @with = [params].flatten.collect {|x| x.to_sym}
       @with = (requires | @with) if requires
     end
     
     # Required params. Should be an array. Merges with `with` or sets `with`.
     def requires=(params)
-      @requires = params.collect {|x| x.to_sym}
+      @requires = [params].flatten.collect {|x| x.to_sym}
       with ? @with = (with | @requires) : (@with = @requires)
     end
     
@@ -115,9 +115,9 @@ module Weary
     # Prepare the Request query or body depending on the HTTP method
     def prepare_request_body(params, options={})
       if (@via == :post || @via == :put)
-          options[:body] = params unless params.empty?
+          options[:body] = params unless params.blank?
       else
-          options[:query] = params unless params.empty?
+          options[:query] = params unless params.blank?
       end
       options
     end
