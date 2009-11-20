@@ -2,7 +2,38 @@ module Weary
   class Interface
     @@resources = {}
     
-    attr_accessor :credentials, :defaults
+    attr_accessor :defaults
+    
+    # Assign credentials to be used when authenticating to a Resource.
+    # Can be a username/password combo, or an OAuth::AccessToken
+    def credentials(username,password='')
+      if username.is_a?(OAuth::AccessToken)
+        @credentials = username
+      else
+        @credentials = {:username => username, :password => password}
+      end
+    end
+    
+    # Each Weary::Base object has its own set of Resources
+    def resources
+      @resources = Marshal.load(Marshal.dump(@@resources)) if !@resources
+      @resources
+    end
+    
+    # Make changes to a Resource given and rebuild the Request method for this object
+    def modify_resource(name)
+      yield resources[name] if block_given?
+      rebuild_method(resources[name])
+    end
+    
+    # Rebuild the Request Method for a given Resource. This only affects the current instance.
+    def rebuild_method(resource)
+      instance_eval %Q{
+        def #{resource.name}(params={})
+          resources[:#{resource.name}].build!(params, @defaults, @credentials)
+        end
+      }
+    end
     
     class << self
       
@@ -63,6 +94,7 @@ module Weary
         resource = prepare_resource(name,verb)
         block.call(resource) if block
         store_resource(resource)
+        build_method(resource)
         resource
       end
       
@@ -81,6 +113,7 @@ module Weary
         resource
       end
       
+      # Build a method to form a Request for the given Resource
       def build_method(resource)
         define_method resource.name.to_sym do |*args|
           args.blank? ? params = {} : params = args[0]
