@@ -1,5 +1,5 @@
 module Weary
-  class Interface
+  class Base
     @@resources = {}
     
     attr_accessor :defaults

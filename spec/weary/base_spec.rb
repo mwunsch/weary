@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), '..', 'spec_helper')
 
-describe Weary::Interface do
+describe Weary::Base do
   describe 'Class' do
     
     describe 'Resource Defaults' do
@@ -9,24 +9,24 @@ describe Weary::Interface do
       end
       
       it 'sets default headers' do
-        test = Class.new(Weary::Interface)
+        test = Class.new(Weary::Base)
         test.headers @headers
         test.instance_variable_get(:@headers).should == @headers
       end
       
       it "sets a domain to be used in default url's" do
-        test = Class.new(Weary::Interface)
+        test = Class.new(Weary::Base)
         test.domain 'http://github.com'
         test.instance_variable_get(:@domain).should == 'http://github.com/'
       end
       
       it 'panics when a domain that is not a url is given' do
-        test = Class.new(Weary::Interface)
+        test = Class.new(Weary::Base)
         lambda { test.domain 'foobar' }.should raise_error
       end
       
       it "sets a format to use in default url's" do
-        test = Class.new(Weary::Interface)
+        test = Class.new(Weary::Base)
         test.format(:json)
         test.instance_variable_get(:@format).should == :json
       end
@@ -35,7 +35,7 @@ describe Weary::Interface do
     describe 'Resource Preparation' do
       before do
         @headers = {"User-Agent" => Weary::UserAgents["Safari 4.0.2 - Mac"]}
-        prepTest = Class.new(Weary::Interface)
+        prepTest = Class.new(Weary::Base)
         prepTest.headers @headers
         prepTest.domain 'http://foobar.com'
         prepTest.format :xml
@@ -63,21 +63,21 @@ describe Weary::Interface do
       end
       
       it 'builds a default url with a json extension if no format is explicitly named' do
-        t = Class.new(Weary::Interface)
+        t = Class.new(Weary::Base)
         t.domain 'http://foobar.com'
         p = t.prepare_resource("test",:get)
         p.url.normalize.to_s.should == 'http://foobar.com/test.json'
       end
       
       it 'ignores the url if no domain is provided' do
-        t = Class.new(Weary::Interface).prepare_resource("test",:get)
+        t = Class.new(Weary::Base).prepare_resource("test",:get)
         t.url.should == nil        
       end
       
       it 'builds a default url following a pattern if a pattern is provided'  
       
       it 'ignores headers if no headers are defined' do
-        t = Class.new(Weary::Interface).prepare_resource("test",:get)
+        t = Class.new(Weary::Base).prepare_resource("test",:get)
         t.headers.should == nil
       end
     end
@@ -85,7 +85,7 @@ describe Weary::Interface do
     describe 'Resource Storage' do
       before do
         @headers = {"User-Agent" => Weary::UserAgents["Safari 4.0.2 - Mac"]}
-        @restest = Class.new(Weary::Interface)
+        @restest = Class.new(Weary::Base)
         @restest.headers @headers
         @restest.domain 'http://foobar.com'
         @r = @restest.prepare_resource("test",:get)
@@ -103,7 +103,7 @@ describe Weary::Interface do
     
     describe 'Resource Construction' do
       before do
-        @contest = Class.new(Weary::Interface)
+        @contest = Class.new(Weary::Base)
         @contest.domain 'http://foobar.com'
       end
       
@@ -132,7 +132,7 @@ describe Weary::Interface do
     
     describe 'Resource Declaration' do
       before do
-        @dectest = Class.new(Weary::Interface)
+        @dectest = Class.new(Weary::Base)
         @dectest.domain 'http://foobar.com'
       end
       
@@ -174,7 +174,7 @@ describe Weary::Interface do
     
     describe 'Method Building' do
       before do
-        @methtest = Class.new(Weary::Interface)
+        @methtest = Class.new(Weary::Base)
         @methtest.domain 'http://foobar.com'
         
         r = @methtest.prepare_resource("method_test",:get)
@@ -230,7 +230,7 @@ describe Weary::Interface do
   
   describe 'Object' do
     before do
-      @klass = Class.new(Weary::Interface)
+      @klass = Class.new(Weary::Base)
       @klass.domain 'http://foobar.com'
       @klass.format :xml
       @klass.headers({"User-Agent" => Weary::UserAgents["Safari 4.0.2 - Mac"]})

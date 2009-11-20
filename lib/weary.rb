@@ -19,7 +19,7 @@ require 'weary/response'
 require 'weary/resource'
 require 'weary/exceptions'
 require 'weary/httpverb'
-require 'weary/interface'
+require 'weary/base'
 
 module Weary
   
