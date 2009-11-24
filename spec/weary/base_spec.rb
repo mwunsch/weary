@@ -73,9 +73,7 @@ describe Weary::Base do
         t = Class.new(Weary::Base).prepare_resource("test",:get)
         t.url.should == nil        
       end
-      
-      it 'builds a default url following a pattern if a pattern is provided'  
-      
+            
       it 'ignores headers if no headers are defined' do
         t = Class.new(Weary::Base).prepare_resource("test",:get)
         t.headers.should == nil
@@ -280,7 +278,7 @@ describe Weary::Base do
     it 'has a list of resources' do
       obj = @klass.new
       
-      obj.resources.count.should == @klass.resources.count
+      obj.resources == @klass.resources
     end
     
     it 'should keep its resources separate' do
