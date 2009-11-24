@@ -134,6 +134,6 @@ Then you can do something like this:
 	f = Foo.new('me','secretz')
 	f.update
 	
-Which will create a Request for *http://foo.bar/update.xml* that will authenticate you, using basic authentication, with the username/password of "me"/"secrets" and will send the parameter {:user => "me"}. Eased
+Which will create a POST Request for *http://foo.bar/update.xml* that will authenticate you, using basic authentication, with the username/password of "me"/"secrets" and will send the parameter `{:user => "me"}`. Easy.
 	
 There's more to discover in the Wiki.	
