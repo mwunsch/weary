@@ -75,17 +75,6 @@ module Weary
       parse[key]
     end
     
-    # Search the body with a CSS/XPath selector with Nokogiri.
-    # If the document is not XMLish, fall back to #parse and ditch the selector.
-    def search(selector)
-      if @format == (:xml || :html)
-        doc = Nokogiri.parse(@body)
-        doc.search(selector)
-      else
-        parse
-      end
-    end
-    
     private
       def handle_errors
         case @code

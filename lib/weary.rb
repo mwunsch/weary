@@ -11,7 +11,6 @@ require 'crack'
 gem 'nokogiri'
 gem 'oauth'
 autoload :Yaml, 'yaml'
-autoload :Nokogiri, 'nokogiri'
 autoload :OAuth, 'oauth'
 
 require 'weary/request'

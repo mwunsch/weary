@@ -42,20 +42,9 @@ describe Weary::Response do
     test.parse["repository"][:name].should == "rails"
   end
   
-  it 'should be able to search XML or HTML with Nokogiri' do
-    test = Weary::Response.new(mock_response(:get, 200, {'content-type' => 'text/xml'}, get_fixture("twitter.xml")), :get)
-    test.search("status:first > id").text.should == "2186350626"
-  end
-  
   it 'should use [] to parse the document' do
     test = Weary::Response.new(mock_response(:get, 200, {'content-type' => 'text/xml'}, get_fixture("twitter.xml")), :get).parse
     test['statuses'][0]['id'].should == "2186350626"
-  end
-  
-  it 'should parse the document to a hash if we try to search a non-XMLish document' do
-    test = Weary::Response.new(mock_response(:get, 200, {'content-type' => 'text/yaml'}, get_fixture("github.yml")), :get)
-    test.search("foo bar").class.should == Hash
-    test.search("foo bar")["repository"][:name].should == "rails"
   end
   
   it 'should raise an exception if there was a Server Error' do
