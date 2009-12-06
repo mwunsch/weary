@@ -3,7 +3,6 @@ $:.unshift(File.dirname(__FILE__))
 require 'uri'
 require 'net/http'
 require 'net/https'
-require 'set'
 
 require 'rubygems'
 require 'crack'
@@ -22,7 +21,7 @@ require 'weary/base'
 
 module Weary
   
-  Methods = Set[:get, :post, :put, :delete, :head]
+  Methods = [:get, :post, :put, :delete, :head]
   ContentTypes = { :json  => [:json, 'json', 'application/json', 'text/json', 'application/javascript', 'text/javascript'],
                    :xml   => [:xml, 'xml', 'text/xml', 'application/xml'],
                    :html  => [:html, 'html', 'text/html'],
