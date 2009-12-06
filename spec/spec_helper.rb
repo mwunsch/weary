@@ -1,6 +1,8 @@
+$LOAD_PATH.unshift File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
+
 require 'rubygems'
 require 'spec'
-require File.join(File.dirname(__FILE__), '..', 'lib', 'weary')
+require 'weary'
 
 def get_fixture(filename)
   open(File.join(File.dirname(__FILE__), 'fixtures', "#{filename.to_s}")).read

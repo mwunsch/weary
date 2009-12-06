@@ -1,16 +1,11 @@
-$:.unshift(File.dirname(__FILE__))
-
 require 'uri'
 require 'net/http'
 require 'net/https'
 
-require 'rubygems'
 require 'crack'
+require 'oauth'
 
-gem 'nokogiri'
-gem 'oauth'
 autoload :Yaml, 'yaml'
-autoload :OAuth, 'oauth'
 
 require 'weary/request'
 require 'weary/response'

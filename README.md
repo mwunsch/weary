@@ -17,7 +17,7 @@ Peruse the [Wiki](http://wiki.github.com/mwunsch/weary) to discover libraries bu
 ## Requirements
 
 + [Crack](http://github.com/jnunemaker/crack) >= 0.1.2
-+ [OAuth](http://github.com/mojodna/oauth) >= 0.3.5 (if you want to use OAuth)
++ [OAuth](http://github.com/mojodna/oauth) >= 0.3.5
 + [RSpec](http://rspec.info/) (for running the tests)
 
 ## Installation
