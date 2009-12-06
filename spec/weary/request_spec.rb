@@ -17,6 +17,7 @@ describe Weary::Request do
     test.class.should == Net::HTTP
   end
   
+  # replace with FakeWeb
   it "should perform the request and retrieve a response" do
     test = Weary::Request.new("http://foo.bar")
     method = test.method
@@ -26,6 +27,7 @@ describe Weary::Request do
     test.perform.redirected?.should == true
   end
   
+  # replace with FakeWeb
   it "should follow redirects" do
     test = Weary::Request.new("http://foo.bar")
     method = test.method   
