@@ -1,4 +1,6 @@
-require File.join(File.dirname(__FILE__), '..', 'lib', 'weary')
+$LOAD_PATH.unshift File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
+require 'rubygems'
+require 'weary'
 
 class Repository < Weary::Base
   
