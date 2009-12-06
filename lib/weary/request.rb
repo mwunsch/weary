@@ -30,15 +30,11 @@ module Weary
     def perform
       req = http.request(request)
       response = Response.new(req, @http_verb)
-      unless options[:no_follow]
-        if response.redirected?
-          response.follow_redirect
-        else
-          response
-        end
-      else
-        response
+      if response.redirected?
+        return response if options[:no_follow]
+        response.follow_redirect
       end
+      response
     end
     
     private
