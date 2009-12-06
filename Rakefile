@@ -23,6 +23,7 @@ begin
     gemspec.description = "The Weary need REST: a tiny DSL that makes the consumption of RESTful web services simple."
     gemspec.authors = "Mark Wunsch"
     gemspec.add_dependency('crack', '>= 0.1.2')
+    gemspec.add_dependency('oauth', '>= 0.3.5')
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
