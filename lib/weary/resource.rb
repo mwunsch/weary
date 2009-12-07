@@ -79,7 +79,7 @@ module Weary
       parameters = setup_parameters(params, defaults)
       request_opts = setup_options(parameters, credentials)
       uri.query = request_opts[:query].to_params if request_opts[:query]
-      Weary::Request.new(uri.normalize.to_s, @via, request_opts)
+      Request.new(uri.normalize.to_s, @via, request_opts)
     end
     
     # Setup the parameters to make the Request with
