@@ -16,8 +16,7 @@ module Weary
     
     # Each Weary::Base object has its own set of Resources
     def resources
-      @resources = Marshal.load(Marshal.dump(@@resources)) if !@resources
-      @resources
+      @resources ||= Marshal.load(Marshal.dump(@@resources))
     end
     
     # Make changes to a Resource given and rebuild the Request method for this object
