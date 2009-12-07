@@ -2,12 +2,18 @@ module Weary
   class Request
     
     attr_reader :uri
-    attr_accessor :options
+    attr_accessor :options, :credentials, :with
   
     def initialize(url, http_verb= :get, options={})
       self.method = http_verb
       self.uri = url
       self.options = options
+      self.credentials = {:username => options[:basic_auth][:username], 
+                          :password => options[:basic_auth][:password]} if options[:basic_auth]
+      self.credentials = options[:oauth] if options[:oauth]
+      if (options[:body])
+        self.with = (options[:body].respond_to?(:to_params) ? options[:body].to_params : options[:body])
+      end
     end
   
     def uri=(url)

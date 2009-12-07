@@ -48,4 +48,25 @@ describe Weary::Request do
     # seems a good a way as any to test if OAuth helpers have been added to the request
   end
   
+  it 'set the credentials to basic authentication' do
+    basic_auth = {:username => 'mark', :password => 'secret'}
+    test = Weary::Request.new("http://foo.bar", :get, {:basic_auth => basic_auth})
+    test.credentials.should == basic_auth
+  end
+  
+  it 'sets the credentials to an oauth token' do
+    consumer = OAuth::Consumer.new("consumer_token","consumer_secret",{:site => 'http://foo.bar'})
+    token = OAuth::AccessToken.new(consumer, "token", "secret")
+    test = Weary::Request.new("http://foo.bar", :post, {:oauth => token})
+    test.credentials.should == token
+  end
+  
+  it 'sets the body params' do
+    body = {:options => "something"}
+    test = Weary::Request.new("http://foo.bar", :post, {:body => body})
+    test.with.should == body.to_params
+    test2 = Weary::Request.new("http://foo.bar", :post, {:body => body.to_params})
+    test2.with.should == body.to_params
+  end
+  
 end
