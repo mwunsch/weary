@@ -21,8 +21,7 @@ module Weary
                    :xml   => [:xml, 'xml', 'text/xml', 'application/xml'],
                    :html  => [:html, 'html', 'text/html'],
                    :yaml  => [:yaml, 'yaml', 'application/x-yaml', 'text/yaml'],
-                   :plain => [:plain, 'plain', 'text/plain'] 
-  }
+                   :plain => [:plain, 'plain', 'text/plain'] }
   # A collection of User Agent strings that I stole from HURL (http://hurl.it)
   UserAgents = {
     "Firefox 1.5.0.12 - Mac" => "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.8.0.12) Gecko/20070508 Firefox/1.5.0.12",
@@ -57,8 +56,7 @@ module Weary
   
   # Weary::Query quickly performs a GET request on a URL and parses the request.
   def self.Query(url)
-    req = Weary::Request.new(url, :get).perform
-    req.parse
+    Weary::Request.new(url, :get).perform.parse
   end
   
 end
