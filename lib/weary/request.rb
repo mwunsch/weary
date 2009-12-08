@@ -14,7 +14,10 @@ module Weary
         self.with = options[:body]
       end
       self.headers = options[:headers] if options[:headers]
-      self.follows = options[:no_follow] ? false : true
+      self.follows = true
+      if options.has_key?(:no_follow)
+        self.follows = options[:no_follow] ? false : true
+      end
     end
   
     def uri=(url)
@@ -57,15 +60,19 @@ module Weary
       @follows
     end
     
-    def perform
+    def perform(callback=nil,&block)
+      @on_complete = block || callback
       req = http.request(request)
       response = Response.new(req, @http_verb)
       if response.redirected?
-        return response if options[:no_follow]
-        response.follow_redirect
+        return response.follow_redirect(block) if follows?
       end
+      yield response if block_given?
+      callback.call(response) if callback
       response
     end
+    # Don't like this
+    
     
     def http
       connection = Net::HTTP.new(uri.host, uri.port)

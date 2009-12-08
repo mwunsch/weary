@@ -16,6 +16,7 @@ module Weary
       @body = http_response.body
       self.format = http_response.content_type
     end
+    #instead of passing http_method, should pass entire Request object
     
     # Is this an HTTP redirect?
     def redirected?
@@ -46,13 +47,14 @@ module Weary
     end
     
     # Follow the Redirect
-    def follow_redirect
+    def follow_redirect(block=nil)
       if redirected?
-        Request.new(@raw['location'], @method).perform
+        Request.new(@raw['location'], @method).perform(block)
       else
         nil
       end
     end
+    # Don't like this
     
     # Parse the body with Crack parsers (if XML/HTML) or Yaml parser
     def parse

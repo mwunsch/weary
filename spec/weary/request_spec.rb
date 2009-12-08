@@ -93,10 +93,73 @@ describe Weary::Request do
     end
     
     describe 'Perform' do
-      it 'performs the request and gets back a response'
-      it 'follows redirection'
-      it 'will not follow redirection if disabled'
-      it 'passes the response into a callback'
+      
+      after do
+        FakeWeb.clean_registry
+      end
+      
+      it 'performs the request and gets back a response' do
+        hello = "Hello from FakeWeb"
+        FakeWeb.register_uri(:get, "http://markwunsch.com", :body => hello)
+        
+        test = Weary::Request.new("http://markwunsch.com")
+        response = test.perform
+        response.class.should == Weary::Response
+        response.body.should == hello
+      end
+        
+      it 'follows redirection' do
+        hello = "Hello from FakeWeb"
+        FakeWeb.register_uri(:get, "http://markwunsch.com", :status => http_status_message(301), :Location => 'http://redirected.com')
+        FakeWeb.register_uri(:get, "http://redirected.com", :body => hello)
+        
+        test = Weary::Request.new("http://markwunsch.com")
+        response = test.perform
+        response.body.should == hello
+      end
+      
+      it 'will not follow redirection if disabled' do
+        hello = "Hello from FakeWeb"
+        FakeWeb.register_uri(:get, "http://markwunsch.com", :status => http_status_message(301), :Location => 'http://redirected.com')
+        FakeWeb.register_uri(:get, "http://redirected.com", :body => hello)
+        
+        test = Weary::Request.new("http://markwunsch.com", :get, :no_follow => true)
+        response = test.perform
+        response.code.should == 301
+      end
+      
+      it 'passes the response into a callback' do
+        hello = "Hello from FakeWeb"
+        FakeWeb.register_uri(:get, "http://markwunsch.com", :body => hello)
+        response_body = ""
+        
+        test = Weary::Request.new("http://markwunsch.com")
+        test.perform do |response|
+          response_body = response.body
+        end
+        
+        response_body.should == hello
+      end
+      
+      it 'performs the callback even when redirected' do
+        hello = "Hello from FakeWeb"
+        FakeWeb.register_uri(:get, "http://markwunsch.com", :status => http_status_message(301), :Location => 'http://redirected.com')
+        FakeWeb.register_uri(:get, "http://redirected.com", :body => hello)
+        
+        response_body = ""
+        
+        test = Weary::Request.new("http://markwunsch.com")
+        test.perform do |response|
+          response_body = response.body
+        end
+        
+        response_body.should == hello
+      end
+      
+      # TODO: Test auth, and post bodies w redirect.
+    end
+    
+    describe 'Callbacks' do
     end
   end
   
