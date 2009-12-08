@@ -2,50 +2,51 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper')
 
 describe Weary::Request do
   
-  it "should contain a url" do
+  it 'creates a Net/HTTP connection' do
     test = Weary::Request.new("http://google.com")
-    test.uri.is_a?(URI).should == true
+    test.http.class.should == Net::HTTP
   end
   
-  it "should parse the http method" do
-    test = Weary::Request.new("http://google.com", "POST")
-    test.method.should == :post
+  it 'maps to a Net/HTTPRequest class' do
+    test = Weary::Request.new("http://google.com")
+    test.request_preparation.class.should == Net::HTTP::Get
   end
   
-  it "should craft a Net/HTTP Request" do
-    test = Weary::Request.new("http://google.com").send :http
-    test.class.should == Net::HTTP
-  end
-  
-  # replace with FakeWeb
-  it "should perform the request and retrieve a response" do
-    test = Weary::Request.new("http://foo.bar")
-    method = test.method
-    response = Weary::Response.new(mock_response(method, 301, {'Location' => 'http://bar.foo'}), method)
-    test.stub!(:perform).and_return(response)
-    test.perform.code.should == 301
-    test.perform.redirected?.should == true
-  end
-  
-  # replace with FakeWeb
-  it "should follow redirects" do
-    test = Weary::Request.new("http://foo.bar")
-    method = test.method   
-    response = Weary::Response.new(mock_response(method, 301, {'Location' => 'http://bar.foo'}), method)
-    response.stub!(:follow_redirect).and_return Weary::Response.new(mock_response(method, 200, {}), method)
-    test.stub!(:perform).and_return(response)
-    test.perform.code.should == 301
-    test.perform.redirected?.should == true
-    test.perform.follow_redirect.code.should == 200
-    # not exactly kosher.
-  end
-  
-  it "should prepare an oauth scheme if a token is provided" do
-    consumer = OAuth::Consumer.new("consumer_token","consumer_secret",{:site => 'http://foo.bar'})
-    token = OAuth::AccessToken.new(consumer, "token", "secret")
-    test = Weary::Request.new("http://foo.bar", :post, {:oauth => token})
-    test.send(:request).oauth_helper.options[:token].should == token
-    # seems a good a way as any to test if OAuth helpers have been added to the request
+  describe 'Request' do    
+    it 'prepares a Net/HTTP request' do
+      test = Weary::Request.new("http://google.com")
+      test.request.class.should == Net::HTTP::Get
+    end
+    
+    it 'prepares a body for POST' do
+      test = Weary::Request.new("http://foo.bar", :post)
+      test.with = {:name => "markwunsch"}
+      req = test.request
+      req.class.should == Net::HTTP::Post
+      req.body.should == test.with
+    end
+    
+    it 'sets up headers' do
+      test = Weary::Request.new("http://foo.bar")
+      test.headers = {"User-Agent" => Weary::UserAgents["Safari 4.0.2 - Mac"]}
+      req = test.request
+      req['User-Agent'].should == Weary::UserAgents["Safari 4.0.2 - Mac"]
+    end
+    
+    it 'has an authorization header when basic auth is used' do
+      test = Weary::Request.new("http://foo.bar")
+      test.credentials = {:username => "mark", :password => "secret"}
+      req = test.request
+      req.key?('Authorization').should == true
+    end
+    
+    it "prepares an oauth scheme if a token is provided" do
+      consumer = OAuth::Consumer.new("consumer_token","consumer_secret",{:site => 'http://foo.bar'})
+      token = OAuth::AccessToken.new(consumer, "token", "secret")
+      test = Weary::Request.new("http://foo.bar", :post)
+      test.credentials = token
+      test.request.oauth_helper.options[:token].should == token
+    end
   end
   
   describe 'Options' do
@@ -85,8 +86,18 @@ describe Weary::Request do
       test.follows?.should == true
     end
     
-    it 'uses a URI query string as a with value'
-    it 'uses the #with hash to create a URI query string if the method is a GET'
+    it 'uses the #with hash to create a URI query string if the method is a GET' do
+      test = Weary::Request.new("http://foo.bar/path/to/something")
+      test.with = {:name => "markwunsch", :title => "awesome"}
+      test.uri.query.should == test.with
+    end
+    
+    describe 'Perform' do
+      it 'performs the request and gets back a response'
+      it 'follows redirection'
+      it 'will not follow redirection if disabled'
+      it 'passes the response into a callback'
+    end
   end
   
 end
