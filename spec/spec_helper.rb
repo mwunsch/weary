@@ -1,16 +1,16 @@
 $LOAD_PATH.unshift File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
 
+require 'weary'
 require 'rubygems'
 require 'spec'
-require 'weary'
+require 'fakeweb'
 
 def get_fixture(filename)
   open(File.join(File.dirname(__FILE__), 'fixtures', "#{filename.to_s}")).read
 end
 
-def mock_response(request_method = :get, code=200, header={}, body=nil)
-  response_class = Net::HTTPResponse::CODE_TO_OBJ[code.to_s]
-  message = case code
+def http_status_message(code)
+  message = case code.to_i
     when 200
       "OK"
     when 301
@@ -38,18 +38,5 @@ def mock_response(request_method = :get, code=200, header={}, body=nil)
     else
       "Unknown"
   end
-  response = response_class.new("1.1", code, "Hello World!")
-  response.initialize_http_header(header)
-  response.stub!(:body).and_return(body)
-  response.stub!(:message).and_return(message)
-  
-  response
-end
-
-def mock_request(url, method = :get, options={}, mock_header={}, mock_body=nil)
-  request = Weary::Request.new(url, method, options)
-  http_response = mock_response(method, 200, mock_header, mock_body)
-  request.stub!(:perform).and_return Weary::Response.new(http_response, method)
-  
-  request
+  [code.to_s,message]
 end
