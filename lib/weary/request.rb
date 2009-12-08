@@ -2,7 +2,7 @@ module Weary
   class Request
     
     attr_reader :uri
-    attr_accessor :options, :credentials, :with
+    attr_accessor :options, :credentials, :with, :headers
   
     def initialize(url, http_verb= :get, options={})
       self.method = http_verb
@@ -14,11 +14,15 @@ module Weary
       if (options[:body])
         self.with = (options[:body].respond_to?(:to_params) ? options[:body].to_params : options[:body])
       end
+      self.headers = options[:headers] if options[:headers]
+      self.follows = options[:no_follow] ? false : true
     end
   
     def uri=(url)
       @uri = URI.parse(url)
     end
+    
+    
     
     def method=(http_verb)
       verb = HTTPVerb.new(http_verb).normalize
@@ -31,6 +35,14 @@ module Weary
     
     def method
       @http_verb
+    end
+    
+    def follows=(bool)
+      @follows = (bool ? true : false)
+    end
+    
+    def follows?
+      @follows
     end
     
     def perform

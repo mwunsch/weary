@@ -48,25 +48,45 @@ describe Weary::Request do
     # seems a good a way as any to test if OAuth helpers have been added to the request
   end
   
-  it 'set the credentials to basic authentication' do
-    basic_auth = {:username => 'mark', :password => 'secret'}
-    test = Weary::Request.new("http://foo.bar", :get, {:basic_auth => basic_auth})
-    test.credentials.should == basic_auth
-  end
-  
-  it 'sets the credentials to an oauth token' do
-    consumer = OAuth::Consumer.new("consumer_token","consumer_secret",{:site => 'http://foo.bar'})
-    token = OAuth::AccessToken.new(consumer, "token", "secret")
-    test = Weary::Request.new("http://foo.bar", :post, {:oauth => token})
-    test.credentials.should == token
-  end
-  
-  it 'sets the body params' do
-    body = {:options => "something"}
-    test = Weary::Request.new("http://foo.bar", :post, {:body => body})
-    test.with.should == body.to_params
-    test2 = Weary::Request.new("http://foo.bar", :post, {:body => body.to_params})
-    test2.with.should == body.to_params
+  describe 'Options' do
+    it 'sets the credentials to basic authentication' do
+      basic_auth = {:username => 'mark', :password => 'secret'}
+      test = Weary::Request.new("http://foo.bar", :get, {:basic_auth => basic_auth})
+      test.credentials.should == basic_auth
+    end
+
+    it 'sets the credentials to an oauth token' do
+      consumer = OAuth::Consumer.new("consumer_token","consumer_secret",{:site => 'http://foo.bar'})
+      token = OAuth::AccessToken.new(consumer, "token", "secret")
+      test = Weary::Request.new("http://foo.bar", :post, {:oauth => token})
+      test.credentials.should == token
+    end
+
+    it 'sets the body params' do
+      body = {:options => "something"}
+      test = Weary::Request.new("http://foo.bar", :post, {:body => body})
+      test.with.should == body.to_params
+      test2 = Weary::Request.new("http://foo.bar", :post, {:body => body.to_params})
+      test2.with.should == body.to_params
+    end
+
+    it 'sets header values' do
+      head = {"User-Agent" => Weary::UserAgents["Safari 4.0.2 - Mac"]}
+      test = Weary::Request.new("http://foo.bar", :get, {:headers => head})
+      test.headers.should == head
+    end
+
+    it 'sets a following value for redirection' do
+      test = Weary::Request.new("http://foo.bar", :get, {:no_follow => true})
+      test.follows?.should == false
+      test = Weary::Request.new("http://foo.bar", :get, {:no_follow => false})
+      test.follows?.should == true
+      test = Weary::Request.new("http://foo.bar", :get)
+      test.follows?.should == true
+    end
+    
+    it 'uses a URI query string as a with value'
+    it 'uses the #with hash to create a URI query string if the method is a GET'
   end
   
 end
