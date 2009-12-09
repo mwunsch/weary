@@ -242,8 +242,8 @@ describe Weary::Resource do
       request = @test.build!(params, defaults, basic_auth)
       
       request.class.should == Weary::Request
-      request.method.should == :get
-      request.options[:basic_auth].should == basic_auth
+      request.via.should == :get
+      request.credentials.should == basic_auth
     end
   end
   

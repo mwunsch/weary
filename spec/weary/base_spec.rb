@@ -203,7 +203,7 @@ describe Weary::Base do
         cred = {:username => 'mwunsch', :password => 'secret'}
         lambda { n.authentication_test }.should raise_error
         n.credentials cred[:username], cred[:password]
-        n.authentication_test.options[:basic_auth].should == cred
+        n.authentication_test.credentials.should == cred
       end
       
       it 'passes in default parameters if defined' do
@@ -211,14 +211,14 @@ describe Weary::Base do
         defaults = {:id => 1234, :message => "Hello world"}
         lambda { n.params_test }.should raise_error
         n.defaults = defaults
-        n.params_test.options[:body].should == defaults
+        n.params_test.with.should == defaults.to_params
       end
       
       it 'accepts parameters when given' do
         n = @methtest.new
         req = n.params_test :id => 1234, :message => "Hello world", :foo => "Bar"
-        req.options[:body].should == {:id => 1234, :message => "Hello world"}
-        req.options[:body].has_key?(:foo).should == false
+        req.with.should == {:id => 1234, :message => "Hello world"}.to_params
+        req.with.include?("foo").should == false
       end
       
       
@@ -253,7 +253,7 @@ describe Weary::Base do
       
       obj.credentials "username", "password"
       obj.instance_variable_get(:@credentials).should == {:username => "username", :password => "password"}
-      obj.important(:id => 1234).options[:basic_auth].should == obj.instance_variable_get(:@credentials)
+      obj.important(:id => 1234).credentials.should == obj.instance_variable_get(:@credentials)
     end
     
     it 'credentials can be an OAuth access token' do
@@ -263,8 +263,7 @@ describe Weary::Base do
       
       obj.credentials oauth_token
       obj.instance_variable_get(:@credentials).class.should == OAuth::AccessToken
-      obj.important(:id => 1234).options.has_key?(:oauth).should == true
-      obj.important(:id => 1234).options.has_key?(:basic_auth).should == false
+      obj.important(:id => 1234).credentials.should == oauth_token
     end
     
     it 'can set defaults to pass into requests' do
@@ -272,7 +271,7 @@ describe Weary::Base do
       
       obj.defaults = {:user => "mwunsch", :message => "hello world"}
       obj.defaults.should == {:user => "mwunsch", :message => "hello world"}
-      obj.thing(:id => 1234).options[:query].should == {:user => "mwunsch", :message => "hello world", :id => 1234}
+      obj.thing(:id => 1234).uri.query.should == {:user => "mwunsch", :message => "hello world", :id => 1234}.to_params
     end
     
     it 'has a list of resources' do
@@ -297,8 +296,8 @@ describe Weary::Base do
       obj1.resources[:thing].follows = false
       obj1.rebuild_method(obj1.resources[:thing])
       
-      obj1.thing(:id => 1234).options[:no_follow].should == true
-      @klass.new.thing(:id => 1234).options[:no_follow].should == nil
+      obj1.thing(:id => 1234).follows?.should == false
+      @klass.new.thing(:id => 1234).follows?.should == true
     end
     
     it 'can modify a resource without modifying the resources of its class' do
@@ -314,7 +313,7 @@ describe Weary::Base do
       
       obj.credentials "username", "password"
       obj.modify_resource(:important) {|r| r.follows = false }
-      obj.important(:id => 1234).options[:no_follow].should == true
+      obj.important(:id => 1234).follows?.should == false
     end
     
   end

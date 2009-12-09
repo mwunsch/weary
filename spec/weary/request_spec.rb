@@ -12,7 +12,7 @@ describe Weary::Request do
     test.request_preparation.class.should == Net::HTTP::Get
   end
   
-  describe 'Request' do    
+  describe 'Request' do
     it 'prepares a Net/HTTP request' do
       test = Weary::Request.new("http://google.com")
       test.request.class.should == Net::HTTP::Get
@@ -231,6 +231,73 @@ describe Weary::Request do
   end
   
   describe 'Callbacks' do
+    after do
+      FakeWeb.clean_registry
+    end
+    
+    describe 'on_complete' do
+      it 'accepts a block, and the block becomes the callback' do
+        msg = "You did it!"
+        FakeWeb.register_uri(:get, "http://markwunsch.com", :body => msg)
+        test = Weary::Request.new("http://markwunsch.com")
+        body = ""
+
+        test.on_complete do |response|
+          body = response.body
+        end
+
+        test.perform
+        body.should == msg
+      end
+
+      it 'is overriden when a block is passed to the perform method' do
+        msg = "You did it!"
+        FakeWeb.register_uri(:get, "http://markwunsch.com", :body => msg)
+        test = Weary::Request.new("http://markwunsch.com")
+        body = ""
+
+        test.on_complete do |response|
+          body = response.body
+        end
+        test.perform
+        body.should == msg
+
+        test.perform do |response|
+          body = 'Now it is different'
+        end
+
+        body.should == 'Now it is different'
+      end
+    end
+    
+    describe 'before_send' do
+      it 'accepts a block, and the block becomes the callback' do
+        msg = "You did it!"
+        FakeWeb.register_uri(:get, "http://markwunsch.com", :body => msg)
+        test = Weary::Request.new("http://markwunsch.com")
+        body = ""
+
+        test.before_send do
+          body = msg
+        end
+        body.should_not == msg
+        test.perform
+        body.should == msg
+      end
+      
+      it 'takes the Request as an argument, so it can be manipulate before sending' do
+        hello = "Hello from FakeWeb"
+        FakeWeb.register_uri(:get, "http://markwunsch.com", :status => http_status_message(301), :Location => 'http://redirected.com')
+        FakeWeb.register_uri(:get, "http://redirected.com", :body => hello)
+        
+        test = Weary::Request.new("http://markwunsch.com")
+        test.before_send do |req|
+          req.follows = false
+        end
+        
+        test.perform.code.should == 301
+      end
+    end
   end
   
 end

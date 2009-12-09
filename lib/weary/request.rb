@@ -63,15 +63,25 @@ module Weary
       @follows
     end
     
+    def on_complete(&block)
+      @on_complete = block if block_given?
+      @on_complete
+    end
+    
+    def before_send(&block)
+      @before_send = block if block_given?
+      @before_send
+    end
+    
     def perform(&block)
       @on_complete = block if block_given?
+      before_send.call(self) if before_send
       req = http.request(request)
       response = Response.new(req, self)
       if response.redirected?
         return response.follow_redirect if follows?
       end
-      yield response if block_given?
-      @on_complete.call(response) if @on_complete
+      on_complete.call(response) if on_complete
       response
     end    
     
