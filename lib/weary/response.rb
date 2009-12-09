@@ -48,11 +48,7 @@ module Weary
     
     # Follow the Redirect
     def follow_redirect(block=nil)
-      if redirected?
-        Request.new(@raw['location'], @method).perform(block)
-      else
-        nil
-      end
+      Request.new(@raw['location'], @method).perform(block) if redirected?
     end
     # Don't like this
     
