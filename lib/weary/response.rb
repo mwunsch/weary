@@ -1,13 +1,13 @@
 module Weary
   class Response
   
-    attr_reader :raw, :method, :code, :message, :header, :content_type, :cookie, :body, :format
+    attr_reader :raw, :requester, :code, :message, :header, :content_type, :cookie, :body, :format
     alias mime_type content_type
     
-    def initialize(http_response, http_method)
+    def initialize(http_response, requester)
       raise ArgumentError, "Must be a Net::HTTPResponse" unless http_response.is_a?(Net::HTTPResponse)
       @raw = http_response
-      @method = http_method
+      @requester = requester
       @code = http_response.code.to_i
       @message = http_response.message
       @header = http_response.to_hash
@@ -16,7 +16,6 @@ module Weary
       @body = http_response.body
       self.format = http_response.content_type
     end
-    #instead of passing http_method, should pass entire Request object
     
     # Is this an HTTP redirect?
     def redirected?
@@ -47,10 +46,13 @@ module Weary
     end
     
     # Follow the Redirect
-    def follow_redirect(block=nil)
-      Request.new(@raw['location'], @method).perform(block) if redirected?
+    def follow_redirect
+      if redirected?
+        new_request = requester.dup
+        new_request.uri = @raw['location']
+        new_request.perform
+      end  
     end
-    # Don't like this
     
     # Parse the body with Crack parsers (if XML/HTML) or Yaml parser
     def parse
