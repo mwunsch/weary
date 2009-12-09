@@ -22,6 +22,9 @@ module Weary
   
     def uri=(url)
       @uri = URI.parse(url)
+      if (with && !request_preparation.request_body_permitted?)
+        @uri.query = with
+      end
     end
     
     def via=(http_verb)
@@ -60,19 +63,17 @@ module Weary
       @follows
     end
     
-    def perform(callback=nil,&block)
-      @on_complete = block || callback
+    def perform(&block)
+      @on_complete = block if block_given?
       req = http.request(request)
-      response = Response.new(req, @http_verb)
+      response = Response.new(req, self)
       if response.redirected?
-        return response.follow_redirect(block) if follows?
+        return response.follow_redirect if follows?
       end
       yield response if block_given?
-      callback.call(response) if callback
+      @on_complete.call(response) if @on_complete
       response
-    end
-    # Don't like this
-    
+    end    
     
     def http
       connection = Net::HTTP.new(uri.host, uri.port)

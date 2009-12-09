@@ -94,6 +94,7 @@ describe Weary::Request do
   end
     
   describe 'Perform' do
+    # These tests reveal tight coupling with Response API, which may or may not be a good thing
     
     after do
       FakeWeb.clean_registry
@@ -157,7 +158,76 @@ describe Weary::Request do
       response_body.should == hello
     end
     
-    # TODO: Test auth, and post bodies w redirect.
+    it 'authorizes with basic authentication' do
+      message = 'You are authorized to do that.'
+      FakeWeb.register_uri(:get, "http://markwunsch.com", :status => http_status_message(401))
+      FakeWeb.register_uri(:get, "http://mark:secret@markwunsch.com", :body => message)
+      
+      test = Weary::Request.new("http://markwunsch.com")
+      response = test.perform
+      response.code.should == 401
+      response.body.should_not == message
+      test.credentials = {:username => 'mark', :password => 'secret'}
+      response = test.perform
+      response.code.should == 200
+      response.body.should == message
+    end
+    
+    it 'still authorizes correctly if redirected' do
+      message = 'You are authorized to do that.'
+      FakeWeb.register_uri(:get, "http://markwunsch.com", :status => http_status_message(401))
+      FakeWeb.register_uri(:get, "http://mark:secret@markwunsch.com", :status => http_status_message(301), :Location => 'http://markwunsch.net')
+      FakeWeb.register_uri(:get, "http://markwunsch.net", :status => http_status_message(401))
+      FakeWeb.register_uri(:get, "http://mark:secret@markwunsch.net", :body => message)
+      
+      test = Weary::Request.new("http://markwunsch.com")
+      test.credentials = {:username => 'mark', :password => 'secret'}
+      response = test.perform
+      response.code.should == 200
+      response.body.should == message
+    end
+    
+    it 'converts parameters to url query strings' do
+      params = {:id => 'mark', :message => 'hello'}
+      message = "Using FakeWeb with params of #{params.to_params}"
+      FakeWeb.register_uri(:get, "http://markwunsch.com", :status => http_status_message(403))
+      FakeWeb.register_uri(:get, "http://markwunsch.com?#{params.to_params}", :body => message)
+      
+      test = Weary::Request.new("http://markwunsch.com")
+      test.with = params
+      response = test.perform
+      response.body.should == message
+    end
+    
+    it 'sends query strings correctly when redirected' do
+      params = {:id => 'mark', :message => 'hello'}
+      message = "Using FakeWeb with params of #{params.to_params}"
+      FakeWeb.register_uri(:get, "http://markwunsch.com", :status => http_status_message(403))
+      FakeWeb.register_uri(:get, "http://markwunsch.net", :status => http_status_message(403))
+      FakeWeb.register_uri(:get, "http://markwunsch.com?#{params.to_params}", :status => http_status_message(301), :Location => 'http://markwunsch.net')
+      FakeWeb.register_uri(:get, "http://markwunsch.net?#{params.to_params}", :body => message)
+      
+      test = Weary::Request.new("http://markwunsch.com")
+      test.with = params
+      response = test.perform
+      response.code.should == 200
+    end
+    
+    it 'converts parameters to request body on post' do
+      params = {:id => 'mark', :message => 'hello'}
+      message = "Using FakeWeb with params of #{params.to_params}"
+      FakeWeb.register_uri(:get, "http://markwunsch.com", :status => http_status_message(403))
+      FakeWeb.register_uri(:post, "http://markwunsch.com", :body => message)
+      
+      test = Weary::Request.new("http://markwunsch.com")
+      test.via = :post
+      test.with = params
+      response = test.perform
+      response.code.should == 200
+      response.body.should == message
+      
+      # No way of testing Request bodies with FakeWeb as of 1.2.7 
+    end    
   end
   
   describe 'Callbacks' do
