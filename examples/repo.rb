@@ -17,4 +17,6 @@ class Repository < Weary::Base
 end
 
 weary = Repository.new('mwunsch','weary')
-puts weary.show.perform.body
+weary.show.perform do |response|
+  puts response.body
+end
