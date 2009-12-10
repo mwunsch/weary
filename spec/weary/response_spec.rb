@@ -2,71 +2,159 @@ require File.join(File.dirname(__FILE__), '..', 'spec_helper')
 
 describe Weary::Response do
   before do
-    @test = Weary::Response.new(mock_response, :get)
+    FakeWeb.register_uri(:get, "http://twitter.com", :body => get_fixture('twitter.xml'))
+    FakeWeb.register_uri(:get, "http://github.com", :body => get_fixture('github.yml'))
   end
   
-  it 'should wrap a Net::Response' do
-    @test.raw.is_a?(Net::HTTPResponse).should == true
+  after do
+    FakeWeb.clean_registry
   end
   
-  it 'should store the HTTP method' do
-    @test.method.should == :get
+  it 'wraps a raw Net::HTTPResponse' do
+    FakeWeb.register_uri(:get, "http://vimeo.com", :body => get_fixture('vimeo.json'))
+    
+    request = Weary::Request.new('http://vimeo.com')
+    response = request.perform
+    response.raw.is_a?(Net::HTTPResponse).should == true
   end
   
-  it 'should have an HTTP code' do
-    @test.code.should == 200
+  it 'stores the Request object that requested it' do
+    FakeWeb.register_uri(:get, "http://vimeo.com", :body => get_fixture('vimeo.json'))
+    
+    request = Weary::Request.new('http://vimeo.com')
+    response = request.perform
+    response.requester.should == request
   end
   
-  it 'should have an HTTP message' do
-    @test.message.should == "OK"
+  it 'has an HTTP code' do
+    FakeWeb.register_uri(:get, "http://vimeo.com", :body => get_fixture('vimeo.json'), :status => http_status_message(418))
+    
+    request = Weary::Request.new('http://vimeo.com')
+    response = request.perform
+    response.code.should == 418
   end
   
-  it 'should know if the request was successful' do
-    @test.success?.should == true
+  it 'has an HTTP message associated with it' do
+    FakeWeb.register_uri(:get, "http://vimeo.com", :body => get_fixture('vimeo.json'), :status => http_status_message(418))
+    
+    request = Weary::Request.new('http://vimeo.com')
+    response = request.perform
+    response.message.should == "I'm a teapot"
   end
   
-  # replace with better mocking method
-  it 'should parse JSON' do
-    test = Weary::Response.new(mock_response(:get, 200, {'content-type' => 'text/json'}, get_fixture("vimeo.json")), :get)
-    test.parse[0]["title"].should == "\"The Noises Rest\""
+  it 'knows if the request cycle was successful' do
+    FakeWeb.register_uri(:get, "http://vimeo.com", :body => get_fixture('vimeo.json'))
+    
+    request = Weary::Request.new('http://vimeo.com')
+    response = request.perform
+    response.success?.should == true
   end
   
-  # replace with better mocking method
-  it 'should parse XML' do
-    test = Weary::Response.new(mock_response(:get, 200, {'content-type' => 'text/xml'}, get_fixture("twitter.xml")), :get)
-    test.parse.class.should == Hash
-    test.parse['statuses'][0]['id'].should == "2186350626"
+  it 'stores the HTTP header' do
+    FakeWeb.register_uri(:get, "http://vimeo.com", :body => get_fixture('vimeo.json'), :Server => 'Apache')
+    
+    request = Weary::Request.new('http://vimeo.com')
+    response = request.perform
+    response.header['server'][0].should == 'Apache'
   end
   
-  # replace with better mocking method
-  it 'should parse YAML' do
-    test = Weary::Response.new(mock_response(:get, 200, {'content-type' => 'text/yaml'}, get_fixture("github.yml")), :get)
-    test.parse.class.should == Hash
-    test.parse["repository"][:name].should == "rails"
+  it 'stores the content-type of the response' do
+    FakeWeb.register_uri(:get, "http://vimeo.com", :body => get_fixture('vimeo.json'), :'Content-Type' => 'text/json')
+    
+    request = Weary::Request.new('http://vimeo.com')
+    response = request.perform
+    response.content_type.should == 'text/json'
   end
   
-  # replace with better mocking method
-  it 'should use [] to parse the document' do
-    test = Weary::Response.new(mock_response(:get, 200, {'content-type' => 'text/xml'}, get_fixture("twitter.xml")), :get).parse
-    test['statuses'][0]['id'].should == "2186350626"
+  it 'stores the cookies sent by the response' do
+    FakeWeb.register_uri(:get, "http://vimeo.com", :body => get_fixture('vimeo.json'), :'Set-Cookie' => 'cookie=true')
+    
+    request = Weary::Request.new('http://vimeo.com')
+    response = request.perform
+    response.cookie.should == 'cookie=true'
   end
   
-  # replace with better mocking method
-  it 'should raise an exception if there was a Server Error' do
-    test = Weary::Response.new(mock_response(:get, 500), :get)
-    lambda { test.parse }.should raise_error
+  it 'stores the body of the response' do
+    FakeWeb.register_uri(:get, "http://vimeo.com", :body => get_fixture('vimeo.json'))
+    
+    request = Weary::Request.new('http://vimeo.com')
+    response = request.perform
+    response.body.should == get_fixture('vimeo.json')
   end
   
-  # replace with better mocking method
-  it 'should raise an exception if there was a Client Error'  do
-    test = Weary::Response.new(mock_response(:get, 404), :get)
-    lambda { test.parse }.should raise_error
+  it 'normalizes the format type of the response' do
+    FakeWeb.register_uri(:get, "http://vimeo.com", :body => get_fixture('vimeo.json'), :'Content-Type' => 'text/json')
+    
+    request = Weary::Request.new('http://vimeo.com')
+    response = request.perform
+    response.format.should == :json
   end
   
-  # replace with better mocking method
-  it 'should follow HTTP redirects' do
-    test = Weary::Response.new(mock_response(:get, 301), :get)
-    test.redirected?.should == true
+  it 'can follow redirects' do
+    FakeWeb.register_uri(:get, "http://markwunsch.com", :status => http_status_message(301), :Location => 'http://redirected.com')
+    FakeWeb.register_uri(:get, "http://redirected.com", :body => "Hello world")
+    
+    request = Weary::Request.new('http://markwunsch.com')
+    request.follows = false
+    response = request.perform
+    response.code.should == 301
+    response.follow_redirect.code.should == 200
+    response.follow_redirect.body.should == "Hello world"
+  end
+  
+  describe 'Parsing' do
+    it 'parses JSON' do
+      FakeWeb.register_uri(:get, "http://vimeo.com", :body => get_fixture('vimeo.json'), :'Content-Type' => 'text/json')
+      
+      request = Weary::Request.new('http://vimeo.com')
+      response = request.perform
+      response.parse[0].class.should == Hash
+      response.parse[0]['title'].should == '"The Noises Rest"'
+    end
+    
+    it 'parses XML' do
+      FakeWeb.register_uri(:get, "http://twitter.com", :body => get_fixture('twitter.xml'), :'Content-Type' => 'application/xml')
+      
+      request = Weary::Request.new('http://twitter.com')
+      response = request.perform
+      response.parse.class.should == Hash
+      response.parse['statuses'].size.should == 20
+    end
+    
+    it 'parses YAML' do
+      FakeWeb.register_uri(:get, "http://github.com", :body => get_fixture('github.yml'), :'Content-Type' => 'text/yaml')
+      
+      request = Weary::Request.new('http://github.com')
+      response = request.perform
+      response.parse.class.should == Hash
+      response.parse['repository'][:name].should == 'rails'
+    end
+    
+    it 'can parse with the [] method' do
+      FakeWeb.register_uri(:get, "http://github.com", :body => get_fixture('github.yml'), :'Content-Type' => 'text/yaml')
+      
+      request = Weary::Request.new('http://github.com')
+      response = request.perform
+      response['repository'][:name].should == 'rails'
+    end
+  end
+  
+  describe 'Exceptions' do
+    it 'raises an exception if there is a Server Error' do
+      FakeWeb.register_uri(:get, "http://github.com", :status => http_status_message(500))
+      
+      request = Weary::Request.new('http://github.com')
+      response = request.perform
+      lambda { response.parse }.should raise_error
+    end
+    
+    it 'raises an exception if there is a Client Error' do
+      FakeWeb.register_uri(:get, "http://github.com", :status => http_status_message(404))
+      
+      request = Weary::Request.new('http://github.com')
+      response = request.perform
+      lambda { response.parse }.should raise_error
+    end
   end
   
 end

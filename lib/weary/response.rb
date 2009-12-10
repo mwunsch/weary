@@ -1,11 +1,9 @@
 module Weary
   class Response
   
-    attr_reader :raw, :requester, :code, :message, :header, :content_type, :cookie, :body, :format
-    alias mime_type content_type
+    attr_reader :raw, :requester, :code, :message, :header, :content_type, :cookie, :body
     
     def initialize(http_response, requester)
-      raise ArgumentError, "Must be a Net::HTTPResponse" unless http_response.is_a?(Net::HTTPResponse)
       @raw = http_response
       @requester = requester
       @code = http_response.code.to_i
@@ -14,22 +12,21 @@ module Weary
       @content_type = http_response.content_type
       @cookie = http_response['Set-Cookie']
       @body = http_response.body
-      self.format = http_response.content_type
     end
     
     # Is this an HTTP redirect?
     def redirected?
-      @raw.is_a?(Net::HTTPRedirection)
+      raw.is_a?(Net::HTTPRedirection)
     end
     
     # Was this Request successful?
     def success?
-      (200..299).include?(@code)
+      (200..299).include?(code)
     end
     
     # Returns a symbol corresponding to the Response's Content Type
-    def format=(type)
-      @format = case type
+    def format
+      @format ||= case content_type
         when *ContentTypes[:json]
           :json
         when *ContentTypes[:xml]
@@ -38,10 +35,8 @@ module Weary
           :html
         when *ContentTypes[:yaml]
           :yaml
-        when *ContentTypes[:plain]
-          :plain
         else
-          nil
+          :plain
       end
     end
     
@@ -56,17 +51,17 @@ module Weary
     
     # Parse the body with Crack parsers (if XML/HTML) or Yaml parser
     def parse
-      raise StandardError, "The Response has no body. #{@method.to_s.upcase} request sent." unless @body
+      raise StandardError, "The Response has no body. #{requester.via.to_s.upcase} request sent." unless body
       handle_errors
-      case @format
+      case format
         when :xml, :html
-          Crack::XML.parse @body
+          Crack::XML.parse body
         when :json
-          Crack::JSON.parse @body
+          Crack::JSON.parse body
         when :yaml
-          YAML::load @body
+          YAML::load body
         else
-          @body
+          body
       end
     end
     

@@ -29,6 +29,8 @@ def http_status_message(code)
       "Method Not Allowed"
     when 409
       "Conflict"
+    when 418
+      "I'm a teapot"  
     when 422
       "Unprocessable Entity"
     when 401...500
