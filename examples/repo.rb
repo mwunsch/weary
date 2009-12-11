@@ -2,21 +2,16 @@ $LOAD_PATH.unshift File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib
 require 'rubygems'
 require 'weary'
 
-class Repository < Weary::Base
+class Repository
+  include Weary
   
-  def initialize(user, repo)
-    self.modify_resource(:show) do |r|
-      r.url = "http://github.com/api/v2/yaml/repos/show/#{user}/#{repo}"
-    end
-  end  
-  
-  get "show" do |r|
-    r.url = "http://github.com/api/v2/yaml/repos/show/__gh_user__/__gh_repo__"
+  def show(user, repo)
+    get "http://github.com/api/v2/yaml/repos/show/#{user}/#{repo}"
   end
       
 end
 
-weary = Repository.new('mwunsch','weary')
-weary.show.perform do |response|
+weary = Repository.new
+weary.show('mwunsch','weary').perform do |response|
   puts response.body
 end
