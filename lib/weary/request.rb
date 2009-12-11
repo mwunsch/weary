@@ -79,7 +79,8 @@ module Weary
       response.value
     end
     
-    def perform!
+    def perform!(&block)
+      @on_complete = block if block_given?
       Thread.new {
         before_send.call(self) if before_send
         req = http.request(request)

@@ -229,7 +229,29 @@ describe Weary::Request do
       # No way of testing Request bodies with FakeWeb as of 1.2.7 
     end    
   
-    describe 'Non-Blocking' do
+    describe 'Non-Blocking, Threaded' do
+      # Not exactly sure the best way to test these
+      
+      it 'creates a new thread to perform the request' do
+        hello = "Hello from FakeWeb"
+        FakeWeb.register_uri(:get, "http://markwunsch.com", :body => hello)
+
+        test = Weary::Request.new("http://markwunsch.com")
+        test.perform!.value.body.should == hello
+      end
+      
+      it "sets its callback" do
+        msg = "You did it!"
+        FakeWeb.register_uri(:get, "http://markwunsch.com", :body => msg)
+        test = Weary::Request.new("http://markwunsch.com")
+        body = ""
+
+        thread = test.perform! do |r|
+          body = r.body
+        end
+        
+        body.should == thread.value.body
+      end
     end
   end
   
