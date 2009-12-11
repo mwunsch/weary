@@ -1,6 +1,7 @@
 $LOAD_PATH.unshift File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'rubygems'
 require 'weary'
+require 'pp'
 
 class Status < Weary::Base
   
@@ -14,5 +15,12 @@ class Status < Weary::Base
 end
 
 toots = Status.new
-recent_toot = toots.user_timeline(:id => "markwunsch").perform[0]
-puts "@" + recent_toot["user"]["screen_name"] + ": " + "\"#{recent_toot['text']}\""
+
+toots.user_timeline(:id => "markwunsch").perform do |response|
+  if response.success?
+    recent_toot = response[0]
+    puts "@#{recent_toot['user']['screen_name']}: \"#{recent_toot['text']}\""
+  else
+   puts "#{response.code}: #{response.message}"
+ end
+end
