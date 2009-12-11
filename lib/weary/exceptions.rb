@@ -11,5 +11,5 @@ module Weary
   class NotFound            < ClientError; end #404
   class MethodNotAllowed    < ClientError; end #405
   class ResourceConflict    < ClientError; end #409
-  class UnprocessableEntity < ClientError; end #422  
+  class UnprocessableEntity < ClientError; end #422
 end

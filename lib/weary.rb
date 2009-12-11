@@ -54,9 +54,56 @@ module Weary
     "Safari 4.0.2 - Windows" => "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/530.19.2 (KHTML, like Gecko) Version/4.0.2 Safari/530.19.1"
   }
   
-  # Weary::Query quickly performs a GET request on a URL and parses the request.
-  def self.Query(url)
-    Weary::Request.new(url, :get).perform.parse
+  def get(url,&block)
+   request url, :get, block
+  end
+  
+  def post(url,&block)
+    request url, :post, block
+  end
+  
+  def put(url,&block)
+    request url, :put, block
+  end
+  
+  def delete(url,&block)
+    request url, :delete, block
+  end
+  
+  def head(url,&block)
+    request url, :head, block
+  end
+  
+  def request(url,via = :get,block = nil)
+    Weary.request(url, via, block)
+  end
+  
+  class << self
+    def get(url,&block)
+      request url, :get, block
+    end
+    
+    def post(url,&block)
+      request url, :post, block
+    end
+    
+    def put(url,&block)
+      request url, :put, block
+    end
+    
+    def delete(url,&block)
+      request url, :delete, block
+    end
+    
+    def head(url,&block)
+      request url, :head, block
+    end
+    
+    def request(url,via = :get,block = nil)
+      req = Request.new(url,via)
+      block.call(req) if block
+      req
+    end
   end
   
 end
