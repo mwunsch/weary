@@ -228,6 +228,9 @@ describe Weary::Request do
       
       # No way of testing Request bodies with FakeWeb as of 1.2.7 
     end    
+  
+    describe 'Non-Blocking' do
+    end
   end
   
   describe 'Callbacks' do
@@ -236,6 +239,14 @@ describe Weary::Request do
     end
     
     describe 'on_complete' do
+      it 'stores the callback' do
+        test = Weary::Request.new("http://markwunsch.com")
+        test.on_complete do
+          'hello'
+        end
+        test.on_complete.call.should == 'hello'
+      end
+      
       it 'accepts a block, and the block becomes the callback' do
         msg = "You did it!"
         FakeWeb.register_uri(:get, "http://markwunsch.com", :body => msg)
@@ -271,6 +282,14 @@ describe Weary::Request do
     end
     
     describe 'before_send' do
+      it 'stores the callback' do
+        test = Weary::Request.new("http://markwunsch.com")
+        test.before_send do
+          'hello'
+        end
+        test.before_send.call.should == 'hello'
+      end
+      
       it 'accepts a block, and the block becomes the callback' do
         msg = "You did it!"
         FakeWeb.register_uri(:get, "http://markwunsch.com", :body => msg)

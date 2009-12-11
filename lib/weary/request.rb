@@ -75,15 +75,23 @@ module Weary
     
     def perform(&block)
       @on_complete = block if block_given?
-      before_send.call(self) if before_send
-      req = http.request(request)
-      response = Response.new(req, self)
-      if response.redirected?
-        return response.follow_redirect if follows?
-      end
-      on_complete.call(response) if on_complete
-      response
-    end    
+      response = perform!
+      response.value
+    end
+    
+    def perform!
+      Thread.new {
+        before_send.call(self) if before_send
+        req = http.request(request)
+        response = Response.new(req, self)
+        if response.redirected? && follows?
+          response.follow_redirect
+        else
+          on_complete.call(response) if on_complete
+          response
+        end
+      }
+    end
     
     def http
       connection = Net::HTTP.new(uri.host, uri.port)
