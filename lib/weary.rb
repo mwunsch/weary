@@ -32,7 +32,7 @@ module Weary
     "Firefox 3.0.4 - Windows" => "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.12) Gecko/2008102920 Firefox/3.0.4",
     "Firefox 3.5.2 - Mac" => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2",
     "Firefox 3.5.2 - Windows" => "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2",
-    "Internet Explorer 5.2.3 – Mac" => "Mozilla/4.0 (compatible; MSIE 5.23; Mac_PowerPC)",
+    "Internet Explorer 5.2.3 - Mac" => "Mozilla/4.0 (compatible; MSIE 5.23; Mac_PowerPC)",
     "Internet Explorer 5.5" => "Mozilla/4.0 (compatible; MSIE 5.5; Windows NT 5.1)",
     "Internet Explorer 6.0" => "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)",
     "Internet Explorer 7.0" => "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)",
