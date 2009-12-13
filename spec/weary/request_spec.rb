@@ -249,8 +249,8 @@ describe Weary::Request do
         thread = test.perform! do |r|
           body = r.body
         end
-        
-        body.should == thread.value.body
+        body = thread.value.body
+        body.should == msg
       end
     end
   end

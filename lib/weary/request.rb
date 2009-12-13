@@ -96,8 +96,7 @@ module Weary
     
     def http
       connection = Net::HTTP.new(uri.host, uri.port)
-      connection.use_ssl = uri.is_a?(URI::HTTPS)
-      connection.verify_mode = OpenSSL::SSL::VERIFY_NONE if connection.use_ssl
+      connection.verify_mode = OpenSSL::SSL::VERIFY_NONE if connection.use_ssl?
       connection
     end
     
