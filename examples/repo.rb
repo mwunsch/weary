@@ -3,10 +3,9 @@ require 'rubygems'
 require 'weary'
 
 class Repository
-  include Weary
   
   def show(user, repo)
-    get "http://github.com/api/v2/yaml/repos/show/#{user}/#{repo}"
+    Weary.get "http://github.com/api/v2/yaml/repos/show/#{user}/#{repo}"
   end
       
 end
