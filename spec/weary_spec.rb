@@ -47,4 +47,8 @@ describe Weary do
     end
     r.uri.query.should == r.with
   end
+  
+  it 'prepares a Batch request' do
+    requests = []
+  end
 end

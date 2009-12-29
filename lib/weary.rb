@@ -81,6 +81,10 @@ module Weary
       block.call(req) if block
       req
     end
+    
+    def batch(*requests)
+      Batch.new(requests)
+    end
   end
   
 end
