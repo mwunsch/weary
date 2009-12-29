@@ -20,10 +20,12 @@ begin
     gemspec.summary = "A little DSL for consuming RESTful web services"
     gemspec.email = "mark@markwunsch.com"
     gemspec.homepage = "http://github.com/mwunsch/weary"
-    gemspec.description = "The Weary need REST: a tiny DSL that makes the consumption of RESTful web services simple."
+    gemspec.description = "A tiny DSL that makes the consumption of RESTful web services simple."
     gemspec.authors = "Mark Wunsch"
-    gemspec.add_dependency('crack', '>= 0.1.2')
-    gemspec.add_dependency('oauth', '>= 0.3.5')
+    gemspec.add_dependency 'crack', '>= 0.1.2'
+    gemspec.add_dependency 'oauth', '>= 0.3.5'
+    gemspec.add_development_dependency 'rspec'
+    gemspec.add_development_dependency 'fakeweb'
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
