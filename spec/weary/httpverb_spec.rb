@@ -17,4 +17,9 @@ describe Weary::HTTPVerb do
     @test.request_class.should == Net::HTTP::Get
   end
   
+  it 'freaks out if you give it an unrecognized verb' do
+    test = Weary::HTTPVerb.new('FooBar')
+    lambda{ test.request_class }.should raise_error
+  end
+  
 end

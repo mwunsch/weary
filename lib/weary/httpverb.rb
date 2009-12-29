@@ -24,7 +24,7 @@ module Weary
         when :head
           Net::HTTP::Head
         else
-          Net::HTTP::Get  
+          raise "Weary does not recognize the HTTP verb '#{normalize.inspect}'."
       end
     end
     
