@@ -49,6 +49,10 @@ describe Weary do
   end
   
   it 'prepares a Batch request' do
-    requests = []
+    requests = [ Weary.get('http://twitter.com'),
+                 Weary.get('http://github.com'),
+                 Weary.get('http://vimeo.com'),
+                 Weary.get('http://tumblr.com')]
+    Weary.batch(requests).class.should == Weary::Batch             
   end
 end
