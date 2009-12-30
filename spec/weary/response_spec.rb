@@ -102,6 +102,14 @@ describe Weary::Response do
     response.follow_redirect.body.should == "Hello world"
   end
   
+  it 'stores the url' do
+    FakeWeb.register_uri(:get, "http://vimeo.com", :body => get_fixture('vimeo.json'))
+    
+    request = Weary::Request.new('http://vimeo.com')
+    response = request.perform
+    response.url.to_s.should == 'http://vimeo.com'
+  end
+  
   describe 'Parsing' do
     it 'parses JSON' do
       FakeWeb.register_uri(:get, "http://vimeo.com", :body => get_fixture('vimeo.json'), :'Content-Type' => 'text/json')

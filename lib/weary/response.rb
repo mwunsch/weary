@@ -1,11 +1,12 @@
 module Weary
   class Response
   
-    attr_reader :raw, :requester, :code, :message, :header, :content_type, :cookie, :body
+    attr_reader :raw, :requester, :code, :message, :header, :content_type, :cookie, :body, :url
     
     def initialize(http_response, requester)
       @raw = http_response
       @requester = requester
+      @url = requester.uri
       @code = http_response.code.to_i
       @message = http_response.message
       @header = http_response.to_hash
