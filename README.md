@@ -136,7 +136,7 @@ Which will create a POST Request for *http://foo.bar/update.xml* that will authe
 
 ## Weary Class Methods
 
-Maybe you don't want the baggage that comes with `Weary::Base`. That's okay, Weary provides some basic class-level methods to Easily build a `Weary::Requests`:
+Maybe you don't want the baggage that comes with `Weary::Base`. That's okay, Weary provides some basic class-level methods to Easily build a `Weary::Request`:
 
 	# See examples/repo.rb to see this in practice
 	class Repository
@@ -162,8 +162,60 @@ Pass a block to `Weary.get` to dive further into the Request:
 	
 ## Request Callbacks
 
-*Still to come*
+A `Weary::Request` has a couple of callbacks you can do:
 
-## And more...	
+	status = Weary.get("http://twitter.com/statuses/user_timeline") do |r|
+		r.with = {:id => 'markwunsch'}
+	end
+	
+	status.before_send do |request|
+		puts "Sending a request to #{request.uri}"
+	end
+	
+	status.on_complete do |response|
+		if response.success?
+			puts response.body
+		else
+			puts "Something went wrong: #{response.code}: #{response.message}"
+		end
+	end
+	
+`before_send` is sent just before the request is made, and `on_complete` is triggered immediately following. `before_send` passes the Request object to the block and `on_complete` passes the Response object.
+
+You don't need to define `on_complete`, though. Passing a block to the `perform` method of the Request also defines this callback or will overwrite what you had previously defined:
+
+	status.perform do |response|
+		puts "Request to #{response.url}, complete. Got a #{response.code}."
+	end
+	
+## Multiple Asynchronous Requests with Batch
+
+Requests, along with the `perform` method, also has a `perform!` method, which spins off a Thread to actually perform the Net::HTTP Request. This method returns a Thread object, and is encapsulated by the `perform` method.
+
+Weary::Batch allows you to make a group of `perform!` requests, firing at will. It takes a group of Requests.
+
+	# see examples/batch.rb
+	resources = %w[http://twitter.com http://github.com http://vimeo.com http://tumblr.com]
+	requests = []
+	
+	## build the group of requests:
+	resources.each do |url|
+		requests << Weary.get(url) do |req|
+			req.on_complete {|res| puts "Hello from #{res.url}"}
+		end
+	end
+	
+	## And fire them off:
+	Weary.batch(requests).perform
+	
+Batch has callbacks, just like the Request:
+
+	Weary.batch(requests).perform do
+		puts 'All done.'
+	end
+
+You can investigate the pool of threads once you've called `perform` with `Batch#pool` or look at all the returned responses with `Batch#responses`.
+
+## And more...
 	
 There's more to discover in the Wiki.
