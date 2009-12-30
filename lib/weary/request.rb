@@ -19,7 +19,8 @@ module Weary
         self.follows = options[:no_follow] ? false : true
       end
     end
-  
+    
+    # Create a URI object for the given URL
     def uri=(url)
       @uri = URI.parse(url)
       if (with && !request_preparation.request_body_permitted?)
@@ -40,6 +41,9 @@ module Weary
       @http_verb
     end
     
+    # Set parameters to send with the Request.
+    # If this Request does not accept a body (a GET request for instance),
+    # set the query string for the url.
     def with=(params)
       @with = (params.respond_to?(:to_params) ? params.to_params : params)
       if (!request_preparation.request_body_permitted?)
@@ -47,6 +51,9 @@ module Weary
       end
     end
     
+    # Credentials to send to Authorize the Request
+    # For basic auth, use a hash with keys :username and :password
+    # For OAuth, use an Access Token
     def credentials=(auth)
       if auth.is_a?(OAuth::AccessToken)
         @credentials = auth
@@ -55,30 +62,36 @@ module Weary
       end
     end
     
+    # Should the Request follow redirects?
     def follows=(bool)
       @follows = (bool ? true : false)
     end
-    
+
     def follows?
       @follows
     end
     
+    # A callback that is triggered after the Response is received.
     def on_complete(&block)
       @on_complete = block if block_given?
       @on_complete
     end
     
+    # A callback that is sent before the Request is fired.
     def before_send(&block)
       @before_send = block if block_given?
       @before_send
     end
     
+    # Perform the Request, returns the Response. Pass a block in to use
+    # as the on_complete callback.
     def perform(&block)
       @on_complete = block if block_given?
       response = perform!
       response.value
     end
     
+    # Spins off a new thread to perform the Request.
     def perform!(&block)
       @on_complete = block if block_given?
       Thread.new {
@@ -94,12 +107,14 @@ module Weary
       }
     end
     
+    # Build the HTTP connection.
     def http
       connection = Net::HTTP.new(uri.host, uri.port)
       connection.verify_mode = OpenSSL::SSL::VERIFY_NONE if connection.use_ssl?
       connection
     end
     
+    # Build the HTTP Request.
     def request
       req = request_preparation
       
@@ -121,6 +136,11 @@ module Weary
       req
     end
     
+    # Prepare the HTTP Request.
+    # The Request has a lifecycle:
+    # Prepare with `request_preparation`
+    # Build with `request`
+    # Fire with `perform`
     def request_preparation
       HTTPVerb.new(via).request_class.new(uri.request_uri)
     end

@@ -17,12 +17,16 @@ require 'weary/base'
 
 module Weary
   
+  # Supported HTTP Verbs
   Methods = [:get, :post, :put, :delete, :head]
+  
+  # Supported Content Types
   ContentTypes = { :json  => [:json, 'json', 'application/json', 'text/json', 'application/javascript', 'text/javascript'],
                    :xml   => [:xml, 'xml', 'text/xml', 'application/xml'],
                    :html  => [:html, 'html', 'text/html'],
                    :yaml  => [:yaml, 'yaml', 'application/x-yaml', 'text/yaml'],
                    :plain => [:plain, 'plain', 'text/plain'] }
+                   
   # A collection of User Agent strings that I stole from HURL (http://hurl.it)
   UserAgents = {
     "Firefox 1.5.0.12 - Mac" => "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.8.0.12) Gecko/20070508 Firefox/1.5.0.12",
@@ -76,12 +80,15 @@ module Weary
       request url, :head, block
     end
     
+    # Create a Request for the URL.
+    # Defaults to a GET Request. Use a block to further modify the Request
     def request(url,via = :get,block = nil)
       req = Request.new(url,via)
       block.call(req) if block
       req
     end
     
+    # Create a Batch for a group of Requests
     def batch(*requests)
       Batch.new(requests)
     end
