@@ -1,4 +1,13 @@
-require 'rubygems'
+begin
+  # Try to require the preresolved locked set of gems.
+  require File.expand_path('../.bundle/environment', __FILE__)
+rescue LoadError
+  # Fall back on doing an unlocked resolve at runtime.
+  require "rubygems"
+  require "bundler"
+  Bundler.setup
+end
+
 require 'spec/rake/spectask'
 
 task :default => :spec
@@ -24,12 +33,11 @@ begin
     gemspec.authors = "Mark Wunsch"
     gemspec.add_dependency 'crack', '>= 0.1.2'
     gemspec.add_dependency 'oauth', '>= 0.3.5'
-    gemspec.add_development_dependency 'rspec'
-    gemspec.add_development_dependency 'fakeweb'
+    gemspec.add_development_dependency 'bundler', ">= 0.9.7"
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
-  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"  
+  puts "Jeweler not available.  Install it with: gem install jeweler"
 end
 
 desc "Open an irb session preloaded with this library"

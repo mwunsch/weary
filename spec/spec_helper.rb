@@ -1,7 +1,21 @@
-$LOAD_PATH.unshift File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
+begin
+  # Try to require the preresolved locked set of gems.
+  require File.expand_path('../.bundle/environment', __FILE__)
+rescue LoadError
+  # Fall back on doing an unlocked resolve at runtime.
+  require "rubygems"
+  require "bundler"
+  Bundler.setup
+end
 
-require 'rubygems'
-require 'weary'
+begin
+  require 'weary'
+rescue LoadError
+  lib_path = File.join(File.dirname(__FILE__), '..', 'lib')
+  $LOAD_PATH.unshift lib_path unless $LOAD_PATH.include?(lib_path)
+  require 'weary'
+end
+
 require 'spec'
 require 'fakeweb'
 
