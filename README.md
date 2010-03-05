@@ -9,8 +9,7 @@ What does it do:
 + Authentication with Basic Authentication and [OAuth](http://oauth.net/).
 + Asynchronous, multi-threaded requests.
 
-Browse the documentation here: [http://rdoc.info/projects/mwunsch/weary](http://rdoc.info/projects/mwunsch/weary)
-Peruse the [Wiki](http://wiki.github.com/mwunsch/weary) to discover libraries built with Weary and a more thorough review of the API.
+[RDoc](http://rdoc.info/projects/mwunsch/weary) | [Gem](http://rubygems.org/gems/weary) | [Wiki](http://wiki.github.com/mwunsch/weary) | [Metrics](http://getcaliper.com/caliper/project?repo=git://github.com/mwunsch/weary.git)
 
 ## Requirements
 
@@ -20,8 +19,6 @@ Peruse the [Wiki](http://wiki.github.com/mwunsch/weary) to discover libraries bu
 + [FakeWeb](http://github.com/chrisk/fakeweb) (for running the tests)
 
 ## Installation
-
-You do have Rubygems right? You do use [Gemcutter](http://gemcutter.org/), right?
 
 	gem install weary
 	
