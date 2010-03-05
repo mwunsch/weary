@@ -10,14 +10,9 @@ module Weary
       self.credentials = {:username => options[:basic_auth][:username], 
                           :password => options[:basic_auth][:password]} if options[:basic_auth]
       self.credentials = options[:oauth] if options[:oauth]
-      if (options[:body])
-        self.with = options[:body]
-      end
+      self.with = options[:body] if options[:body]
       self.headers = options[:headers] if options[:headers]
-      self.follows = true
-      if options.has_key?(:no_follow)
-        self.follows = options[:no_follow] ? false : true
-      end
+      self.follows = options[:no_follow] ? false : true
     end
     
     # Create a URI object for the given URL
