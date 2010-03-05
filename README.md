@@ -13,14 +13,14 @@ What does it do:
 
 ## Requirements
 
-+ [Crack](http://github.com/jnunemaker/crack) >= 0.1.2
++ [Crack](http://github.com/jnunemaker/crack) >= 0.1.7
 + [OAuth](http://github.com/mojodna/oauth) >= 0.3.5
-+ [RSpec](http://rspec.info/) (for running the tests)
-+ [FakeWeb](http://github.com/chrisk/fakeweb) (for running the tests)
 
 ## Installation
 
 	gem install weary
+	
+If you're interested in doing development on Weary, clone the repository and run `bundle install` to get the development dependencies.	
 	
 ## Quick Start
 	
