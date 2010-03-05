@@ -61,30 +61,30 @@ module Weary
   
   class << self
     def get(url,&block)
-      request url, :get, block
+      request url, :get, &block
     end
     
     def post(url,&block)
-      request url, :post, block
+      request url, :post, &block
     end
     
     def put(url,&block)
-      request url, :put, block
+      request url, :put, &block
     end
     
     def delete(url,&block)
-      request url, :delete, block
+      request url, :delete, &block
     end
     
     def head(url,&block)
-      request url, :head, block
+      request url, :head, &block
     end
     
     # Create a Request for the URL.
     # Defaults to a GET Request. Use a block to further modify the Request
-    def request(url,via = :get,block = nil)
+    def request(url,via = :get, &block)
       req = Request.new(url,via)
-      block.call(req) if block
+      yield req if block_given?
       req
     end
     

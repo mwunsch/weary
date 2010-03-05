@@ -9,8 +9,7 @@ describe Weary do
   end
   
   it 'can alter the request' do
-    block = lambda{|r| r.via = 'POST' }
-    r = Weary.request('http://google.com', :get, block)
+    r = Weary.request('http://google.com', :get) {|r| r.via = 'POST' }
     r.via.should == :post
   end
   
