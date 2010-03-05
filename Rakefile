@@ -31,7 +31,7 @@ begin
     gemspec.homepage = "http://github.com/mwunsch/weary"
     gemspec.description = "A tiny DSL that makes the consumption of RESTful web services simple."
     gemspec.authors = "Mark Wunsch"
-    gemspec.add_dependency 'crack', '>= 0.1.2'
+    gemspec.add_dependency 'crack', '>= 0.1.7'
     gemspec.add_dependency 'oauth', '>= 0.3.5'
     gemspec.add_development_dependency 'bundler', ">= 0.9.7"
   end
