@@ -112,7 +112,7 @@ describe Weary::Base do
       end
       
       it 'passes the resource into a block for further refinement' do
-        r = @contest.build_resource("test", :post, Proc.new {|res| res.via = :put })
+        r = @contest.build_resource("test", :post) {|res| res.via = :put }
         r.name.should == "test"
         r.via.should == :put
       end

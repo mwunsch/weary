@@ -34,8 +34,7 @@ module Weary
       }
     end
     
-    class << self
-      
+    class << self      
       # Getter for class-level resources
       def resources
         @@resources
@@ -52,23 +51,23 @@ module Weary
       # [<tt>follows</tt>] Boolean; Does this follow redirects? Defaults to true
       # [<tt>headers</tt>] Set headers for the HTTP Request
       def get(name,&block)
-        build_resource(name, :get, block)
+        build_resource(name, :get, &block)
       end
       alias declare get
       
       # Declares a Resource to be requested via POST
       def post(name,&block)
-        build_resource(name, :post, block)
+        build_resource(name, :post, &block)
       end
       
       # Declares a Resource to be requested via PUT
       def put(name,&block)
-        build_resource(name, :put, block)
+        build_resource(name, :put, &block)
       end
 
       # Declares a Resource to be requested via DELETE
       def delete(name,&block)
-        build_resource(name, :delete, block)
+        build_resource(name, :delete, &block)
       end
       
       # Set custom default Headers for your Request
@@ -89,9 +88,9 @@ module Weary
       end
       
       # Prepare and store the Resource
-      def build_resource(name,verb,block=nil)
+      def build_resource(name,verb,&block)
         resource = prepare_resource(name,verb)
-        block.call(resource) if block
+        yield resource if block_given?
         store_resource(resource)
         build_method(resource)
         resource
