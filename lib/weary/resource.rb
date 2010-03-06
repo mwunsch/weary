@@ -4,7 +4,7 @@ module Weary
     attr_accessor :headers
     
     def initialize(name)
-      self.name = name
+      self.name = name.to_sym
       self.via = :get
       self.authenticates = false
       self.follows = true
@@ -18,11 +18,7 @@ module Weary
     # The HTTP Method used to fetch the Resource
     def via=(http_verb)
       verb = HTTPVerb.new(http_verb).normalize
-      @via = if Methods.include?(verb)
-        verb
-      else
-        :get
-      end
+      @via = Methods.include?(verb) ? verb : :get
     end
     
     # Optional params. Should be an array. Merges with requires if that is set.
@@ -49,7 +45,7 @@ module Weary
     
     # Sets whether the Resource should follow redirection. Always sets to a boolean value.
     def follows=(bool)
-      @follows = (bool ? true : false)
+      @follows = bool ? true : false
     end
     
     # Should the resource follow redirection?

@@ -113,7 +113,7 @@ module Weary
       
       # Build a method to form a Request for the given Resource
       def build_method(resource)
-        define_method resource.name.to_sym do |*args|
+        define_method resource.name do |*args|
           args.blank? ? params = {} : params = args[0]
           resource.build!(params, @defaults, @credentials)
         end
