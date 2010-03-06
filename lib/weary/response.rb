@@ -17,7 +17,7 @@ module Weary
     
     # Is this an HTTP redirect?
     def redirected?
-      raw.is_a?(Net::HTTPRedirection)
+      raw.is_a? Net::HTTPRedirection
     end
     
     # Was this Request successful?
