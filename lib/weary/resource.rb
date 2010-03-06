@@ -4,7 +4,7 @@ module Weary
     attr_accessor :headers
     
     def initialize(name)
-      self.name = name.to_sym
+      self.name = name
       self.via = :get
       self.authenticates = false
       self.follows = true
