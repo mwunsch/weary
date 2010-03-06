@@ -18,7 +18,7 @@ module Weary
     # Create a URI object for the given URL
     def uri=(url)
       @uri = URI.parse(url)
-      if (with && !request_preparation.request_body_permitted?)
+      if (with && !connection.request_body_permitted?)
         @uri.query = with
       end
     end
@@ -41,7 +41,7 @@ module Weary
     # set the query string for the url.
     def with=(params)
       @with = (params.respond_to?(:to_params) ? params.to_params : params)
-      if (!request_preparation.request_body_permitted?)
+      if (!connection.request_body_permitted?)
         uri.query = @with
       end
     end
@@ -104,14 +104,14 @@ module Weary
     
     # Build the HTTP connection.
     def http
-      connection = Net::HTTP.new(uri.host, uri.port)
-      connection.verify_mode = OpenSSL::SSL::VERIFY_NONE if connection.use_ssl?
-      connection
+      socket = Net::HTTP.new(uri.host, uri.port)
+      socket.verify_mode = OpenSSL::SSL::VERIFY_NONE if socket.use_ssl?
+      socket
     end
     
     # Build the HTTP Request.
     def request
-      req = request_preparation
+      req = connection
       
       req.body = with if (with && req.request_body_permitted?)
       if (credentials)
@@ -122,11 +122,7 @@ module Weary
         end
       end
       
-      if headers
-        headers.each_pair do |key, value|
-          req[key] = value
-        end
-      end
+      headers.each_pair {|key,value| req[key] = value } if headers
       
       req
     end
@@ -136,7 +132,7 @@ module Weary
     # Prepare with `request_preparation`
     # Build with `request`
     # Fire with `perform`
-    def request_preparation
+    def connection
       HTTPVerb.new(via).request_class.new(uri.request_uri)
     end
 

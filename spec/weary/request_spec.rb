@@ -9,7 +9,7 @@ describe Weary::Request do
   
   it 'maps to a Net/HTTPRequest class' do
     test = Weary::Request.new("http://google.com")
-    test.request_preparation.class.should == Net::HTTP::Get
+    test.connection.class.should == Net::HTTP::Get
   end
   
   describe 'Request' do
