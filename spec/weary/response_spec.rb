@@ -145,6 +145,14 @@ describe Weary::Response do
       response = request.perform
       response['repository'][:name].should == 'rails'
     end
+    
+    it 'converts to a string by printing the body' do
+      fixture = get_fixture('github.yml')
+      FakeWeb.register_uri(:get, "http://github.com", :body => fixture, :'Content-Type' => 'text/yaml')
+      request = Weary::Request.new('http://github.com')
+      response = request.perform
+      response.to_s.should == get_fixture('github.yml')      
+    end
   end
   
   describe 'Exceptions' do

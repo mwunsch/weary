@@ -66,6 +66,11 @@ module Weary
       end
     end
     
+    # Puts the body
+    def to_s
+      body.to_s
+    end
+    
     # Same as parse[key]
     def [](key)
       parse[key]
