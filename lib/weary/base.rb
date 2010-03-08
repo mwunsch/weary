@@ -47,7 +47,7 @@ module Weary
       # [<tt>with</tt>] An array of parameters that will be passed to the body or query of the request. If you pass a hash, it will define default <tt>values</tt> for params <tt>keys</tt>
       # [<tt>requires</tt>] Array of members of <tt>:with</tt> that are required by the resource.
       # [<tt>authenticates</tt>] Boolean value; does the resource require authentication?
-      # [<tt>url</tt>] The url of the resource. You can use the same flags as #construct_url
+      # [<tt>url</tt>] The url of the resource.
       # [<tt>follows</tt>] Boolean; Does this follow redirects? Defaults to true
       # [<tt>headers</tt>] Set headers for the HTTP Request
       def get(name,&block)
