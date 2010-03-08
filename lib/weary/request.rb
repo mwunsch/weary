@@ -105,6 +105,7 @@ module Weary
     # Build the HTTP connection.
     def http
       socket = Net::HTTP.new(uri.host, uri.port)
+      socket.use_ssl = uri.is_a?(URI::HTTPS)
       socket.verify_mode = OpenSSL::SSL::VERIFY_NONE if socket.use_ssl?
       socket
     end
