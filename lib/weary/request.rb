@@ -25,11 +25,7 @@ module Weary
     
     def via=(http_verb)
       verb = HTTPVerb.new(http_verb).normalize
-      @http_verb = if Methods.include?(verb)
-        verb
-      else
-        :get
-      end
+      @http_verb = Methods.include?(verb) ? verb : :get
     end
     
     def via
@@ -129,7 +125,7 @@ module Weary
     
     # Prepare the HTTP Request.
     # The Request has a lifecycle:
-    # Prepare with `request_preparation`
+    # Prepare with `connection`
     # Build with `request`
     # Fire with `perform`
     def connection
