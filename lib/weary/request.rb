@@ -81,8 +81,7 @@ module Weary
     # Perform the Request, returns the Response. Pass a block in to use
     # as the on_complete callback.
     def perform(&block)
-      @on_complete = block if block_given?
-      response = perform!
+      response = perform!(&block)
       response.value
     end
     
