@@ -152,7 +152,7 @@ describe Weary::Request do
 
     it "accepts an optional block" do
       code = nil
-      subject.perform {|response| code = response.status }
+      subject.perform {|response| code = response.status }.force
       code.should be >= 100
     end
   end
