@@ -1,34 +1,8 @@
-require 'uri'
-require 'net/http'
-require 'net/https'
-
-require 'crack'
-require 'oauth'
-
-autoload :Yaml, 'yaml'
-
+require 'weary/version'
 require 'weary/request'
-require 'weary/response'
-require 'weary/resource'
-require 'weary/batch'
-require 'weary/exceptions'
-require 'weary/httpverb'
-require 'weary/base'
 
 module Weary
-  
-  # Supported HTTP Verbs
-  Methods = [:get, :post, :put, :delete, :head]
-  
-  # Supported Content Types
-  ContentTypes = { :json  => [:json, 'json', 'application/json', 'text/json', 'application/javascript', 'text/javascript'],
-                   :xml   => [:xml, 'xml', 'text/xml', 'application/xml'],
-                   :html  => [:html, 'html', 'text/html'],
-                   :yaml  => [:yaml, 'yaml', 'application/x-yaml', 'text/yaml'],
-                   :plain => [:plain, 'plain', 'text/plain'] }
-                   
-  # A collection of User Agent strings that I stole from HURL (http://hurl.it)
-  UserAgents = {
+  USER_AGENTS = {
     "Firefox 1.5.0.12 - Mac" => "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.8.0.12) Gecko/20070508 Firefox/1.5.0.12",
     "Firefox 1.5.0.12 - Windows" => "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.12) Gecko/20070508 Firefox/1.5.0.12",
     "Firefox 2.0.0.12 - Mac" => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1.12) Gecko/20080201 Firefox/2.0.0.12",
@@ -58,40 +32,4 @@ module Weary
     "Safari 4.0.2 - Mac" => "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_7; en-us) AppleWebKit/530.19.2 (KHTML, like Gecko) Version/4.0.2 Safari/530.19",
     "Safari 4.0.2 - Windows" => "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/530.19.2 (KHTML, like Gecko) Version/4.0.2 Safari/530.19.1"
   }
-  
-  class << self
-    def get(url,&block)
-      request url, :get, &block
-    end
-    
-    def post(url,&block)
-      request url, :post, &block
-    end
-    
-    def put(url,&block)
-      request url, :put, &block
-    end
-    
-    def delete(url,&block)
-      request url, :delete, &block
-    end
-    
-    def head(url,&block)
-      request url, :head, &block
-    end
-    
-    # Create a Request for the URL.
-    # Defaults to a GET Request. Use a block to further modify the Request
-    def request(url,via = :get, &block)
-      req = Request.new(url,via)
-      yield req if block_given?
-      req
-    end
-    
-    # Create a Batch for a group of Requests
-    def batch(*requests)
-      Batch.new(requests)
-    end
-  end
-  
 end

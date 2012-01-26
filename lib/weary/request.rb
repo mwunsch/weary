@@ -1,135 +1,59 @@
+# A Request builds a rack env to hand off to an adapter,
+# which is a rack application that actually makes the request
+require 'addressable/uri'
+require 'rack/request'
+require 'rack/response'
+require 'weary/adapter'
+
 module Weary
   class Request
-    
-    attr_reader :uri, :with, :credentials
-    attr_accessor :headers
-  
-    def initialize(url, http_verb= :get, options={})
+    attr_reader :uri, :method
+
+    def initialize(url, method='GET')
       self.uri = url
-      self.via = http_verb
-      self.credentials = {:username => options[:basic_auth][:username], 
-                          :password => options[:basic_auth][:password]} if options[:basic_auth]
-      self.credentials = options[:oauth] if options[:oauth]
-      self.with = options[:body] if options[:body]
-      self.headers = options[:headers] if options[:headers]
-      self.follows = options[:no_follow] ? false : true
-    end
-    
-    # Create a URI object for the given URL
-    def uri=(url)
-      @uri = URI.parse(url)
-      if (with && !connection.request_body_permitted?)
-        @uri.query = with
-      end
-    end
-    
-    def via=(http_verb)
-      verb = HTTPVerb.new(http_verb).normalize
-      @http_verb = Methods.include?(verb) ? verb : :get
-    end
-    
-    def via
-      @http_verb
-    end
-    
-    # Set parameters to send with the Request.
-    # If this Request does not accept a body (a GET request for instance),
-    # set the query string for the url.
-    def with=(params)
-      @with = (params.respond_to?(:to_params) ? params.to_params : params)
-      if (!connection.request_body_permitted?)
-        uri.query = @with
-      end
-    end
-    
-    # Credentials to send to Authorize the Request
-    # For basic auth, use a hash with keys :username and :password
-    # For OAuth, use an Access Token
-    def credentials=(auth)
-      if auth.is_a?(OAuth::AccessToken)
-        @credentials = auth
-      else
-        @credentials = {:username => auth[:username], :password => auth[:password]}
-      end
-    end
-    
-    # Should the Request follow redirects?
-    def follows=(bool)
-      @follows = (bool ? true : false)
+      self.method = method
+      yield self if block_given?
     end
 
-    def follows?
-      @follows
+    def uri=(url)
+      uri = Addressable::URI.parse(url).normalize!
+      @uri = uri
     end
-    
-    # A callback that is triggered after the Response is received.
-    def on_complete(&block)
-      @on_complete = block if block_given?
-      @on_complete
+
+    def call(environment)
+      perform.finish
     end
-    
-    # A callback that is sent before the Request is fired.
-    def before_send(&block)
-      @before_send = block if block_given?
-      @before_send
+
+    def env
+      {
+        'REQUEST_METHOD'  => method,
+        'SCRIPT_NAME'     => "",
+        'PATH_INFO'       => uri.path,
+        'QUERY_STRING'    => uri.query || "",
+        'SERVER_NAME'     => uri.host,
+        'SERVER_PORT'     => uri.port || uri.inferred_port,
+        'REQUEST_URI'     => uri.request_uri,
+        'weary.request'   => self
+      }.update Hash[headers.map {|k,v| ["HTTP_#{k.to_s.upcase.gsub('-','_')}", v] }]
     end
-    
-    # Perform the Request, returns the Response. Pass a block in to use
-    # as the on_complete callback.
+
+    def method=(verb)
+      @method = verb.to_s.upcase
+    end
+
+    def headers(hash=nil)
+      @headers = hash unless hash.nil?
+      @headers ||= {}
+    end
+
+    def adapter(connection=nil)
+      @connection = connection unless connection.nil?
+      @connection ||= Weary::Adapter::NetHttp
+    end
+
+    # A Future comes back
     def perform(&block)
-      response = perform!(&block)
-      response.value
-    end
-    
-    # Spins off a new thread to perform the Request.
-    def perform!(&block)
-      @on_complete = block if block_given?
-      Thread.new {
-        before_send.call(self) if before_send
-        req = http.request(request)
-        response = Response.new(req, self)
-        if response.redirected? && follows?
-          response.follow_redirect
-        else
-          on_complete.call(response) if on_complete
-          response
-        end
-      }
-    end
-    
-    # Build the HTTP connection.
-    def http
-      socket = Net::HTTP.new(uri.host, uri.port)
-      socket.use_ssl = uri.is_a?(URI::HTTPS)
-      socket.verify_mode = OpenSSL::SSL::VERIFY_NONE if socket.use_ssl?
-      socket
-    end
-    
-    # Build the HTTP Request.
-    def request
-      req = connection
-      
-      req.body = with if (with && req.request_body_permitted?)
-      if (credentials)
-        if (credentials.is_a?(OAuth::AccessToken))
-          credentials.sign!(req)
-        else
-          req.basic_auth(credentials[:username], credentials[:password])
-        end
-      end
-      
-      headers.each_pair {|key,value| req[key] = value } if headers
-      
-      req
-    end
-    
-    # Prepare the HTTP Request.
-    # The Request has a lifecycle:
-    # Prepare with `connection`
-    # Build with `request`
-    # Fire with `perform`
-    def connection
-      HTTPVerb.new(via).request_class.new(uri.request_uri)
+      adapter.new(self).perform env, &block
     end
 
   end
