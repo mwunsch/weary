@@ -20,7 +20,7 @@ describe Weary::Adapter do
 
   describe "#perform" do
     it "returns a Rack::Response" do
-      subject.perform(env).should be_a Rack::Response
+      subject.perform(env).should be_a Weary::Response
     end
 
     it "yields the response to a block" do
@@ -32,7 +32,7 @@ describe Weary::Adapter do
 
   describe "connect" do
     it "returns a Rack::Response" do
-      subject.connect(Rack::Request.new(env)).should be_a Rack::Response
+      subject.connect(Rack::Request.new(env)).should be_a Weary::Response
     end
   end
 end

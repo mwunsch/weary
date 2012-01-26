@@ -141,8 +141,8 @@ describe Weary::Request do
         to_rack(lambda{|env| [200, {'Content-Type' => 'text/html'}, ['']]})
     end
 
-    it "returns a Rack::Response" do
-      subject.perform.should be_a Rack::Response
+    it "returns a Weary::Response" do
+      subject.perform.should be_a Weary::Response
     end
 
     it "accepts an optional block" do
