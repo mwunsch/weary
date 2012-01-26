@@ -1,4 +1,5 @@
 require 'net/http'
+require 'net/https'
 
 module Weary
   module Adapter
@@ -11,20 +12,34 @@ module Weary
 
       def self.perform(env)
         req = Rack::Request.new(env)
-        response = connect(req)
-        yield response if block_given?
-        response
+        future do
+          response = connect(req)
+          yield response if block_given?
+          response
+        end
       end
 
       def self.connect(request)
-         response = socket(request).send_request(request.request_method, request.path)
-         Rack::Response.new response.body, response.code, headers(response)
+        connection = socket(request)
+        response = connection.send_request(request.request_method,
+                                           request.fullpath,
+                                           nil,
+                                           normalize_request_headers(request.env))
+        Weary::Response.new response.body, response.code, response.to_hash
+      end
+
+      def self.normalize_request_headers(env)
+        req_headers = env.reject {|k,v| !k.start_with? "HTTP_" }
+        Hash[req_headers.map {|k, v| [k.sub("HTTP_",''), v] }]
       end
 
       def self.socket(request)
         host = request.env['SERVER_NAME']
         port = request.env['SERVER_PORT'].to_s
-        Net::HTTP.new host, port
+        connection = Net::HTTP.new host, port
+        connection.use_ssl = request.scheme.eql?'https'
+        connection.verify_mode = OpenSSL::SSL::VERIFY_NONE if connection.use_ssl?
+        connection
       end
 
       def self.headers(response)
