@@ -89,6 +89,11 @@ describe Weary::Request do
     it "infers a SERVER_PORT of 80" do
       request.env["SERVER_PORT"].should eql 80
     end
+
+    it "pulls the query string out of the uri" do
+      request.uri = "http://api.twitter.com/version/users/show.format?screen_name=markwunsch"
+      request.env['QUERY_STRING'].should eql 'screen_name=markwunsch'
+    end
   end
 
   describe "#headers" do
