@@ -2,7 +2,16 @@ shared_examples_for "a Rack application" do
   it { should respond_to :call }
 
   it "takes one argument, the environment" do
-    subject.public_method(:call).arity.should eq 1
+    method = if subject.respond_to? :public_method
+      subject.public_method(:call)
+    else
+      begin
+        subject.__method__(:call)
+      rescue NoMethodError
+        subject.method(:call)
+      end
+    end
+    method.arity.should eq 1
   end
 
   it "returns an Array" do
