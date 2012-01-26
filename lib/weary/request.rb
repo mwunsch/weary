@@ -2,12 +2,11 @@
 # which is a rack application that actually makes the request
 require 'addressable/uri'
 require 'rack/request'
-require 'rack/response'
 require 'weary/adapter'
 
 module Weary
   class Request
-    attr_reader :uri, :method
+    attr_reader :uri
 
     def initialize(url, method='GET')
       self.uri = url
@@ -33,8 +32,15 @@ module Weary
         'SERVER_NAME'     => uri.host,
         'SERVER_PORT'     => uri.port || uri.inferred_port,
         'REQUEST_URI'     => uri.request_uri,
+        'rack.url_scheme' => uri.scheme,
         'weary.request'   => self
       }.update Hash[headers.map {|k,v| ["HTTP_#{k.to_s.upcase.gsub('-','_')}", v] }]
+    end
+
+    alias_method :__method__, :method
+
+    def method
+      @method
     end
 
     def method=(verb)
@@ -53,7 +59,7 @@ module Weary
 
     # A Future comes back
     def perform(&block)
-      adapter.new(self).perform env, &block
+      adapter.new.perform env, &block
     end
 
   end
