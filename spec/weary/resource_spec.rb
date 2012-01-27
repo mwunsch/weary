@@ -49,12 +49,34 @@ describe Weary::Resource do
     end
   end
 
+  describe "#headers" do
+    it "prepares headers for the request"
+    it "passes headers along to the request"
+  end
+
+  describe "#user_agent" do
+    it "updates the #headers hash with a User-Agent"
+  end
+
   describe "#request" do
     it "builds a request object" do
       url = "http://github.com/api/v2/json/repos/show/{user}/{repo}"
       resource = Weary::Resource.new "GET", url
-      resource.defaults :repo => "weary"
-      resource.request :user => "mwunsch"
+      req = resource.request(:repo => "weary", :user => "mwunsch")
+      req.should be_a Weary::Request
+    end
+
+    it "expands templated urls" do
+      url = "http://github.com/api/v2/json/repos/show/{user}/{repo}"
+      resource = Weary::Resource.new "GET", url
+      req = resource.request(:repo => "weary", :user => "mwunsch")
+      req.uri.to_s.should eql "http://github.com/api/v2/json/repos/show/mwunsch/weary"
+    end
+
+    it "raises an exception for missing requirements" do
+      url = "http://github.com/api/v2/json/repos/show/{user}/{repo}"
+      resource = Weary::Resource.new "GET", url
+      expect { resource.request }.to raise_error Weary::Resource::UnmetRequirementsError
     end
   end
 end

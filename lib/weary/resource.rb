@@ -2,6 +2,7 @@ require 'addressable/template'
 
 module Weary
   class Resource
+    UnmetRequirementsError = Class.new(StandardError)
 
     def initialize(method, uri)
       @method = method
@@ -28,11 +29,33 @@ module Weary
       @defaults ||= {}
     end
 
+    def headers(hash=nil)
+      @headers = hash unless hash.nil?
+      @headers ||= {}
+    end
+
+    def user_agent(agent)
+      headers.update 'User-Agent' => agent
+    end
+
     def request(params={})
       params.update(defaults)
-      Weary::Request.new(url.expand({}), @method)
+      raise UnmetRequirementsError, "Required parameters: #{required | url.keys}" \
+        unless meets_requirements? params
+      mapping = url.keys.map {|k| [k, params.delete(k) || params.delete(k.to_sym)] }
+      request = Weary::Request.new url.expand(Hash[mapping]), @method do |r|
+        r.headers headers
+      end
+      yield request if block_given?
+      request
     end
     alias build request
+
+    def meets_requirements?(params)
+      requirements = required.map(&:to_s) | url.keys
+      requirements.reject {|k| params.keys.map(&:to_s).include? k.to_s }.empty?
+    end
+
 
   end
 end
