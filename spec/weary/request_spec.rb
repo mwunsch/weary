@@ -121,6 +121,21 @@ describe Weary::Request do
     end
   end
 
+  describe "#user_agent" do
+    subject { described_class.new "http://github.com/api/v2/json/repos/show/mwunsch/weary" }
+    let(:agent) { 'RSpec' }
+
+    it "updates the #headers hash with a User-Agent" do
+      subject.user_agent agent
+      subject.headers.should have_key 'User-Agent'
+    end
+
+    it "sets the user agent for the headers" do
+      subject.user_agent agent
+      subject.headers['User-Agent'].should be agent
+    end
+  end
+
   describe "#adapter" do
     subject { described_class.new "http://github.com/api/v2/json/repos/show/mwunsch/weary" }
 
