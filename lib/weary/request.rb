@@ -56,6 +56,9 @@ module Weary
       headers.update 'User-Agent' => agent
     end
 
+    def body(parameters=nil)
+    end
+
     def adapter(connection=nil)
       @connection = connection unless connection.nil?
       @connection ||= Weary::Adapter::NetHttp

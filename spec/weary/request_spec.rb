@@ -136,6 +136,11 @@ describe Weary::Request do
     end
   end
 
+  describe "#body" do
+    it "sets the query string for a GET request"
+    it "sets the rack input for a POST request"
+  end
+
   describe "#adapter" do
     subject { described_class.new "http://github.com/api/v2/json/repos/show/mwunsch/weary" }
 
