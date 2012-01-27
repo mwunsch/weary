@@ -30,7 +30,7 @@ describe Weary::Adapter::NetHttp do
     it "performs the request through the connect method" do
       described_class.stub(:connect) { Rack::Response.new("", 200, {})}
       described_class.should_receive :connect
-      described_class.perform(@request.env)
+      described_class.perform(@request.env).force
     end
 
     it "returns a Rack::Response" do
@@ -43,7 +43,7 @@ describe Weary::Adapter::NetHttp do
       stub_request(:get, @url).
         to_return(:status => 200, :body => "", :headers => {})
       code = nil
-      described_class.perform(@request.env) {|response| code = response.status }
+      described_class.perform(@request.env) {|response| code = response.status }.force
       code.should eql 200
     end
   end
@@ -84,7 +84,7 @@ describe Weary::Adapter::NetHttp do
     it "removes the HTTP_ prefix from request headers" do
       @request.headers 'User-Agent' => Weary::USER_AGENTS['Lynx 2.8.4rel.1 on Linux']
       headers = described_class.normalize_request_headers(@request.env)
-      headers.should have_key "USER_AGENT"
+      headers.should have_key "User-Agent"
     end
   end
 

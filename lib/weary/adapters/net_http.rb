@@ -30,7 +30,11 @@ module Weary
 
       def self.normalize_request_headers(env)
         req_headers = env.reject {|k,v| !k.start_with? "HTTP_" }
-        Hash[req_headers.map {|k, v| [k.sub("HTTP_",''), v] }]
+        normalized = req_headers.map do |k, v|
+          new_key = k.sub("HTTP_",'').split('_').map(&:capitalize).join('-')
+          [new_key, v]
+        end
+        Hash[normalized]
       end
 
       def self.socket(request)
