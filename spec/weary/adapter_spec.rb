@@ -25,7 +25,7 @@ describe Weary::Adapter do
 
     it "yields the response to a block" do
       code = nil
-      subject.perform(env) {|response| code = response.status }
+      subject.perform(env) {|response| code = response.status }.force
       code.should be >= 100
     end
   end
