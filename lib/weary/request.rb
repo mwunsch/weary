@@ -57,6 +57,21 @@ module Weary
     end
 
     def body(parameters=nil)
+      if !parameters.nil?
+        if ["POST", "PUT"].include? method
+          attachment StringIO.new(parameters.map {|k,v| "#{k}=#{v}" }.join('&'))
+          @body = attachment.read
+        else
+          uri.query_values = parameters
+          @body = uri.query
+        end
+      end
+      @body
+    end
+
+    def attachment(io=nil)
+      @attachment = io unless io.nil?
+      @attachment
     end
 
     def adapter(connection=nil)

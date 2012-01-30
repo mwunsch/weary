@@ -45,6 +45,9 @@ module Weary
       mapping = url.keys.map {|k| [k, params.delete(k) || params.delete(k.to_sym)] }
       request = Weary::Request.new url.expand(Hash[mapping]), @method do |r|
         r.headers headers
+        if !optional.empty? || !required.empty?
+          r.body params.reject {|k,v| invalid_parameter? k }
+        end
       end
       yield request if block_given?
       request
@@ -54,6 +57,10 @@ module Weary
     def meets_requirements?(params)
       requirements = required.map(&:to_s) | url.keys
       requirements.reject {|k| params.keys.map(&:to_s).include? k.to_s }.empty?
+    end
+
+    def invalid_parameter?(key)
+      !(optional.map(&:to_s) | required.map(&:to_s)).include? key.to_s
     end
 
 

@@ -72,9 +72,6 @@ describe Weary::Request do
     end
   end
 
-  describe "#handler" do
-  end
-
   describe "#env" do
     let(:request) { described_class.new "http://github.com/api/v2/json/repos/show/mwunsch/weary" }
 
@@ -137,7 +134,12 @@ describe Weary::Request do
   end
 
   describe "#body" do
-    it "sets the query string for a GET request"
+    it "sets the query string for a GET request" do
+      req = described_class.new "http://api.twitter.com/version/users/show.json"
+      req.body :screen_name => 'markwunsch'
+      req.uri.query.should eql "screen_name=markwunsch"
+    end
+
     it "sets the rack input for a POST request"
   end
 

@@ -50,33 +50,58 @@ describe Weary::Resource do
   end
 
   describe "#headers" do
-    it "prepares headers for the request"
-    it "passes headers along to the request"
+    it "prepares headers for the request" do
+      url = "http://github.com/api/v2/json/repos/show/{user}/{repo}"
+      resource = Weary::Resource.new "GET", url
+      resource.headers 'User-Agent' => 'RSpec'
+      resource.headers.should eql 'User-Agent' => 'RSpec'
+    end
   end
 
   describe "#user_agent" do
-    it "updates the #headers hash with a User-Agent"
+    it "updates the #headers hash with a User-Agent" do
+      url = "http://github.com/api/v2/json/repos/show/{user}/{repo}"
+      resource = Weary::Resource.new "GET", url
+      resource.user_agent 'RSpec'
+      resource.headers.should eql 'User-Agent' => 'RSpec'
+    end
+
+
   end
 
   describe "#request" do
     it "builds a request object" do
       url = "http://github.com/api/v2/json/repos/show/{user}/{repo}"
-      resource = Weary::Resource.new "GET", url
+      resource = described_class.new "GET", url
       req = resource.request(:repo => "weary", :user => "mwunsch")
       req.should be_a Weary::Request
     end
 
     it "expands templated urls" do
       url = "http://github.com/api/v2/json/repos/show/{user}/{repo}"
-      resource = Weary::Resource.new "GET", url
+      resource = described_class.new "GET", url
       req = resource.request(:repo => "weary", :user => "mwunsch")
       req.uri.to_s.should eql "http://github.com/api/v2/json/repos/show/mwunsch/weary"
     end
 
     it "raises an exception for missing requirements" do
       url = "http://github.com/api/v2/json/repos/show/{user}/{repo}"
-      resource = Weary::Resource.new "GET", url
+      resource = described_class.new "GET", url
       expect { resource.request }.to raise_error Weary::Resource::UnmetRequirementsError
+    end
+
+    it "passes headers along to the request" do
+      url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
+      resource = described_class.new "GET", url
+      resource.headers 'User-Agent' => 'RSpec'
+      resource.request.headers.should eql 'User-Agent' => 'RSpec'
+    end
+
+    it "passes parameters into the request body" do
+      resource = described_class.new "GET", "http://api.twitter.com/version/users/show.json"
+      resource.required :user_id
+      req = resource.request :user_id => "markwunsch"
+      req.body.should eql "user_id=markwunsch"
     end
   end
 end
