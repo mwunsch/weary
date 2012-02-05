@@ -140,7 +140,37 @@ describe Weary::Request do
       req.uri.query.should eql "screen_name=markwunsch"
     end
 
-    it "sets the rack input for a POST request"
+    it "sets the rack input for a POST request" do
+      req = described_class.new "https://api.github.com/gists", "POST"
+      req.body :public => true,
+               :files  => { "file1.txt" => { :content => "String file contents"}}
+      req.env['rack.input'].read.should eql req.body
+    end
+  end
+
+  describe "#json" do
+    it "sets the request body to be a json string from a hash" do
+      hash = {:foo => 'baz'}
+      req = described_class.new "https://api.github.com/gists", "POST"
+      req.json hash
+      req.env['rack.input'].read.should eql hash.to_json
+    end
+  end
+
+  describe "#basic_auth" do
+    it "sets the Authorization header for the request" do
+      req = described_class.new "https://api.github.com/gists", "POST"
+      req.basic_auth "mwunsch", "secret-passphrase"
+      req.headers.should have_key "Authorization"
+    end
+
+    it "packs the passed credentials" do
+      req = described_class.new "https://api.github.com/gists", "POST"
+      credentials = ["mwunsch", "secret-passphrase"]
+      req.basic_auth *credentials
+      parts = req.headers['Authorization'].split(' ', 2)
+      parts.last.unpack('m*').first.split(':',2).should eql credentials
+    end
   end
 
   describe "#adapter" do

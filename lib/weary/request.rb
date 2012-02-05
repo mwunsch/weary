@@ -1,8 +1,9 @@
 # A Request builds a rack env to hand off to an adapter,
 # which is a rack application that actually makes the request
+require 'json'
 require 'future'
 require 'addressable/uri'
-require 'rack/request'
+require 'rack'
 require 'weary/adapter'
 
 module Weary
@@ -21,11 +22,12 @@ module Weary
     end
 
     def call(environment)
-      adapter.new.call env
+      new_env = environment.update(env)
+      adapter.new.call new_env
     end
 
     def env
-      {
+      rack_hash = {
         'REQUEST_METHOD'  => method,
         'SCRIPT_NAME'     => "",
         'PATH_INFO'       => uri.path,
@@ -34,8 +36,11 @@ module Weary
         'SERVER_PORT'     => uri.port || uri.inferred_port,
         'REQUEST_URI'     => uri.request_uri,
         'rack.url_scheme' => uri.scheme,
+        'rack.input'      => attachment,
         'weary.request'   => self
-      }.update Hash[headers.map {|k,v| ["HTTP_#{k.to_s.upcase.gsub('-','_')}", v] }]
+      }
+      rack_hash.update Hash[headers.map {|k,v| ["HTTP_#{k.to_s.upcase.gsub('-','_')}", v] }]
+      rack_hash
     end
 
     alias_method :__method__, :method
@@ -60,14 +65,20 @@ module Weary
     def body(parameters=nil)
       if !parameters.nil?
         if ["POST", "PUT"].include? method
-          attachment StringIO.new(parameters.map {|k,v| "#{k}=#{v}" }.join('&'))
-          @body = attachment.read
+          @body = query_params_from_hash(parameters)
+          attachment StringIO.new(@body)
         else
           uri.query_values = parameters
           @body = uri.query
         end
       end
       @body
+    end
+
+    def json(parameters)
+      json = parameters.to_json
+      attachment StringIO.new(json)
+      json
     end
 
     def attachment(io=nil)
@@ -80,6 +91,14 @@ module Weary
       @connection ||= Weary::Adapter::NetHttp
     end
 
+    def basic_auth(*credentials)
+      unless credentials.empty?
+        @basic_auth = [credentials.join(':')].pack('m*')
+        headers.update 'Authorization' => "Basic #{@basic_auth}"
+      end
+      @basic_auth
+    end
+
     # A Future comes back
     def perform
       future do
@@ -88,6 +107,14 @@ module Weary
         yield response if block_given?
         response
       end
+    end
+
+    private
+
+    def query_params_from_hash(hash)
+      tmp_uri = Addressable::URI.new
+      tmp_uri.query_values = hash
+      tmp_uri.query
     end
 
   end
