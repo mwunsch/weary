@@ -168,7 +168,7 @@ describe Weary::Request do
         to_rack(lambda{|env| [200, {'Content-Type' => 'text/html'}, ['']]})
     end
 
-    it "returns a Weary::Response" do
+    it "returns a future containing a Weary::Response" do
       subject.perform.should be_a Weary::Response
     end
 

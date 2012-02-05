@@ -18,21 +18,9 @@ describe Weary::Adapter do
     it_behaves_like "a Rack application"
   end
 
-  describe "#perform" do
-    it "returns a Rack::Response" do
-      subject.perform(env).should be_a Weary::Response
-    end
-
-    it "yields the response to a block" do
-      code = nil
-      subject.perform(env) {|response| code = response.status }.force
-      code.should be >= 100
-    end
-  end
-
   describe "connect" do
     it "returns a Rack::Response" do
-      subject.connect(Rack::Request.new(env)).should be_a Weary::Response
+      subject.connect(Rack::Request.new(env)).should be_a Rack::Response
     end
   end
 end

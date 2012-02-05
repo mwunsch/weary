@@ -1,5 +1,6 @@
 # A Request builds a rack env to hand off to an adapter,
 # which is a rack application that actually makes the request
+require 'future'
 require 'addressable/uri'
 require 'rack/request'
 require 'weary/adapter'
@@ -20,7 +21,7 @@ module Weary
     end
 
     def call(environment)
-      perform.finish
+      adapter.new.call env
     end
 
     def env
@@ -80,8 +81,13 @@ module Weary
     end
 
     # A Future comes back
-    def perform(&block)
-      adapter.new.perform env, &block
+    def perform
+      future do
+        status, headers, body = call({})
+        response = Weary::Response.new body, status, headers
+        yield response if block_given?
+        response
+      end
     end
 
   end

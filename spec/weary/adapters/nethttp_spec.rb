@@ -16,6 +16,12 @@ describe Weary::Adapter::NetHttp do
       subject { described_class }
       let(:env) { @request.env }
     end
+
+    it "performs the request through the connect method" do
+      described_class.stub(:connect) { Rack::Response.new("", 200, {})}
+      described_class.should_receive :connect
+      described_class.call(@request.env)
+    end
   end
 
   describe "#call" do
@@ -23,36 +29,6 @@ describe Weary::Adapter::NetHttp do
       described_class.stub(:call) { [200, {'Content-Type' => 'text/plain'}, [""]] }
       described_class.should_receive(:call).with(@request.env)
       described_class.new.call(@request.env)
-    end
-  end
-
-  describe "::perform" do
-    it "performs the request through the connect method" do
-      described_class.stub(:connect) { Rack::Response.new("", 200, {})}
-      described_class.should_receive :connect
-      described_class.perform(@request.env).force
-    end
-
-    it "returns a Rack::Response" do
-      stub_request(:get, @url).
-        to_return(:status => 200, :body => "", :headers => {})
-      described_class.perform(@request.env).should be_kind_of Weary::Response
-    end
-
-    it "yields the response to a block if given" do
-      stub_request(:get, @url).
-        to_return(:status => 200, :body => "", :headers => {})
-      code = nil
-      described_class.perform(@request.env) {|response| code = response.status }.force
-      code.should eql 200
-    end
-  end
-
-  describe "#perform" do
-    it "calls the class method `.perform`" do
-      described_class.stub(:perform) { Rack::Response.new("", 200, {})}
-      described_class.should_receive(:perform).with(@request.env)
-      described_class.new.perform(@request.env)
     end
   end
 
@@ -69,7 +45,7 @@ describe Weary::Adapter::NetHttp do
 
     it "returns a Rack::Response" do
       req = Rack::Request.new(@request.env)
-      described_class.connect(req).should be_kind_of Weary::Response
+      described_class.connect(req).should be_kind_of Rack::Response
     end
 
     it "sets appropriate request headers" do

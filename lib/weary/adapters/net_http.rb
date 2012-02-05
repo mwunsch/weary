@@ -7,16 +7,7 @@ module Weary
       include Weary::Adapter
 
       def self.call(env)
-        perform(env).finish
-      end
-
-      def self.perform(env)
-        req = Rack::Request.new(env)
-        future do
-          response = connect(req)
-          yield response if block_given?
-          response
-        end
+        connect(Rack::Request.new(env)).finish
       end
 
       def self.connect(request)
@@ -25,7 +16,7 @@ module Weary
                                            request.fullpath,
                                            nil,
                                            normalize_request_headers(request.env))
-        Weary::Response.new response.body, response.code, response.to_hash
+        Rack::Response.new response.body, response.code, response.to_hash
       end
 
       def self.normalize_request_headers(env)
@@ -46,20 +37,8 @@ module Weary
         connection
       end
 
-      def self.headers(response)
-        map = {}
-        response.each_capitalized do |key, value|
-          map[key] = value unless key == 'Status' # Pass Rack::Lint assertions
-        end
-        map
-      end
-
       def call(env)
         self.class.call(env)
-      end
-
-      def perform(env, &block)
-        self.class.perform(env, &block)
       end
 
     end
