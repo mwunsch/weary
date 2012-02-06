@@ -30,8 +30,7 @@ module Weary
       stack = Rack::Builder.new do
         middlewares.each do |middleware|
           klass, *args = middleware
-          block = args.last if args.last.respond_to? :call
-          use klass, *args[0...-1], &block
+          use klass, *args[0...-1], &args.last
         end
         run app
       end
