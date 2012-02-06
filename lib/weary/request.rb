@@ -120,13 +120,11 @@ module Weary
     end
 
     def rack_env_defaults
-      {
-        'rack.version'      => Rack::VERSION,
+      { 'rack.version'      => Rack::VERSION,
         'rack.errors'       => $stderr,
         'rack.multithread'  => true,
         'rack.multiprocess' => false,
-        'rack.run_once'     => false
-      }
+        'rack.run_once'     => false }
     end
 
   end
