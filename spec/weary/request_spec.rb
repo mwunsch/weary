@@ -84,7 +84,7 @@ describe Weary::Request do
     end
 
     it "infers a SERVER_PORT of 80" do
-      request.env["SERVER_PORT"].should eql 80
+      request.env["SERVER_PORT"].should eql "80"
     end
 
     it "pulls the query string out of the uri" do
@@ -133,18 +133,18 @@ describe Weary::Request do
     end
   end
 
-  describe "#body" do
+  describe "#params" do
     it "sets the query string for a GET request" do
       req = described_class.new "http://api.twitter.com/version/users/show.json"
-      req.body :screen_name => 'markwunsch'
+      req.params :screen_name => 'markwunsch'
       req.uri.query.should eql "screen_name=markwunsch"
     end
 
     it "sets the rack input for a POST request" do
       req = described_class.new "https://api.github.com/gists", "POST"
-      req.body :public => true,
+      req.params :public => true,
                :files  => { "file1.txt" => { :content => "String file contents"}}
-      req.env['rack.input'].read.should eql req.body
+      req.env['rack.input'].read.should eql req.params
     end
   end
 
@@ -206,6 +206,18 @@ describe Weary::Request do
       code = nil
       subject.perform {|response| code = response.status }.force
       code.should be >= 100
+    end
+  end
+
+  describe "#use" do
+    it "adds a middleware to the stack" do
+      req = described_class.new "http://github.com/api/v2/json/repos/show/mwunsch/weary"
+      req.adapter(Class.new { include Weary::Adapter })
+      # Rack::Runtime sets an "X-Runtime" response header
+      # http://rack.rubyforge.org/doc/Rack/Runtime.html
+      req.use Rack::Runtime, "RSpec"
+      code, headers, body = req.call({})
+      headers.should have_key "X-Runtime-RSpec"
     end
   end
 

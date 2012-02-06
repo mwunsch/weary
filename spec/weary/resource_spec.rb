@@ -101,7 +101,7 @@ describe Weary::Resource do
       resource = described_class.new "GET", "http://api.twitter.com/version/users/show.json"
       resource.required :user_id
       req = resource.request :user_id => "markwunsch"
-      req.body.should eql "user_id=markwunsch"
+      req.params.should eql "user_id=markwunsch"
     end
   end
 end

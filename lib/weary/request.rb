@@ -1,9 +1,11 @@
 # A Request builds a rack env to hand off to an adapter,
 # which is a rack application that actually makes the request
 require 'json'
-require 'future'
 require 'addressable/uri'
+require 'future'
 require 'rack'
+
+require 'weary/env'
 require 'weary/adapter'
 
 module Weary
@@ -13,6 +15,7 @@ module Weary
     def initialize(url, method='GET')
       self.uri = url
       self.method = method
+      @middlewares = []
       yield self if block_given?
     end
 
@@ -22,25 +25,21 @@ module Weary
     end
 
     def call(environment)
-      new_env = environment.update(env)
-      adapter.new.call new_env
+      app = adapter.new
+      middlewares = @middlewares
+      stack = Rack::Builder.new do
+        middlewares.each do |middleware|
+          klass, *args = middleware
+          block = args.last if args.last.respond_to? :call
+          use klass, *args[0...-1], &block
+        end
+        run app
+      end
+      stack.call rack_env_defaults.merge(environment.update(env))
     end
 
     def env
-      rack_hash = {
-        'REQUEST_METHOD'  => method,
-        'SCRIPT_NAME'     => "",
-        'PATH_INFO'       => uri.path,
-        'QUERY_STRING'    => uri.query || "",
-        'SERVER_NAME'     => uri.host,
-        'SERVER_PORT'     => uri.port || uri.inferred_port,
-        'REQUEST_URI'     => uri.request_uri,
-        'rack.url_scheme' => uri.scheme,
-        'rack.input'      => attachment,
-        'weary.request'   => self
-      }
-      rack_hash.update Hash[headers.map {|k,v| ["HTTP_#{k.to_s.upcase.gsub('-','_')}", v] }]
-      rack_hash
+      Weary::Env.new(self).env
     end
 
     alias_method :__method__, :method
@@ -62,11 +61,11 @@ module Weary
       headers.update 'User-Agent' => agent
     end
 
-    def body(parameters=nil)
+    def params(parameters=nil)
       if !parameters.nil?
         if ["POST", "PUT"].include? method
           @body = query_params_from_hash(parameters)
-          attachment StringIO.new(@body)
+          attachment StringIO.new(@body).set_encoding("ASCII-8BIT")
         else
           uri.query_values = parameters
           @body = uri.query
@@ -77,13 +76,13 @@ module Weary
 
     def json(parameters)
       json = parameters.to_json
-      attachment StringIO.new(json)
+      attachment StringIO.new(json).set_encoding("ASCII-8BIT")
       json
     end
 
     def attachment(io=nil)
       @attachment = io unless io.nil?
-      @attachment
+      @attachment ||= StringIO.new('').set_encoding("ASCII-8BIT")
     end
 
     def adapter(connection=nil)
@@ -102,11 +101,15 @@ module Weary
     # A Future comes back
     def perform
       future do
-        status, headers, body = call({})
+        status, headers, body = call(rack_env_defaults)
         response = Weary::Response.new body, status, headers
         yield response if block_given?
         response
       end
+    end
+
+    def use(middleware, *args, &block)
+      @middlewares << [middleware, *args, block]
     end
 
     private
@@ -115,6 +118,16 @@ module Weary
       tmp_uri = Addressable::URI.new
       tmp_uri.query_values = hash
       tmp_uri.query
+    end
+
+    def rack_env_defaults
+      {
+        'rack.version'      => Rack::VERSION,
+        'rack.errors'       => $stderr,
+        'rack.multithread'  => true,
+        'rack.multiprocess' => false,
+        'rack.run_once'     => false
+      }
     end
 
   end

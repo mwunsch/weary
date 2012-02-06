@@ -46,7 +46,7 @@ module Weary
       request = Weary::Request.new url.expand(Hash[mapping]), @method do |r|
         r.headers headers
         if !optional.empty? || !required.empty?
-          r.body params.reject {|k,v| invalid_parameter? k }
+          r.params params.reject {|k,v| invalid_parameter? k }
         end
       end
       yield request if block_given?
