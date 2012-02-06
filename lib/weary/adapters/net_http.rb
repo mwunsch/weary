@@ -16,6 +16,18 @@ module Weary
         Rack::Response.new response.body, response.code, normalize_response(response.to_hash)
       end
 
+      def self.prepare(request)
+        req_class = request_class(request.request_method)
+        req = req_class.new(request.fullpath, normalize_request_headers(request.env))
+        if req.request_body_permitted?
+          req.body = request.body.read
+          request.body.rewind
+        end
+        auth = Rack::Auth::Basic::Request.new(request.env)
+        req.basic_auth *auth.credentials if auth.provided? && auth.basic?
+        req
+      end
+
       def self.normalize_request_headers(env)
         req_headers = env.reject {|k,v| !k.start_with? "HTTP_" }
         normalized = req_headers.map do |k, v|
@@ -23,21 +35,6 @@ module Weary
           [new_key, v] unless UNWANTED_REQUEST_HEADERS.include? new_key
         end
         Hash[normalized]
-      end
-
-      def self.prepare(request)
-        req = Net::HTTPGenericRequest.new(request.request_method,
-                                          !request.body.nil?,
-                                          true,
-                                          request.fullpath,
-                                          normalize_request_headers(request.env))
-        if !request.body.nil?
-          req.body = request.body.read
-          request.body.rewind
-        end
-        auth = Rack::Auth::Basic::Request.new(request.env)
-        req.basic_auth *auth.credentials if auth.provided? && auth.basic?
-        req
       end
 
       def self.normalize_response(headers)
@@ -53,6 +50,11 @@ module Weary
         connection
       end
 
+      def self.request_class(method)
+        capitalized = method.capitalize
+        Net::HTTP.const_get capitalized
+      end
+
       def call(env)
         self.class.call(env)
       end
@@ -60,6 +62,7 @@ module Weary
       private
 
       UNWANTED_REQUEST_HEADERS = ['Host']
+
     end
   end
 end

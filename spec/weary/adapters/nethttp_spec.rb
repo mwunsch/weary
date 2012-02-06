@@ -6,7 +6,7 @@ describe Weary::Adapter::NetHttp do
     @request = Weary::Request.new @url
   end
 
-  describe "::call" do
+  describe ".call" do
     before do
       stub_request(:get, @url).
          to_return(:status => 200, :body => "", :headers => {})
@@ -27,12 +27,12 @@ describe Weary::Adapter::NetHttp do
   describe "#call" do
     it "calls the class method `.call`" do
       described_class.stub(:call) { [200, {'Content-Type' => 'text/plain'}, [""]] }
-      described_class.should_receive(:call).with(@request.env)
+      described_class.should_receive(:call)
       described_class.new.call(@request.env)
     end
   end
 
-  describe "::connect" do
+  describe ".connect" do
     before do
       stub_request(:get, @url)
     end
@@ -56,7 +56,7 @@ describe Weary::Adapter::NetHttp do
     end
   end
 
-  describe "::normalize_request_headers" do
+  describe ".normalize_request_headers" do
     it "removes the HTTP_ prefix from request headers" do
       @request.headers 'User-Agent' => Weary::USER_AGENTS['Lynx 2.8.4rel.1 on Linux']
       headers = described_class.normalize_request_headers(@request.env)
@@ -64,10 +64,16 @@ describe Weary::Adapter::NetHttp do
     end
   end
 
-  describe "::socket" do
+  describe ".socket" do
     it "sets up the http connection" do
       req = Rack::Request.new(@request.env)
       described_class.socket(req).should be_kind_of Net::HTTP
+    end
+  end
+
+  describe ".request_class" do
+    it "gets the Net::HTTP request class for the request method" do
+      described_class.request_class("POST").should be Net::HTTP::Post
     end
   end
 end
