@@ -54,6 +54,10 @@ describe Weary::Adapter::NetHttp do
       described_class.connect(req)
       a_request(:get, @url).with(:headers => @request.headers).should have_been_made
     end
+
+    it "authenticates to the server"
+
+    it "sets the body of the request"
   end
 
   describe ".normalize_request_headers" do

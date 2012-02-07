@@ -19,8 +19,8 @@ module Weary
       def self.prepare(request)
         req_class = request_class(request.request_method)
         req = req_class.new(request.fullpath, normalize_request_headers(request.env))
-        if req.request_body_permitted?
-          req.body = request.body
+        if req.request_body_permitted? # What's the best way of passing the body?
+          req.body = request.body.read
           request.body.rewind
         end
         # Is this needed since we pass Auth in the headers?
