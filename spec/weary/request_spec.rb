@@ -173,6 +173,10 @@ describe Weary::Request do
     end
   end
 
+  describe "#oauth" do
+    it "works..."
+  end
+
   describe "#adapter" do
     subject { described_class.new "http://github.com/api/v2/json/repos/show/mwunsch/weary" }
 

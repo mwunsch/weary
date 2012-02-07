@@ -84,7 +84,35 @@ describe Weary::Resource do
       req.basic_auth.should be
     end
 
-    it "allows the default credential params to be overriden"
+    it "allows the default credential params to be overriden" do
+      subject.basic_auth! :login, :token
+      req = subject.request :login => "mwunsch", :token=> "secret"
+      req.basic_auth.should be
+    end
+
+    it "permits the credentials to be completely optional" do
+      subject.basic_auth!
+      req = subject.request
+      req.basic_auth.should_not be
+    end
+  end
+
+  describe "#authenticates?" do
+    subject do
+      url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
+      resource = described_class.new "GET", url
+    end
+
+    it "is false when the resource does not accept authentication" do
+      subject.authenticates?.should be_false
+    end
+
+    it "is true when basic authentication has been declared" do
+      subject.basic_auth!
+      subject.authenticates?.should be_true
+    end
+
+    it "is true when OAuth has been declared"
   end
 
   describe "#expected_params" do

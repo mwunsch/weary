@@ -23,6 +23,7 @@ module Weary
           req.body = request.body
           request.body.rewind
         end
+        # Is this needed since we pass Auth in the headers?
         auth = Rack::Auth::Basic::Request.new(request.env)
         req.basic_auth *auth.credentials if auth.provided? && auth.basic?
         req
