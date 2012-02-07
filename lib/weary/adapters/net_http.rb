@@ -20,7 +20,7 @@ module Weary
         req_class = request_class(request.request_method)
         req = req_class.new(request.fullpath, normalize_request_headers(request.env))
         if req.request_body_permitted?
-          req.body = request.body.read
+          req.body = request.body
           request.body.rewind
         end
         auth = Rack::Auth::Basic::Request.new(request.env)

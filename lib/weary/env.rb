@@ -18,7 +18,7 @@ module Weary
         'SERVER_PORT'     => (@request.uri.port || @request.uri.inferred_port).to_s,
         'REQUEST_URI'     => @request.uri.request_uri,
         'rack.url_scheme' => @request.uri.scheme,
-        'rack.input'      => @request.attachment,
+        'rack.input'      => @request.body,
         'weary.request'   => @request
       }.update headers
     end

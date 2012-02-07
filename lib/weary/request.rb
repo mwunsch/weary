@@ -64,7 +64,7 @@ module Weary
       if !parameters.nil?
         if ["POST", "PUT"].include? method
           @body = query_params_from_hash(parameters)
-          attachment StringIO.new(@body).set_encoding("ASCII-8BIT")
+          body StringIO.new(@body).set_encoding("ASCII-8BIT")
         else
           uri.query_values = parameters
           @body = uri.query
@@ -75,11 +75,11 @@ module Weary
 
     def json(parameters)
       json = parameters.to_json
-      attachment StringIO.new(json).set_encoding("ASCII-8BIT")
+      body StringIO.new(json).set_encoding("ASCII-8BIT")
       json
     end
 
-    def attachment(io=nil)
+    def body(io=nil)
       @attachment = io unless io.nil?
       @attachment ||= StringIO.new('').set_encoding("ASCII-8BIT")
     end
