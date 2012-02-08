@@ -8,6 +8,8 @@ require 'rack'
 require 'weary/env'
 require 'weary/adapter'
 
+autoload :Middleware, 'weary/middleware'
+
 module Weary
   class Request
     attr_reader :uri
