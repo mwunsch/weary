@@ -43,7 +43,7 @@ module Weary
       end
 
       def self.socket(request)
-        host = request.env['SERVER_NAME']
+        host = request.env['HTTP_HOST'] || request.env['SERVER_NAME']
         port = request.env['SERVER_PORT'].to_s
         connection = Net::HTTP.new host, port
         connection.use_ssl = request.scheme == 'https'
@@ -62,7 +62,7 @@ module Weary
 
       private
 
-      UNWANTED_REQUEST_HEADERS = ['Host']
+      UNWANTED_REQUEST_HEADERS = []
 
     end
   end

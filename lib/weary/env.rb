@@ -15,12 +15,18 @@ module Weary
         'PATH_INFO'       => @request.uri.path,
         'QUERY_STRING'    => @request.uri.query || "",
         'SERVER_NAME'     => @request.uri.host,
-        'SERVER_PORT'     => (@request.uri.port || @request.uri.inferred_port).to_s,
+        'SERVER_PORT'     => port,
         'REQUEST_URI'     => @request.uri.request_uri,
+        'HTTP_HOST'       => @request.uri.host,
         'rack.url_scheme' => @request.uri.scheme,
         'rack.input'      => @request.body,
         'weary.request'   => @request
       }.update headers
     end
+
+    def port
+      (@request.uri.port || @request.uri.inferred_port).to_s
+    end
+
   end
 end

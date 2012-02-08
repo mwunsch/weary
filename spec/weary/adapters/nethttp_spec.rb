@@ -55,9 +55,23 @@ describe Weary::Adapter::NetHttp do
       a_request(:get, @url).with(:headers => @request.headers).should have_been_made
     end
 
-    it "authenticates to the server"
+    it "authenticates to the server" do
+      url = "http://mwunsch:secrets@github.com/api/v2/json/repos/show/mwunsch/weary"
+      stub_request(:get, url)
+      @request.basic_auth "mwunsch", "secrets"
+      req = Rack::Request.new(@request.env)
+      described_class.connect(req)
+      a_request(:get, url).should have_been_made
+    end
 
-    it "sets the body of the request"
+    it "sets the body of the request" do
+      stub_request(:post, @url)
+      @request.method = "POST"
+      @request.params :foo => "baz"
+      req = Rack::Request.new(@request.env)
+      described_class.connect(req)
+      a_request(:post, @url).with(:body => "foo=baz").should have_been_made
+    end
   end
 
   describe ".normalize_request_headers" do
