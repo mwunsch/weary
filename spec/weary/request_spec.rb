@@ -158,23 +158,16 @@ describe Weary::Request do
   end
 
   describe "#basic_auth" do
-    it "sets the Authorization header for the request" do
+    it "adds a Middleware to the stack to handle authentication" do
       req = described_class.new "https://api.github.com/gists", "POST"
-      req.basic_auth "mwunsch", "secret-passphrase"
-      req.headers.should have_key "Authorization"
-    end
-
-    it "packs the passed credentials" do
-      req = described_class.new "https://api.github.com/gists", "POST"
-      credentials = ["mwunsch", "secret-passphrase"]
-      req.basic_auth *credentials
-      parts = req.headers['Authorization'].split(' ', 2)
-      parts.last.unpack('m*').first.split(':',2).should eql credentials
+      cred = ["mwunsch", "secret-passphrase"]
+      req.should_receive(:use).with(Weary::Middleware::BasicAuth, cred)
+      req.basic_auth *cred
     end
   end
 
   describe "#oauth" do
-    it "works..."
+    it "adds a Middleware to the stack to sign the request"
   end
 
   describe "#adapter" do

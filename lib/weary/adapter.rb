@@ -5,6 +5,10 @@ require 'weary/adapters/net_http'
 module Weary
   module Adapter
 
+    def initialize(app=nil)
+      @app = app
+    end
+
     def call(env)
       connect(Rack::Request.new(env)).finish
     end

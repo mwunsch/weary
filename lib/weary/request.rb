@@ -91,8 +91,8 @@ module Weary
 
     def basic_auth(*credentials)
       unless credentials.empty?
-        @basic_auth = [credentials.join(':')].pack('m*')
-        headers.update 'Authorization' => "Basic #{@basic_auth}"
+        @basic_auth = true
+        use Weary::Middleware::BasicAuth, credentials
       end
       @basic_auth
     end
