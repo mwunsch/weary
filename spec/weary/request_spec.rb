@@ -164,10 +164,29 @@ describe Weary::Request do
       req.should_receive(:use).with(Weary::Middleware::BasicAuth, cred)
       req.basic_auth *cred
     end
+
+    it "returns true if auth has been set" do
+      req = described_class.new "https://api.github.com/gists", "POST"
+      cred = ["mwunsch", "secret-passphrase"]
+      req.basic_auth *cred
+      req.basic_auth.should be_true
+    end
   end
 
   describe "#oauth" do
-    it "adds a Middleware to the stack to sign the request"
+    it "adds a Middleware to the stack to sign the request" do
+      req = described_class.new "https://api.github.com/gists", "POST"
+      cred = ["consumer_key", "access_token"]
+      req.should_receive(:use).with(Weary::Middleware::OAuth, cred)
+      req.oauth *cred
+    end
+
+    it "returns true if auth has been set" do
+      req = described_class.new "https://api.github.com/gists", "POST"
+      cred = ["consumer_key", "access_token"]
+      req.oauth *cred
+      req.oauth.should be_true
+    end
   end
 
   describe "#adapter" do

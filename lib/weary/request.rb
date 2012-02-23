@@ -99,6 +99,14 @@ module Weary
       @basic_auth
     end
 
+    def oauth(consumer_key=nil, access_token=nil)
+      if !consumer_key.nil? && !access_token.nil?
+        @oauth = true
+        use Weary::Middleware::OAuth, [consumer_key, access_token]
+      end
+      @oauth
+    end
+
     # A Future comes back
     def perform
       future do
