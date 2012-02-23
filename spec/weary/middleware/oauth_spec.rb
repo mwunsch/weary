@@ -4,13 +4,23 @@ require 'spec_helper'
 describe Weary::Middleware::OAuth do
   describe "#call" do
     before do
-      @request = Weary::Request.new("http://github.com/api/v2/json/repos/show/mwunsch/weary")
+      @url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
+      @request = Weary::Request.new @url
       stub_request :get, @request.uri.to_s
     end
 
     it_behaves_like "a Rack application" do
-      subject { described_class.new(@request) }
+      subject { described_class.new(@request, "consumer_key", "access_token") }
       let(:env) { @request.env }
+    end
+
+    it "prepares the Authorization header for the request" do
+      middleware = described_class.new(@request, "consumer_key", "access_token")
+      middleware.call(@request.env)
+      signed_header = middleware.sign(@request.env)
+      a_request(:get, @url).
+        with {|req| req.headers.has_key?("Authorization") }.
+        should have_been_made
     end
 
   end
