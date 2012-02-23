@@ -92,7 +92,7 @@ module Weary
     end
 
     def basic_auth(*credentials)
-      unless credentials.empty?
+      if !credentials.empty?
         @basic_auth = true
         use Weary::Middleware::BasicAuth, credentials
       end
