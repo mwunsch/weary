@@ -4,3 +4,4 @@ module Weary
 end
 
 autoload :BasicAuth, 'weary/middleware/basic_auth'
+autoload :OAuth, 'weary/middleware/oauth'
