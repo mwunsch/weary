@@ -39,8 +39,13 @@ module Weary
     end
 
     def basic_auth!(user = :username, pass = :password)
-      @authenticates = true
+      @authenticates = :basic_auth
       @credentials = [user, pass]
+    end
+
+    def oauth!(key = :consumer_key, token = :token)
+      @authenticates = :oauth
+      @credentials = [key, token]
     end
 
     def authenticates?
@@ -74,7 +79,7 @@ module Weary
         if !expected_params.empty?
           r.params params.reject {|k,v| !expects? k }
         end
-        r.basic_auth *credentials if authenticates?
+        r.send @authenticates, *credentials if authenticates?
       end
       yield request if block_given?
       request

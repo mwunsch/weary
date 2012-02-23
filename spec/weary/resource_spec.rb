@@ -73,11 +73,6 @@ describe Weary::Resource do
       resource = described_class.new "GET", url
     end
 
-    it "sets the resource up to expect authentication" do
-      subject.basic_auth!
-      subject.authenticates?.should be_true
-    end
-
     it "prepares the request to accept username and password parameters" do
       subject.basic_auth!
       req = subject.request :username => "mwunsch", :password => "secret"
@@ -97,6 +92,31 @@ describe Weary::Resource do
     end
   end
 
+  describe "#oauth!" do
+    subject do
+      url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
+      resource = described_class.new "GET", url
+    end
+
+    it "prepares the request to accept consumer_key and token parameters" do
+      subject.oauth!
+      req = subject.request :consumer_key => "key", :token => "access"
+      req.oauth.should be
+    end
+
+    it "allows the default oauth params to be overriden" do
+      subject.oauth! :consumer, :access_token
+      req = subject.request :consumer => "key", :access_token => "access"
+      req.oauth.should be
+    end
+
+    it "permits the oauth parameters to be completely optional" do
+      subject.oauth!
+      req = subject.request
+      req.oauth.should_not be
+    end
+  end
+
   describe "#authenticates?" do
     subject do
       url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
@@ -112,7 +132,10 @@ describe Weary::Resource do
       subject.authenticates?.should be_true
     end
 
-    it "is true when OAuth has been declared"
+    it "is true when OAuth has been declared" do
+      subject.oauth!
+      subject.authenticates?.should be_true
+    end
   end
 
   describe "#expected_params" do
