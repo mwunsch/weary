@@ -3,22 +3,49 @@ require 'weary/resource'
 module Weary
   class Client
 
-    def self.get(name, url="", &block)
-      resource(name, "GET", url, &block)
-    end
+    REQUEST_METHODS = [
+      :copy, :delete, :get, :head, :lock, :mkcol, :move, :options,
+      :patch, :post, :propfind, :proppatch, :put, :trace, :unlock
+    ]
 
-    def self.post(name, url="", &block)
-      resource(name, "POST", url, &block)
-    end
+    class << self
+      REQUEST_METHODS.each do |request_method|
+        define_method request_method do |name, path="", &block|
+          resource(name, request_method.to_s.upcase, path, &block)
+        end
+      end
 
-    def self.put(name, url="", &block)
-      resource(name, "PUT", url, &block)
-    end
+      def resource(name, method, path="")
+        resource = Weary::Resource.new method, path
+        yield resource if block_given?
+        self[name] = resource
+      end
 
-    def self.resource(name, method, url="", &block)
-      resource = Weary::Resource.new method, url
-      yield resource if block_given?
-      resource
+      def resources
+        @resources ||= {}
+      end
+
+      def []=(name,resource)
+        store name, resource
+      end
+
+      def [](name)
+        resources[name]
+      end
+
+      private
+
+      def store(name, resource)
+        raise ArgumentError, "Expected a Weary::Resource but got #{resource.inspect}" \
+          unless resource.is_a? Weary::Resource
+        key = name.to_sym
+        build_method(key, resource)
+        resources[key] = resource
+      end
+
+      def build_method(key, resource)
+        define_method(key) {|parameters={}, &block| resource.request(parameters, &block) }
+      end
     end
 
   end
