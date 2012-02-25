@@ -1,3 +1,4 @@
+require 'weary/middleware'
 require 'simple_oauth'
 
 module Weary
@@ -19,12 +20,10 @@ module Weary
       end
 
       def sign(env)
-        request_method = env["REQUEST_METHOD"]
-        url = env["weary.request"].uri.to_s
-        params = {}
-        SimpleOAuth::Header.new request_method,
-                                url,
-                                params,
+        req = Rack::Request.new(env)
+        SimpleOAuth::Header.new req.request_method,
+                                req.url,
+                                req.params,
                                 @oauth
       end
     end
