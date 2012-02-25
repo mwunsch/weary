@@ -23,6 +23,8 @@ module Weary
           req.body = request.body.read
           request.body.rewind
         end
+        req.content_type = request.content_type if request.content_type
+        req.content_length = request.content_length if request.content_length
         req
       end
 
