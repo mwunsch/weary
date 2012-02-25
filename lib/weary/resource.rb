@@ -53,7 +53,7 @@ module Weary
     end
 
     def expected_params
-      optional.map(&:to_s) | required.map(&:to_s)
+      defaults.keys.map(&:to_s) | optional.map(&:to_s) | required.map(&:to_s)
     end
 
     def expects?(param)

@@ -146,6 +146,13 @@ describe Weary::Resource do
       resource.optional :baz
       resource.expected_params.size.should be 2
     end
+
+    it "contains the keys of the resource's defaults" do
+      url = "http://github.com/api/v2/json/repos/show/{user}/{repo}"
+      resource = described_class.new "GET", url
+      resource.defaults :foo => "baz"
+      resource.expected_params.should include "foo"
+    end
   end
 
   describe "#expects?" do
