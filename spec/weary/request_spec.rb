@@ -146,6 +146,12 @@ describe Weary::Request do
                :files  => { "file1.txt" => { :content => "String file contents"}}
       req.env['rack.input'].read.should eql req.params
     end
+
+    it "adds a Middleware to the stack for the Content-Type and Length" do
+      req = described_class.new "https://api.github.com/gists", "POST"
+      req.should_receive(:use).with(Weary::Middleware::ContentType)
+      req.params :foo => "baz"
+    end
   end
 
   describe "#json" do
