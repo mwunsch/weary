@@ -1,5 +1,4 @@
 require 'weary/version'
-require 'weary/request'
 require 'weary/client'
 
 module Weary

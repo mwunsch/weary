@@ -1,4 +1,5 @@
 require 'addressable/template'
+require 'weary/request'
 
 module Weary
   class Resource
