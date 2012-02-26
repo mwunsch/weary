@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'rack/lobster'
 
 describe Weary::Client do
   describe "::resource" do
@@ -40,6 +41,97 @@ describe Weary::Client do
         subject.should_receive(:resource).with(:name, upcase_method, @url)
         subject.send(request_method, :name, @url) {|r| r.basic_auth! }
       end
+    end
+  end
+
+  describe "::domain" do
+    before do
+      @url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
+    end
+
+    subject { Class.new(Weary::Client) }
+
+    it "prepends the domain to the path when creating resources" do
+      repo = {:user => "mwunsch", :repo => "weary"}
+      subject.domain "http://github.com/api/v2/json/repos"
+      resource = subject.get :show, "/show/{user}/{repo}"
+      resource.url.expand(repo).to_s.should eql @url
+    end
+  end
+
+  describe "::optional" do
+    before do
+      @url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
+    end
+
+    subject { Class.new(Weary::Client) }
+
+    it "passes optional requirements to the resources" do
+      param = :username
+      subject.optional param
+      resource = subject.get :show, @url
+      resource.optional.should include param
+    end
+  end
+
+  describe "::required" do
+    before do
+      @url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
+    end
+
+    subject { Class.new(Weary::Client) }
+
+    it "passes optional requirements to the resources" do
+      param = :username
+      subject.required param
+      resource = subject.get :show, @url
+      resource.required.should include param
+    end
+  end
+
+  describe "::defaults" do
+    before do
+      @url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
+    end
+
+    subject { Class.new(Weary::Client) }
+
+    it "passes default parameters into the resources" do
+      params = { :foo => "baz" }
+      subject.defaults params
+      resource = subject.get :show, @url
+      resource.defaults.should eql params
+    end
+  end
+
+  describe "::headers" do
+    before do
+      @url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
+    end
+
+    subject { Class.new(Weary::Client) }
+
+    it "passes headers into the resources" do
+      header = {'User-Agent' => "RSpec"}
+      subject.headers header
+      resource = subject.get :show, @url
+      resource.headers.should eql header
+    end
+  end
+
+  describe "::use" do
+    before do
+      @url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
+    end
+
+    subject { Class.new(Weary::Client) }
+
+    it "adds a middleware to a stack and passes it into subsequent requests" do
+      subject.use Rack::Lobster
+      subject.get :show, @url
+      client = subject.new
+      stack = client.show.instance_variable_get :@middlewares
+      stack.flatten.should include Rack::Lobster
     end
   end
 

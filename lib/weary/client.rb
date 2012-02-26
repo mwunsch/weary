@@ -15,8 +15,42 @@ module Weary
         end
       end
 
+      def domain(host=nil)
+        @domain = host unless host.nil?
+        @domain ||= ""
+      end
+
+      def optional(*params)
+        @optional = params unless params.empty?
+        @optional ||= []
+      end
+
+      def required(*params)
+        @required = params unless params.empty?
+        @required ||= []
+      end
+
+      def defaults(hash=nil)
+        @defaults = hash unless hash.nil?
+        @defaults ||= {}
+      end
+
+      def headers(hash=nil)
+        @headers = hash unless hash.nil?
+        @headers ||= {}
+      end
+
+      def use(middleware, *args, &block)
+        @middlewares ||= []
+        @middlewares << [middleware, *args, block]
+      end
+
       def resource(name, method, path="")
-        resource = Weary::Resource.new method, path
+        resource = Weary::Resource.new method, "#{domain}#{path}"
+        resource.optional *optional
+        resource.required *required
+        resource.defaults defaults
+        resource.headers headers
         yield resource if block_given?
         self[name] = resource
       end
@@ -44,7 +78,14 @@ module Weary
       end
 
       def build_method(key, resource)
-        define_method(key) {|parameters={}, &block| resource.request(parameters, &block) }
+        stack = if @middlewares && !@middlewares.empty?
+          stack = lambda {|r| @middlewares.each {|middleware| r.use *middleware } }
+        end
+        define_method(key) do |parameters={}, &block|
+          request = resource.request(parameters, &block)
+          stack.call(request) unless stack.nil?
+          request
+        end
       end
     end
 
