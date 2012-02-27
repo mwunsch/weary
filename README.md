@@ -11,9 +11,11 @@ If you dig a bit deeper, it's a suite of tools built around the [Rack](http://ra
 It features:
 
 *   Full Rack integration:
+
     There are points in the stack to hook in Rack middleware and just about every class in Weary is a Rack application in its own right.
 
 *   Asynchronous:
+
     Weary::Request#perform, the thing that performs the request, returns a [future](http://en.wikipedia.org/wiki/Futures_and_promises) and only blocks when accessed.
 
 
