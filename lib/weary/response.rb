@@ -18,11 +18,13 @@ module Weary
     end
 
     def body
-      @response.body
+      buffer = ""
+      @response.body.each {|chunk| buffer << chunk }
+      buffer
     end
 
     def each(&iterator)
-      body.each(&iterator)
+      @response.body.each(&iterator)
     end
 
     def finish

@@ -17,8 +17,8 @@ describe Weary::Response do
 
   describe "#body" do
     subject { Weary::Response.new ["Hi"], 200, {'Content-Type' => 'text/plain'} }
-    it "returns the body" do
-      subject.body.should eql ["Hi"]
+    it "returns the body, compacted" do
+      subject.body.should eql "Hi"
     end
   end
 
@@ -26,8 +26,8 @@ describe Weary::Response do
     subject { Weary::Response.new ["Hi"], 200, {'Content-Type' => 'text/plain'} }
     it "calls #each on the body" do
       iterated = false
-      subject.each {|body| iterated = body }
-      iterated.should eql "Hi"
+      subject.each {|body| iterated = body.downcase.to_sym }
+      iterated.should eql :hi
     end
   end
 
