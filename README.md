@@ -8,11 +8,13 @@ At it's most minimal, Weary is simply some nice syntactic sugar around Net/HTTP.
 
 If you dig a bit deeper, it's a suite of tools built around the [Rack](http://rack.rubyforge.org/) ecosystem. As you build a client, remember that just about every class in Weary is a piece of Rack middleware or a Rack application underneath the covers.
 
-It features
-+ Full Rack integration:
-  There are points in the stack to hook in Rack middleware and just about every class in Weary is a Rack application in its own right.
-+ Asynchronous:
-  Weary::Request#perform, the thing that performs the request, returns a [future](http://en.wikipedia.org/wiki/Futures_and_promises) and only blocks when accessed.
+It features:
+
+*   Full Rack integration:
+    There are points in the stack to hook in Rack middleware and just about every class in Weary is a Rack application in its own right.
+
+*   Asynchronous:
+    Weary::Request#perform, the thing that performs the request, returns a [future](http://en.wikipedia.org/wiki/Futures_and_promises) and only blocks when accessed.
 
 
 ## Quick Start
