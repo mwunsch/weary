@@ -17,25 +17,25 @@ It features
 
 ## Quick Start
 
-    ```ruby
-    # http://developer.github.com/v3/repos/
-    class GitHubRepo < Weary::Client
-      domain "https://api.github.com"
+```ruby
+# http://developer.github.com/v3/repos/
+class GitHubRepo < Weary::Client
+  domain "https://api.github.com"
 
-      use Rack::Lint
+  use Rack::Lint
 
-      get :list_user_repos, "/users/{user}/repos" do |resource|
-        resource.optional :type
-      end
+  get :list_user_repos, "/users/{user}/repos" do |resource|
+    resource.optional :type
+  end
 
-      get :get, "/repos/{user}/{repo}"
-    end
+  get :get, "/repos/{user}/{repo}"
+end
 
-    client = GitHubRepo.new
-    client.list_user_repos(:user => "mwunsch").perform do |response|
-      puts response.body if response.success?
-    end
-    ```
+client = GitHubRepo.new
+client.list_user_repos(:user => "mwunsch").perform do |response|
+  puts response.body if response.success?
+end
+```
 
 This is a basic example of a client you will build using the Weary framework. If you're coming from a previous version of Weary, you would have created a subclass of `Weary::Base`. That's one of the many changes in the **big rewrite**.
 
@@ -43,13 +43,13 @@ This is a basic example of a client you will build using the Weary framework. If
 
 Inherit from `Weary::Client` for a set of class methods that craft "Resources" (more on that later).
 
-    ```ruby
-    MyClass < Weary::Client
-      get :resource, "http://host.com/path/to/resource" do |resource|
-        resource.optional :optional_parameter
-      end
-    end
-    ```
+```ruby
+MyClass < Weary::Client
+  get :resource, "http://host.com/path/to/resource" do |resource|
+    resource.optional :optional_parameter
+  end
+end
+```
 
 The DSL provides methods for all of the HTTP verbs (See `Weary::Client::REQUEST_METHODS`). When you instantiate this class, the object will have an instance method named "resource" that will return a `Weary::Request` object set up to perform a "GET" request on "http://host.com/path/to/resource".
 
@@ -81,22 +81,22 @@ The resource is a building block used in `Client` to describe the requirements o
 
 Finally, the `request` method of the Resource takes a set of parameters to verify that requirements are met and returns a `Weary::Request` object. It should all look something like this once all is said and done.
 
-    ```ruby
-    # https://dev.twitter.com/docs/api/1/post/statuses/update
-    post :update, "http://api.twitter.com/1/statuses/update.json" do |resource|
-      resource.required :status
-      resource.optional :in_reply_to_status_id, :lat, :long, :place_id,
-                        :display_coordinates, :trim_user, :include_entities
-      resource.oauth!
-    end
+```ruby
+# https://dev.twitter.com/docs/api/1/post/statuses/update
+post :update, "http://api.twitter.com/1/statuses/update.json" do |resource|
+  resource.required :status
+  resource.optional :in_reply_to_status_id, :lat, :long, :place_id,
+                    :display_coordinates, :trim_user, :include_entities
+  resource.oauth!
+end
 
-    # After instantiating the client:
-    # (This calls the "update" resource's `request` method)
-    client.update :status       => "I'm tweeting from Weary",
-                  :consumer_key => "an_oauth_consumer_key",
-                  :token        => "my_oauth_access_token"
+# After instantiating the client:
+# (This calls the "update" resource's `request` method)
+client.update :status       => "I'm tweeting from Weary",
+              :consumer_key => "an_oauth_consumer_key",
+              :token        => "my_oauth_access_token"
 
-    ```
+```
 
 If a `required` parameter is missing, a `Weary::Resource::UnmetRequirementsError` exception is raised.
 
