@@ -16,14 +16,14 @@ It features:
 
 *   Asynchronous:
 
-    Weary::Request#perform, the thing that performs the request, returns a [future](http://en.wikipedia.org/wiki/Futures_and_promises) and only blocks when accessed.
+    `Weary::Request#perform`, the thing that performs the request, returns a [future](http://en.wikipedia.org/wiki/Futures_and_promises) and only blocks when accessed.
 
 
 ## Quick Start
 
 ```ruby
 # http://developer.github.com/v3/repos/
-class GitHubRepo < Weary::Client
+class GithubRepo < Weary::Client
   domain "https://api.github.com"
 
   use Rack::Lint
@@ -35,7 +35,7 @@ class GitHubRepo < Weary::Client
   get :get, "/repos/{user}/{repo}"
 end
 
-client = GitHubRepo.new
+client = GithubRepo.new
 client.list_user_repos(:user => "mwunsch").perform do |response|
   puts response.body if response.success?
 end
@@ -120,4 +120,28 @@ By default, the request is performed through [Net::HTTP](http://www.ruby-doc.org
 
 ## Rack
 
-To maximize the utility of Weary, it's important to remember that driving everything is Rack. Almost every class is built to provide a Rack interface. A Weary::Request is a Rack middleware that constructs its own special environment.
+To maximize the utility of Weary, it's important to remember that driving everything is Rack. Almost every class is built to provide a Rack interface.
+
+A `Weary::Request` is a Rack application. When you call `Request#call` it creates its own special Rack environment. In order to preserve your Rack middleware, you can add your middleware to the stack using `Request#use`.
+
+When using `Weary::Client` the `use` method will add the passed middleware to every Request stack.
+
+Authentication, by default is done by either `Weary::Middleware::BasicAuth` or `Weary::Middleware::OAuth`. Both are just Rack middleware, and can be used in any Rack stack.
+
+The point is, **it's just Rack**.
+
+## TODO
+
+1. I'm in the process of building `Weary::Route`, this will be a Rack application that is initialized with a set of Resources. On `#call`, it will find a resource that matches, build its request, and perform it, or return a 404.
+
+2. `Weary::Client#call` will call the aforementioned Route object. This will make every `Weary::Client` a mountable Rack application.
+
+3. Still need to do great documentation on the classes.
+
+4. I'm not particularly happy about the specs, they seem a bit brittle in places.
+
+5. I'd love to see more examples that utilize the Rackness of Weary. Using Devise, Warden, or mounted in a Rails application.
+
+## Copyright
+
+Copyright (c) 2009 - 2012 Mark Wunsch. Licensed under the [MIT License](http://opensource.org/licenses/mit-license.php).
