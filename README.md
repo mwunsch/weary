@@ -4,7 +4,7 @@ This is the **big rewrite** of Weary, currently ongoing.
 
 _Weary is a framework and DSL for building clients for (preferably RESTful) web service APIs._
 
-At it's most minimal, Weary is simply some nice syntactic sugar around Net/HTTP.
+At its most minimal, Weary is simply some nice syntactic sugar around Net/HTTP.
 
 If you dig a bit deeper, it's a suite of tools built around the [Rack](http://rack.rubyforge.org/) ecosystem. As you build a client, remember that just about every class in Weary is a piece of Rack middleware or a Rack application underneath the covers.
 
