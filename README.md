@@ -122,7 +122,7 @@ By default, the request is performed through [Net::HTTP](http://www.ruby-doc.org
 
 To maximize the utility of Weary, it's important to remember that driving everything is Rack. Almost every class is built to provide a Rack interface.
 
-Every `Weary::Client` is a Rack application.
+Every class that inherits from `Weary::Client` is a Rack application.
 
 A `Weary::Request` is a Rack application. When you call `Request#call` it creates its own special Rack environment. In order to preserve your Rack middleware, you can add your middleware to the stack using `Request#use`.
 
