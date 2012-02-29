@@ -134,17 +134,13 @@ The point is, **it's just Rack**.
 
 ## TODO
 
-<del>1. I'm in the process of building `Weary::Route`, this will be a Rack application that is initialized with a set of Resources. On `#call`, it will find a resource that matches, build its request, and perform it, or return a 404.</del> (See 2f4208ecb5cfeccfa520cf84ba76a9fc82f2f1c3)
+1. More documentation.
 
-<del>2. `Weary::Client#call` will call the aforementioned Route object. This will make every `Weary::Client` a mountable Rack application.</del> (See a878d5bb3cbcf15e3aae0da655a0c8f69089a0b0)
+2. I'm not particularly happy about the specs, they seem a bit brittle in places.
 
-3. Still need to do great documentation on the classes.
+3. I'd love to see more examples that utilize the Rackness of Weary. Using Devise, Warden, or mounted in a Rails application.
 
-4. I'm not particularly happy about the specs, they seem a bit brittle in places.
-
-5. I'd love to see more examples that utilize the Rackness of Weary. Using Devise, Warden, or mounted in a Rails application.
-
-6. The Route class needs to be adjusted to better grok the path from a request env
+4. Need to push adapter and middleware onto the Resource for Weary::Route's benefit.
 
 ## Copyright
 
