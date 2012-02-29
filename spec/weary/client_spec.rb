@@ -183,6 +183,39 @@ describe Weary::Client do
     end
   end
 
+  describe "::route" do
+    before do
+      @client = Class.new(Weary::Client)
+      @client.domain "https://api.github.com"
+      @client.get(:list, "/user/repos") {|r| r.basic_auth! }
+      @client.get(:user, "/users/{user}/repos")
+      @client.post(:create, "/user/repos") {|r| r.basic_auth! }
+      @client.get(:repo, "/users/{user}/{repo}")
+      @client.patch(:edit, "/users/{user}/{repo}") {|r| r.basic_auth! }
+    end
+
+    it "returns a router for the resources" do
+      @client.route.should be_a Weary::Route
+    end
+  end
+
+  describe "::call" do
+    before do
+      @client = Class.new(Weary::Client)
+      @client.domain "https://api.github.com"
+      @client.get(:list, "/user/repos") {|r| r.basic_auth! }
+      @client.get(:user, "/users/{user}/repos")
+      @client.post(:create, "/user/repos") {|r| r.basic_auth! }
+      @client.get(:repo, "/users/{user}/{repo}")
+      @client.patch(:edit, "/users/{user}/{repo}") {|r| r.basic_auth! }
+    end
+
+    it_behaves_like "a Rack application" do
+      subject { @client }
+      let(:env) { @client.resources[:list].request.env }
+    end
+  end
+
   describe "#initialize" do
     before do
       @url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"

@@ -1,6 +1,8 @@
 require 'weary/resource'
 
 module Weary
+  autoload :Route, 'weary/route'
+
   class Client
 
     REQUEST_METHODS = [
@@ -65,6 +67,14 @@ module Weary
 
       def [](name)
         resources[name]
+      end
+
+      def route
+        Weary::Route.new *resources
+      end
+
+      def call(env)
+        route.call(env)
       end
 
       private
