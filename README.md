@@ -122,6 +122,8 @@ By default, the request is performed through [Net::HTTP](http://www.ruby-doc.org
 
 To maximize the utility of Weary, it's important to remember that driving everything is Rack. Almost every class is built to provide a Rack interface.
 
+Every `Weary::Client` is a Rack application.
+
 A `Weary::Request` is a Rack application. When you call `Request#call` it creates its own special Rack environment. In order to preserve your Rack middleware, you can add your middleware to the stack using `Request#use`.
 
 When using `Weary::Client` the `use` method will add the passed middleware to every Request stack.
@@ -132,15 +134,17 @@ The point is, **it's just Rack**.
 
 ## TODO
 
-1. I'm in the process of building `Weary::Route`, this will be a Rack application that is initialized with a set of Resources. On `#call`, it will find a resource that matches, build its request, and perform it, or return a 404.
+<del>1. I'm in the process of building `Weary::Route`, this will be a Rack application that is initialized with a set of Resources. On `#call`, it will find a resource that matches, build its request, and perform it, or return a 404.</del> (See 2f4208ecb5cfeccfa520cf84ba76a9fc82f2f1c3)
 
-2. `Weary::Client#call` will call the aforementioned Route object. This will make every `Weary::Client` a mountable Rack application.
+<del>2. `Weary::Client#call` will call the aforementioned Route object. This will make every `Weary::Client` a mountable Rack application.</del> (See a878d5bb3cbcf15e3aae0da655a0c8f69089a0b0)
 
 3. Still need to do great documentation on the classes.
 
 4. I'm not particularly happy about the specs, they seem a bit brittle in places.
 
 5. I'd love to see more examples that utilize the Rackness of Weary. Using Devise, Warden, or mounted in a Rails application.
+
+6. The Route class needs to be adjusted to better grok the path from a request env
 
 ## Copyright
 
