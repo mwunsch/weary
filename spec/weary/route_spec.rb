@@ -7,8 +7,8 @@ describe Weary::Route do
     @client.get(:list, "/user/repos") {|r| r.basic_auth! }
     @client.get(:user, "/users/{user}/repos")
     @client.post(:create, "/user/repos") {|r| r.basic_auth! }
-    @client.get(:repo, "/users/{user}/{repo}")
-    @client.patch(:edit, "/users/{user}/{repo}") {|r| r.basic_auth! }
+    @client.get(:repo, "/repos/{user}/{repo}")
+    @client.patch(:edit, "/repos/{user}/{repo}") {|r| r.basic_auth! }
     @resources = @client.resources
   end
 

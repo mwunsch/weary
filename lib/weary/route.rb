@@ -14,7 +14,7 @@ module Weary
       begin
         request = Rack::Request.new(env)
         resource = route(request)
-        url_variables = resource.url.extract(request.url)
+        url_variables = resource.url.extract("#{@domain}#{request.path}")
         resource.request(url_variables.merge(request.params)).call(env)
       rescue NotFoundError => e
         [404, {'Content-Type' => "text/plain"}, [e.message]]
