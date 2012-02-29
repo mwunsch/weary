@@ -5,6 +5,8 @@ module Weary
   class Resource
     UnmetRequirementsError = Class.new(StandardError)
 
+    attr_reader :method
+
     def initialize(method, uri)
       @method = method
       @uri = Addressable::Template.new(uri)
