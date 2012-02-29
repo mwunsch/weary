@@ -70,7 +70,7 @@ module Weary
       end
 
       def route
-        Weary::Route.new *resources
+        Weary::Route.new resources.values, domain
       end
 
       def call(env)

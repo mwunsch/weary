@@ -14,12 +14,12 @@ describe Weary::Route do
 
   describe "#call" do
     it_behaves_like "a Rack application" do
-      subject { described_class.new *@resources.values }
+      subject { described_class.new @resources.values, @client.domain }
       let(:env) { @resources[:list].request.env }
     end
 
     it "returns a 404 when the url can't be routed" do
-      route = described_class.new *@resources.values
+      route = described_class.new @resources.values, @client.domain
       dummy = @resources[:list].dup
       dummy.url "http://foo.com/baz"
       status, header, body = route.call dummy.request.env
@@ -27,7 +27,7 @@ describe Weary::Route do
     end
 
     it "returns a 405 when the request method is invalid" do
-      route = described_class.new *@resources.values
+      route = described_class.new @resources.values, @client.domain
       bad_request = @resources[:list].request do |request|
         request.method = "PUT"
       end
@@ -38,7 +38,7 @@ describe Weary::Route do
     it "returns a 403 (forbidden) when requirements are unmet" do
       dummy = @resources[:edit].dup
       dummy.required :name
-      route = described_class.new dummy
+      route = described_class.new [dummy], @client.domain
       env = @resources[:edit].request(:user => "mwunsch", :repo => "weary").env
       status, header, body = route.call(env)
       status.should eql 403
@@ -46,7 +46,7 @@ describe Weary::Route do
   end
 
   describe "#route" do
-    subject { described_class.new *@resources.values }
+    subject { described_class.new @resources.values, @client.domain }
 
     it "accepts a Rack::Request and returns the best resource" do
       req = @resources[:list].request

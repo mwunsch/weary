@@ -5,8 +5,9 @@ module Weary
     NotFoundError = Class.new(StandardError)
     NotAllowedError = Class.new(StandardError)
 
-    def initialize(*resources)
+    def initialize(resources, domain="")
       @resources = resources
+      @domain = domain
     end
 
     def call(env)
@@ -27,7 +28,7 @@ module Weary
     end
 
     def route(request)
-      subset = select_by_url(request.url)
+      subset = select_by_url("#{@domain}#{request.path}")
       raise NotFoundError, "Not Found" if subset.empty?
       subset = select_by_method(request.request_method, subset)
       raise NotAllowedError, "Method Not Allowed" if subset.empty?
