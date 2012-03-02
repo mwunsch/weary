@@ -244,6 +244,15 @@ describe Weary::Client do
       request = client.send(action, :user => "mwunsch", :repo => "weary")
       request.uri.to_s.should eql @url
     end
+
+    it "combines a @defaults instance_variable with params on method execution" do
+      action = :show
+      url = "http://github.com/api/v2/json/repos/show/{user}/{repo}"
+      @klass.get action, url
+      client = @klass.new
+      client.instance_variable_set :@defaults, :user => "mwunsch", :repo => "weary"
+      expect { client.send(action) }.to_not raise_error
+    end
   end
 
 end

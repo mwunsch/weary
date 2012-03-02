@@ -92,7 +92,8 @@ module Weary
           stack = lambda {|r| @middlewares.each {|middleware| r.use *middleware } }
         end
         define_method(key) do |parameters={}, &block|
-          request = resource.request(parameters, &block)
+          @defaults ||= {}
+          request = resource.request(@defaults.merge(parameters), &block)
           stack.call(request) unless stack.nil?
           request
         end
