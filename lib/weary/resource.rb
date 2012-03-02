@@ -9,11 +9,11 @@ module Weary
 
     def initialize(method, uri)
       @method = method
-      @uri = Addressable::Template.new(uri)
+      self.url uri
     end
 
     def url(uri=nil)
-      @uri = Addressable::Template.new(uri) unless uri.nil?
+      @uri = Addressable::Template.new(uri.gsub(/:(\w+)/) { "{#{$1}}" }) unless uri.nil?
       @uri
     end
 

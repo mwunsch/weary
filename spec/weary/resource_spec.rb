@@ -20,6 +20,18 @@ describe Weary::Resource do
       resource.url url
       resource.url.pattern.should eql url
     end
+
+    it "accepts variables in the url" do
+      url = "http://github.com/api/v2/json/repos/show/{user}/{repo}"
+      resource = Weary::Resource.new "GET", url
+      resource.url.variables.should include 'user'
+    end
+
+    it "accepts variables in the sinatra style" do
+      url = "http://github.com/api/v2/json/repos/show/:user/:repo"
+      resource = Weary::Resource.new "GET", url
+      resource.url.variables.should include 'user'
+    end
   end
 
   describe "#optional" do
