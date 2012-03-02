@@ -72,6 +72,7 @@ module Weary
     end
 
     def request(params={})
+      params.delete_if {|k,v| v.nil? || v.empty? }
       params.update(defaults)
       raise UnmetRequirementsError, "Required parameters: #{requirements}" \
         unless meets_requirements? params
