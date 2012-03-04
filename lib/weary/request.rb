@@ -43,8 +43,6 @@ module Weary
       Weary::Env.new(self).env
     end
 
-    alias_method :__method__, :method
-
     def method
       @method
     end

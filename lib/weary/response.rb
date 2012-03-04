@@ -1,13 +1,12 @@
 require 'rack/response'
-require 'rack/lint'
+
+autoload :MultiJson, 'multi_json'
 
 module Weary
   class Response
     def initialize(body, status, headers)
       @response = Rack::Response.new body, status, headers
     end
-
-    alias_method :__method__, :method
 
     def status
       @response.status.to_i
