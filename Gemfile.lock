@@ -36,7 +36,7 @@ PLATFORMS
 
 DEPENDENCIES
   jruby-openssl (~> 0.7.6)
-  rake (~> 0.9.2.2)
+  rake (~> 0.9.2)
   rspec (~> 2.8.0)
   weary!
   webmock (~> 1.7.10)
