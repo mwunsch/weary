@@ -2,3 +2,4 @@
 pkg/
 doc/
 .bundle/
+.rbenv-version
