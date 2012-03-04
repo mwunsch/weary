@@ -159,7 +159,7 @@ describe Weary::Request do
       hash = {:foo => 'baz'}
       req = described_class.new "https://api.github.com/gists", "POST"
       req.json hash
-      req.env['rack.input'].read.should eql hash.to_json
+      req.env['rack.input'].read.should eql MultiJson.encode(hash)
     end
   end
 

@@ -1,6 +1,5 @@
 # A Request builds a rack env to hand off to an adapter,
 # which is a rack application that actually makes the request
-require 'json'
 require 'addressable/uri'
 require 'future'
 require 'rack'
@@ -9,6 +8,7 @@ require 'weary/env'
 require 'weary/adapter'
 
 autoload :Middleware, 'weary/middleware'
+autoload :MultiJson, 'multi_json'
 
 module Weary
   class Request
@@ -32,7 +32,7 @@ module Weary
       stack = Rack::Builder.new do
         middlewares.each do |middleware|
           klass, *args = middleware
-          use klass, *args[0...-1], &args.last
+          use klass, *args[0...-1].flatten, &args.last
         end
         run app
       end
@@ -66,7 +66,7 @@ module Weary
       if !parameters.nil?
         if ["POST", "PUT"].include? method
           @body = query_params_from_hash(parameters)
-          body StringIO.new(@body).set_encoding("ASCII-8BIT")
+          body StringIO.new(@body)
           use Weary::Middleware::ContentType
         else
           uri.query_values = parameters
@@ -77,14 +77,14 @@ module Weary
     end
 
     def json(parameters)
-      json = parameters.to_json
-      body StringIO.new(json).set_encoding("ASCII-8BIT")
+      json = MultiJson.encode(parameters)
+      body StringIO.new(json)
       json
     end
 
     def body(io=nil)
       @attachment = io unless io.nil?
-      @attachment ||= StringIO.new('').set_encoding("ASCII-8BIT")
+      @attachment ||= StringIO.new('')
     end
 
     def adapter(connection=nil)
@@ -119,7 +119,7 @@ module Weary
     end
 
     def use(middleware, *args, &block)
-      @middlewares << [middleware, *args, block]
+      @middlewares << [middleware, args, block]
     end
 
     private

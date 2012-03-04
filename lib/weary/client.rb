@@ -12,7 +12,7 @@ module Weary
 
     class << self
       REQUEST_METHODS.each do |request_method|
-        define_method request_method do |name, path="", &block|
+        define_method request_method do |name, path, &block|
           resource(name, request_method.to_s.upcase, path, &block)
         end
       end
@@ -44,7 +44,7 @@ module Weary
 
       def use(middleware, *args, &block)
         @middlewares ||= []
-        @middlewares << [middleware, *args, block]
+        @middlewares << [middleware, args, block]
       end
 
       def resource(name, method, path="")
@@ -91,7 +91,8 @@ module Weary
         stack = if @middlewares && !@middlewares.empty?
           stack = lambda {|r| @middlewares.each {|middleware| r.use *middleware } }
         end
-        define_method(key) do |parameters={}, &block|
+        define_method(key) do |*parameters, &block|
+          parameters = parameters.first || {}
           @defaults ||= {}
           request = resource.request(@defaults.merge(parameters), &block)
           stack.call(request) unless stack.nil?
