@@ -124,6 +124,9 @@ module Weary
         resource.required *required
         resource.defaults defaults
         resource.headers headers
+        if !@middlewares.nil? && !@middlewares.empty?
+          @middlewares.each {|middleware| resource.use *middleware }
+        end
         yield resource if block_given?
         self[name] = resource
       end
@@ -159,14 +162,10 @@ module Weary
       end
 
       def build_method(key, resource)
-        stack = if @middlewares && !@middlewares.empty?
-          stack = lambda {|r| @middlewares.each {|middleware| r.use *middleware } }
-        end
         define_method(key) do |*parameters, &block|
           parameters = parameters.first || {}
           @defaults ||= {}
           request = resource.request(@defaults.merge(parameters), &block)
-          stack.call(request) unless stack.nil?
           request
         end
       end
