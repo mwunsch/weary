@@ -4,8 +4,11 @@ autoload :MultiJson, 'multi_json'
 
 module Weary
   class Response
+    include Rack::Response::Helpers
+
     def initialize(body, status, headers)
       @response = Rack::Response.new body, status, headers
+      @status = self.status
     end
 
     def status
@@ -15,6 +18,7 @@ module Weary
     def header
       @response.header
     end
+    alias headers header
 
     def body
       buffer = ""
@@ -31,11 +35,11 @@ module Weary
     end
 
     def success?
-      (200..299).include? status
+      @response.successful?
     end
 
     def redirected?
-      (300..399).include? status
+      @response.redirection?
     end
 
     def length
@@ -44,6 +48,12 @@ module Weary
 
     def call(env)
       self.finish
+    end
+
+    def parse
+      raise "The response does not contain a body" if body.nil? || body.empty?
+      raise "Unable to parse Content-Type: #{content_type}" unless content_type =~ /json$/
+      MultiJson.decode body
     end
   end
 end
