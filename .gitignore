@@ -2,4 +2,5 @@
 pkg/
 doc/
 .bundle/
+.yardoc/
 .rbenv-version
