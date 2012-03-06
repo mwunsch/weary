@@ -3,6 +3,15 @@ require 'weary/resource'
 module Weary
   autoload :Route, 'weary/route'
 
+  # An abstract class used to construct client libraries and the primary
+  # entrance point to use the Weary framework. Client defines a DSL to describe
+  # and construct a set of Resources, which in turn can generate Requests that
+  # can perform HTTP actions.
+  #
+  # Resources are defined and stored by one of the class methods corresponding
+  # to an HTTP request method. Every Resource is declared with a name that
+  # acts as both a key to access the resource, and, when the class is
+  # instantiated, the name of a dynamically generated instance method.
   class Client
 
     # Internal: HTTP Request verbs supported by Weary. These translate to class
@@ -128,22 +137,49 @@ module Weary
         self[name] = resource
       end
 
+      # Public: A getter for the stored table of Resources.
+      #
+      # Returns a Hash of Resources stored by their name keys.
       def resources
         @resources ||= {}
       end
 
+      # Public: Store a Resource at the given key. A method is built for the
+      # instances with the same name as the key that calls the request method
+      # of the Resource.
+      #
+      # name     - A Symbol name of the Resource and the eventual name of the
+      #            method that will build the request.
+      # resource - The Resource object to store. When the named method is
+      #            called on the client instance, this resource's request
+      #            method will be called.
+      #
+      # Returns the stored Resource.
       def []=(name,resource)
         store name, resource
       end
 
+      # Public: A quick getter to retrieve a Resource from the client's
+      # internal store.
+      #
+      # name - The Symbol name of the Resource.
+      #
+      # Returns the Resource stored at name.
       def [](name)
         resources[name]
       end
 
+      # Internal: Build a Rack router for the client's resources.
+      #
+      # Returns a Route object of the resources at the domain.
       def route
         Weary::Route.new resources.values, domain
       end
 
+      # Public: A Rack middleware interface that uses the internal router to
+      # determine the best Resource available.
+      #
+      # Returns an Array of a Rack resource tuple.
       def call(env)
         route.call(env)
       end
