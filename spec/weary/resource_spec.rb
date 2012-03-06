@@ -70,6 +70,16 @@ describe Weary::Resource do
     end
   end
 
+  describe "#use" do
+    it "adds a middleware to the stack and passes them onto the request" do
+      url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
+      resource = described_class.new "GET", url
+      resource.use Rack::Lobster
+      stack = resource.request.instance_variable_get :@middlewares
+      stack.flatten.should include Rack::Lobster
+    end
+  end
+
   describe "#user_agent" do
     it "updates the #headers hash with a User-Agent" do
       url = "http://github.com/api/v2/json/repos/show/{user}/{repo}"

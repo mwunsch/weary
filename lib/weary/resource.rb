@@ -37,6 +37,11 @@ module Weary
       @headers ||= {}
     end
 
+    def use(middleware, *args, &block)
+      @middlewares ||= []
+      @middlewares << [middleware, args, block]
+    end
+
     def user_agent(agent)
       headers.update 'User-Agent' => agent
     end
@@ -84,6 +89,9 @@ module Weary
           r.params params.reject {|k,v| !expects? k }
         end
         r.send @authenticates, *credentials if authenticates?
+        if !@middlewares.nil? && !@middlewares.empty?
+          @middlewares.each {|middleware| r.use *middleware }
+        end
       end
       yield request if block_given?
       request

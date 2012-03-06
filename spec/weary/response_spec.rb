@@ -66,4 +66,34 @@ describe Weary::Response do
     end
   end
 
+  describe "#parse" do
+    before do
+      @body = {
+        :sales => [
+          :name => "Spring: Just Around the Corner",
+          :sale => "https://api.gilt.com/v1/sales/men/spring-just-arou-108/detail.json",
+          :sale_key => "spring-just-arou-108",
+          :store => "men",
+          :description => "Were you aware that there are seasons? Spring will start soon so etc",
+          :begins => "2012-02-09T17:00:00Z"
+        ]
+      }
+    end
+
+    it "parses json out of the response" do
+      json = MultiJson.encode @body
+      response = Weary::Response.new json, 200, {'Content-Type' => 'application/json'}
+      response.parse.should eql MultiJson.decode(json)
+    end
+
+    it "raises an error if the content type is unknown" do
+      response = Weary::Response.new "<lolxml />", 200, {'Content-Type' => 'application/xml'}
+      expect { response.parse }.to raise_error
+    end
+
+    it "raises an error if there is no body" do
+      response = Weary::Response.new "", 404, {'Content-Type' => 'text/plain'}
+      expect { response.parse }.to raise_error
+    end
+  end
 end
