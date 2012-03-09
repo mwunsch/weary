@@ -18,6 +18,7 @@ GEM
     promise (0.3.0)
     rack (1.4.1)
     rake (0.9.2.2)
+    redcarpet (2.1.0)
     rspec (2.8.0)
       rspec-core (~> 2.8.0)
       rspec-expectations (~> 2.8.0)
@@ -27,16 +28,24 @@ GEM
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.8.0)
     simple_oauth (0.1.5)
+    tomparse (0.2.0)
     webmock (1.7.10)
       addressable (~> 2.2, > 2.2.5)
       crack (>= 0.1.7)
+    yard (0.7.5)
+    yard-tomdoc (0.4.0)
+      tomparse
+      yard
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  jruby-openssl (~> 0.7.6)
+  jruby-openssl
   rake (~> 0.9.2)
+  redcarpet
   rspec (~> 2.8.0)
   weary!
   webmock (~> 1.7.10)
+  yard (~> 0.7.5)
+  yard-tomdoc (~> 0.4.0)
