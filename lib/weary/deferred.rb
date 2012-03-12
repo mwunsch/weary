@@ -1,7 +1,7 @@
 require 'weary/response'
 
 module Weary
-  # Public: A handy abstract proxy class that is used to proxy a domain model
+  # A handy abstract proxy class that is used to proxy a domain model
   # in an asynchronous fashion. Useful if you're not interested in a
   # Weary::Response object, but you want to pass that into a domain object
   # when the response is available.

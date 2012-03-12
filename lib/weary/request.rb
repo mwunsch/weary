@@ -1,5 +1,3 @@
-# A Request builds a rack env to hand off to an adapter,
-# which is a rack application that actually makes the request
 require 'addressable/uri'
 require 'future'
 require 'rack'
@@ -11,6 +9,12 @@ autoload :Middleware, 'weary/middleware'
 autoload :MultiJson, 'multi_json'
 
 module Weary
+  # A Request is an interface to an http request. It doesn't actually make the
+  # request. Instead, it builds itself up into a Rack environment. A Request
+  # object is technically a Rack middleware, with a call method. The Request
+  # manipulates the passed in environment, then passes on to the adapter: A
+  # Rack application. Because the Request performs so much manipulation on
+  # the Rack env, you can attach middleware to it to act on its mutated env.
   class Request
     attr_reader :uri
 
@@ -21,11 +25,18 @@ module Weary
       yield self if block_given?
     end
 
+    # Set and normalize the url for the Request.
     def uri=(url)
       uri = Addressable::URI.parse(url).normalize!
       @uri = uri
     end
 
+    # A Rack interface for the Request. Applies itself and whatever
+    # middlewares to the env and passes the new env into the adapter.
+    #
+    # environment - A Hash for the Rack env.
+    #
+    # Returns an Array of three items; a Rack tuple.
     def call(environment)
       app = adapter.new
       middlewares = @middlewares
@@ -39,14 +50,17 @@ module Weary
       stack.call rack_env_defaults.merge(environment.update(env))
     end
 
+    # Build a Rack environment representing this Request.
     def env
       Weary::Env.new(self).env
     end
 
+    # The HTTP request method for this Request.
     def method
       @method
     end
 
+    # Set and normalize the HTTP request method.
     def method=(verb)
       @method = verb.to_s.upcase
     end
@@ -106,7 +120,7 @@ module Weary
       @oauth
     end
 
-    # A Future comes back
+    # Returns a future-wrapped Response.
     def perform
       future do
         status, headers, body = call(rack_env_defaults)

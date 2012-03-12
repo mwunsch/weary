@@ -1,8 +1,8 @@
 require 'weary/response'
 require 'weary/adapters/net_http'
-# An abstract class. A subclass should be something that actually opens
-# a socket to make the request, e.g. Net/HTTP, Curb, etc.
 module Weary
+  # An abstract interface. A subclass should be something that actually opens
+  # a socket to make the request, e.g. Net/HTTP, Curb, etc.
   module Adapter
 
     def initialize(app=nil)
