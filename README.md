@@ -1,7 +1,5 @@
 # Weary
 
-This is the **big rewrite** of Weary, currently ongoing.
-
 _Weary is a framework and DSL for building clients for (preferably RESTful) web service APIs._
 
 At its most minimal, Weary is simply some nice syntactic sugar around Net/HTTP.
@@ -18,6 +16,7 @@ It features:
 
     `Weary::Request#perform`, the thing that performs the request, returns a [future](http://en.wikipedia.org/wiki/Futures_and_promises) and only blocks when accessed.
 
+It takes its inspiration from [HTTParty](https://github.com/jnunemaker/httparty) and [Faraday](https://github.com/technoweenie/faraday).
 
 ## Quick Start
 
@@ -132,15 +131,13 @@ Authentication, by default is done by either `Weary::Middleware::BasicAuth` or `
 
 The point is, **it's just Rack**.
 
-## TODO
+## Release Candidate
 
-1. More documentation.
+At this point, I need _your_ help to further Weary along. I'd love to see more examples that utilize the Rackness of Weary: using Devise, Warden, or mounted in a Rails application.
 
-2. I'm not particularly happy about the specs, they seem a bit brittle in places.
+## Examples
 
-3. I'd love to see more examples that utilize the Rackness of Weary. Using Devise, Warden, or mounted in a Rails application.
-
-4. Need to push adapter and middleware onto the Resource for Weary::Route's benefit.
+[**Gilt**](https://github.com/mwunsch/gilt) is a Ruby client to the [Gilt public API](https://dev.gilt.com/). Notice how much of the code is dedicated to the Gilt domain model, and very little to actually interacting with the web service. That's the idea.
 
 ## Copyright
 
