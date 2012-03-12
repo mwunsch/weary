@@ -1,3 +1,3 @@
 module Weary
-  VERSION = "1.0.0-rc1"
+  VERSION = "1.0.0.rc1"
 end

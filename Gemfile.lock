@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    weary (1.0.0.pre)
+    weary (1.0.0.rc1)
       addressable (~> 2.2.6)
       multi_json (~> 1.1.0)
       promise (~> 0.3.0)
