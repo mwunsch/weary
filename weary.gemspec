@@ -4,7 +4,7 @@ require "weary/version"
 
 Gem::Specification.new do |s|
   s.name = %q{weary}
-  s.version = "#{Weary::VERSION}.pre"
+  s.version = "#{Weary::VERSION}"
   s.authors = ["Mark Wunsch"]
   s.email = %q{mark@markwunsch.com}
   s.summary = %q{A framework and DSL for the consumption of RESTful web services.}
