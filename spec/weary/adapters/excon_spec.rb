@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe Weary::Adapter::Excon do
   before do
-    # WebMock.disable_net_connect!
     @url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
     @request = Weary::Request.new @url
   end
