@@ -1,7 +1,10 @@
 require 'weary/version'
 require 'weary/client'
+require 'weary/configuration'
 
 module Weary
+  extend Configuration
+
   USER_AGENTS = {
     "Firefox 1.5.0.12 - Mac" => "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.8.0.12) Gecko/20070508 Firefox/1.5.0.12",
     "Firefox 1.5.0.12 - Windows" => "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.12) Gecko/20070508 Firefox/1.5.0.12",
