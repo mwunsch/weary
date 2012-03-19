@@ -6,6 +6,7 @@ module Weary
   module Adapter
     autoload :NetHttp, 'weary/adapters/net_http'
     autoload :Excon, 'weary/adapters/excon'
+    autoload :Typhoeus, 'weary/adapters/typhoeus'
 
     def initialize(app=nil)
       @app = app

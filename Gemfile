@@ -15,4 +15,5 @@ end
 
 group :test, :development do
   gem "excon"
+  gem "typhoeus"
 end
