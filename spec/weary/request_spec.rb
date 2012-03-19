@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'multi_json'
 
 describe Weary::Request do
   describe "#uri" do
