@@ -183,7 +183,8 @@ describe Weary::Request do
     it "adds a Middleware to the stack to sign the request" do
       req = described_class.new "https://api.github.com/gists", "POST"
       cred = ["consumer_key", "access_token"]
-      req.should_receive(:use).with(Weary::Middleware::OAuth, cred)
+      expected = {:consumer_key => cred.first, :token => cred.last}
+      req.should_receive(:use).with(Weary::Middleware::OAuth, [expected])
       req.oauth *cred
     end
 
