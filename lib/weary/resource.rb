@@ -59,7 +59,7 @@ module Weary
     # Rack-friendly).
     def use(middleware, *args, &block)
       @middlewares ||= []
-      @middlewares << [middleware, args, block]
+      @middlewares << [middleware, args.compact, block]
     end
 
     # Convenience method to set a User Agent Header
@@ -130,13 +130,13 @@ module Weary
       mapping = url.keys.map {|k| [k, params.delete(k) || params.delete(k.to_sym)] }
       request = Weary::Request.new url.expand(Hash[mapping]), @method do |r|
         r.headers headers
+        if !@middlewares.nil? && !@middlewares.empty?
+          @middlewares.each {|middleware| r.use *middleware }
+        end
         if !expected_params.empty?
           r.params params.reject {|k,v| !expects? k }
         end
         r.send @authenticates, *credentials if authenticates?
-        if !@middlewares.nil? && !@middlewares.empty?
-          @middlewares.each {|middleware| r.use *middleware }
-        end
       end
       yield request if block_given?
       request

@@ -5,10 +5,9 @@ require 'rack'
 require 'weary/env'
 require 'weary/adapter'
 
-autoload :Middleware, 'weary/middleware'
-autoload :MultiJson, 'multi_json'
-
 module Weary
+  autoload :Middleware, 'weary/middleware'
+  autoload :MultiJson, 'multi_json'
   # A Request is an interface to an http request. It doesn't actually make the
   # request. Instead, it builds itself up into a Rack environment. A Request
   # object is technically a Rack middleware, with a call method. The Request
@@ -131,7 +130,7 @@ module Weary
     end
 
     def use(middleware, *args, &block)
-      @middlewares << [middleware, args, block]
+      @middlewares << [middleware, args.compact, block]
     end
 
     private
