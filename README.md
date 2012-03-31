@@ -131,7 +131,7 @@ Authentication, by default is done by either `Weary::Middleware::BasicAuth` or `
 
 The point is, **it's just Rack**.
 
-## Release Candidate
+## Weary needs your help.
 
 At this point, I need _your_ help to further Weary along. I'd love to see more examples that utilize the Rackness of Weary: using Devise, Warden, or mounted in a Rails application.
 
