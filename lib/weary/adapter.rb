@@ -1,9 +1,12 @@
 require 'weary/response'
-require 'weary/adapters/net_http'
+
 module Weary
   # An abstract interface. A subclass should be something that actually opens
   # a socket to make the request, e.g. Net/HTTP, Curb, etc.
   module Adapter
+    autoload :NetHttp, 'weary/adapters/net_http'
+    autoload :Excon, 'weary/adapters/excon'
+    autoload :Typhoeus, 'weary/adapters/typhoeus'
 
     def initialize(app=nil)
       @app = app

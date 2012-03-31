@@ -100,7 +100,7 @@ module Weary
 
     def adapter(connection=nil)
       @connection = connection unless connection.nil?
-      @connection ||= Weary::Adapter::NetHttp
+      @connection ||= Weary.adapter
     end
 
     def basic_auth(*credentials)
