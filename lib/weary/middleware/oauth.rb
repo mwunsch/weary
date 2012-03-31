@@ -9,9 +9,9 @@ module Weary
       def initialize(app, consumer_key, access_token)
         @app = app
         @oauth = {
-          :consumer_key => consumer_key,
-          :token => access_token
+          :consumer_key => consumer_key
         }
+        @oauth[:token] = access_token if access_token
       end
 
       def call(env)
