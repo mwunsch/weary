@@ -6,12 +6,9 @@ module Weary
     class OAuth
       AUTH_HEADER = "HTTP_AUTHORIZATION"
 
-      def initialize(app, consumer_key, access_token)
+      def initialize(app, oauth_options)
         @app = app
-        @oauth = {
-          :consumer_key => consumer_key
-        }
-        @oauth[:token] = access_token if access_token
+        @oauth = oauth_options
       end
 
       def call(env)
