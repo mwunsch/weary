@@ -1,6 +1,12 @@
 require 'weary/middleware'
 require 'simple_oauth'
 
+module SimpleOAuth
+  class Header
+    ATTRIBUTE_KEYS << :verifier
+  end
+end
+
 module Weary
   module Middleware
     class OAuth
