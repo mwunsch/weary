@@ -111,12 +111,13 @@ module Weary
       @basic_auth
     end
 
-    def oauth(consumer_key=nil, access_token=nil, token_secret=nil)
+    def oauth(consumer_key=nil, access_token=nil, token_secret=nil, consumer_secret=nil)
       if !consumer_key.nil?
         @oauth = true
         options = {:consumer_key => consumer_key}
         options[:token] = access_token unless access_token.nil? || access_token.empty?
         options[:token_secret] = token_secret unless token_secret.nil? || token_secret.empty?
+        options[:consumer_secret] = consumer_secret unless consumer_secret.nil? || consumer_secret.empty?
         use Weary::Middleware::OAuth, [options]
       end
       @oauth
