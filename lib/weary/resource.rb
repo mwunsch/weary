@@ -84,9 +84,9 @@ module Weary
     #         :consumer_key)
     # token - The parameter in which to expect the user access token (defaults
     #         to :token)
-    def oauth!(key = :consumer_key, token = :token)
+    def oauth!(key = :consumer_key, token = :token, secret = :token_secret)
       @authenticates = :oauth
-      @credentials = [key, token]
+      @credentials = [key, token, secret]
     end
 
     # Does the Resource anticipate some sort of authentication parameters?
