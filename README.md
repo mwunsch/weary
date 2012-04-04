@@ -47,7 +47,7 @@ This is a basic example of a client you will build using the Weary framework. If
 Inherit from `Weary::Client` for a set of class methods that craft "Resources" (more on that later).
 
 ```ruby
-MyClass < Weary::Client
+class MyClass < Weary::Client
   get :resource, "http://host.com/path/to/resource" do |resource|
     resource.optional :optional_parameter
   end
