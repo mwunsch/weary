@@ -11,8 +11,9 @@ module Weary
 
     attr_reader :method
 
-    def initialize(method, uri)
+    def initialize(method, uri, options={})
       @method = method
+      @ignore_url_colons = options.delete(:ignore_url_colons) || false
       self.url uri
     end
 
@@ -22,7 +23,10 @@ module Weary
     #
     # Returns an Addressable::Template
     def url(uri=nil)
-      @uri = Addressable::Template.new(uri.gsub(/:(\w+)/) { "{#{$1}}" }) unless uri.nil?
+      unless uri.nil?
+        uri.gsub!(/:(\w+)/) { "{#{$1}}" } unless @ignore_url_colons
+        @uri = Addressable::Template.new(uri)
+      end
       @uri
     end
 
