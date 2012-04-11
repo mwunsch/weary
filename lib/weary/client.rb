@@ -77,8 +77,9 @@ module Weary
       # host - An optional String to set the client domain.
       #
       # Returns the domain String.
-      def domain(host=nil)
+      def domain(host=nil, options={})
         @domain = host unless host.nil?
+        @ignore_url_colons = options.delete(:ignore_colons) || false
         @domain ||= ""
       end
 
@@ -154,7 +155,8 @@ module Weary
       #
       # Returns the generated Resource.
       def resource(name, method, path="")
-        resource = Weary::Resource.new method, "#{domain}#{path}"
+        options = { :ignore_url_colons => @ignore_url_colons || false }
+        resource = Weary::Resource.new method, "#{domain}#{path}", options
         resource.optional *optional
         resource.required *required
         resource.defaults defaults

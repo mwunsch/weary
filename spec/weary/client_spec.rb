@@ -57,6 +57,19 @@ describe Weary::Client do
       resource = subject.get :show, "/show/{user}/{repo}"
       resource.url.expand(repo).to_s.should eql @url
     end
+
+    context "when :ignore_colons is given" do
+      before do
+        @url = "http://github.com:8000/api/v2/json/repos/show/mwunsch/weary"
+      end
+
+      it "should not create URL variables out of colons" do
+        repo = {:user => "mwunsch", :repo => "weary"}
+        subject.domain "http://github.com:8000/api/v2/json/repos", :ignore_colons => true
+        resource = subject.get :show, "/show/{user}/{repo}"
+        resource.url.expand(repo).to_s.should eql @url
+      end
+    end
   end
 
   describe "::optional" do
