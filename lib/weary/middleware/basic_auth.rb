@@ -3,7 +3,7 @@ module Weary
     class BasicAuth
       AUTH_HEADER = "HTTP_AUTHORIZATION"
 
-      def initialize(app, credentials)
+      def initialize(app, *credentials)
         @app = app
         @auth = [credentials.join(':')].pack('m*')
       end
