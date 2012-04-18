@@ -32,6 +32,12 @@ describe Weary::Resource do
       resource = Weary::Resource.new "GET", url
       resource.url.variables.should include 'user'
     end
+
+    it "accepts port numbers in the url" do
+      url = "http://localhost:3000/api/v2/"
+      resource = Weary::Resource.new "GET", url
+      resource.url.variables.should_not include '3000'
+    end
   end
 
   describe "#optional" do
