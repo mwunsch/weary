@@ -22,7 +22,7 @@ module Weary
     #
     # Returns an Addressable::Template
     def url(uri=nil)
-      @uri = Addressable::Template.new(uri.gsub(/:(\w+)/) { "{#{$1}}" }) unless uri.nil?
+      @uri = Addressable::Template.new(uri.gsub(/:(?![0-9])(\w+)/) { "{#{$1}}" }) unless uri.nil?
       @uri
     end
 
