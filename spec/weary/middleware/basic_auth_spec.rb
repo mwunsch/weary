@@ -10,12 +10,12 @@ describe Weary::Middleware::BasicAuth do
     end
 
     it_behaves_like "a Rack application" do
-      subject { described_class.new(@request, ["mwunsch", "secret"]) }
+      subject { described_class.new(@request, "mwunsch", "secret") }
       let(:env) { @request.env }
     end
 
     it "prepares the Authorization header for the request" do
-      middleware = described_class.new(@request, ["mwunsch", "secret"])
+      middleware = described_class.new(@request, "mwunsch", "secret")
       middleware.call(@request.env)
       a_request(:get, @url).should have_been_made
     end
