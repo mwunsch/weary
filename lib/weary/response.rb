@@ -1,6 +1,7 @@
 require 'rack/response'
 
 autoload :MultiJson, 'multi_json'
+autoload :MultiXml, 'multi_xml'
 
 module Weary
   class Response
@@ -52,8 +53,13 @@ module Weary
 
     def parse
       raise "The response does not contain a body" if body.nil? || body.empty?
-      raise "Unable to parse Content-Type: #{content_type}" unless content_type =~ /json($|;.*)/
-      MultiJson.decode body
+      raise "Unable to parse Content-Type: #{content_type}" unless content_type =~ /(json|xml)($|;.*)/
+      case content_type.match(/(json|xml)($|;.*)/)[1]
+      when 'json'
+        MultiJson.decode body
+      when 'xml'
+        MultiXml.parse body
+      end
     end
   end
 end
