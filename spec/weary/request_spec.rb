@@ -142,8 +142,7 @@ describe Weary::Request do
 
     it "sets the rack input for a POST request" do
       req = described_class.new "https://api.github.com/gists", "POST"
-      req.params :public => true,
-               :files  => { "file1.txt" => { :content => "String file contents"}}
+      req.params :public => true
       req.env['rack.input'].read.should eql req.params
     end
 

@@ -39,7 +39,12 @@ module Weary
 
     def select_by_url(url, set=@resources)
       set.select do |resource|
-        !resource.url.extract(url).nil?
+        mapping = resource.url.extract(url)
+        if mapping.respond_to?(:empty?) && !mapping.empty?
+          !mapping.values_at(*resource.url.variables).compact.empty?
+        else
+          !mapping.nil?
+        end
       end
     end
 
