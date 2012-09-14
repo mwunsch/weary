@@ -95,5 +95,15 @@ describe Weary::Response do
       response = Weary::Response.new "", 404, {'Content-Type' => 'text/plain'}
       expect { response.parse }.to raise_error
     end
+
+    it "receives an optional block for custom parsing" do
+      message = "Hello, world."
+      dump = Marshal.dump(message)
+      response = Weary::Response.new dump, 200, {'Content-Type' => 'text/plain'}
+      parsed = response.parse do |body, content_type|
+        Marshal.load(body)
+      end
+      parsed.should eql message
+    end
   end
 end

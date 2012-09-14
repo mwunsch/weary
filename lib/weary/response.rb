@@ -52,8 +52,12 @@ module Weary
 
     def parse
       raise "The response does not contain a body" if body.nil? || body.empty?
-      raise "Unable to parse Content-Type: #{content_type}" unless content_type =~ /json($|;.*)/
-      MultiJson.decode body
+      if block_given?
+        yield body, content_type
+      else
+        raise "Unable to parse Content-Type: #{content_type}" unless content_type =~ /json($|;.*)/
+        MultiJson.decode body
+      end
     end
   end
 end
