@@ -18,14 +18,14 @@ module Weary
 
       def self.prepare(request)
         req_class = request_class(request.request_method)
-        req = req_class.new(request.fullpath, normalize_request_headers(request.env))
-        if req.request_body_permitted? # What's the best way of passing the body?
-          req.body = request.body.read
+        net_http_req = req_class.new(request.fullpath, normalize_request_headers(request.env))
+        if net_http_req.request_body_permitted? # What's the best way of passing the body?
+          net_http_req.body = request.body.read
           request.body.rewind
         end
-        req.content_type = request.content_type if request.content_type
-        req.content_length = request.content_length if request.content_length
-        req
+        net_http_req.content_type = request.content_type if request.content_type
+        net_http_req.content_length = request.content_length if request.content_length
+        net_http_req
       end
 
       def self.normalize_request_headers(env)
