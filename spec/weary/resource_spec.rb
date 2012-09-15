@@ -78,6 +78,7 @@ describe Weary::Resource do
 
   describe "#use" do
     it "adds a middleware to the stack and passes them onto the request" do
+      require 'rack/lobster'
       url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
       resource = described_class.new "GET", url
       resource.use Rack::Lobster
@@ -221,6 +222,22 @@ describe Weary::Resource do
       hash = { :user => "mwunsch" }
       resource = described_class.new "GET", url
       resource.should_not be_meets_requirements hash
+    end
+  end
+
+  describe "#has_middleware?" do
+    it "is true if the Request is set up to use a Middleware" do
+      require 'rack/lobster'
+      url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
+      resource = described_class.new "GET", url
+      resource.use Rack::Lobster
+      resource.should have_middleware
+    end
+
+    it "is false if no Middleware is attached to this Resource" do
+      url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
+      resource = described_class.new "GET", url
+      resource.should_not have_middleware
     end
   end
 

@@ -114,6 +114,11 @@ module Weary
       requirements.reject {|k| params.keys.map(&:to_s).include? k.to_s }.empty?
     end
 
+    # Should the Request use one or more Rack::Middleware?
+    def has_middleware?
+      !@middlewares.nil? && !@middlewares.empty?
+    end
+
     # Construct the request from the given parameters.
     #
     # Yields the Request
@@ -122,15 +127,24 @@ module Weary
     # Raises a Weary::Resource::UnmetRequirementsError if the requirements
     #   are not met.
     def request(params={})
-      params.delete_if {|k,v| v.nil? || v.to_s.empty? }
-      params.update(defaults)
+      normalize_parameters params
       raise UnmetRequirementsError, "Required parameters: #{requirements}" \
         unless meets_requirements? params
-      credentials = pull_credentials params if authenticates?
-      mapping = url.keys.map {|k| [k, params.delete(k) || params.delete(k.to_sym)] }
-      request = Weary::Request.new url.expand(Hash[mapping]), @method do |r|
+      credentials = pull_credentials params
+      pairs = pull_url_pairs params
+      request = construct_request expand_url(pairs), params, credentials
+      yield request if block_given?
+      request
+    end
+    alias build request
+
+    private
+
+    # Private: Build the Request object with the given Resource parameters.
+    def construct_request(uri, params, credentials=[])
+      Weary::Request.new uri, @method do |r|
         r.headers headers
-        if !@middlewares.nil? && !@middlewares.empty?
+        if has_middleware?
           @middlewares.each {|middleware| r.use *middleware }
         end
         if !expected_params.empty?
@@ -138,13 +152,26 @@ module Weary
         end
         r.send @authenticates, *credentials if authenticates?
       end
-      yield request if block_given?
-      request
     end
-    alias build request
 
+    # Private: For a set of parameters passed in to build a Request, delete
+    # those with no values, and merge them with the defaults.
+    def normalize_parameters(params)
+      params.delete_if {|k,v| v.nil? || v.to_s.empty? }
+      params.update(defaults)
+      params
+    end
 
-    private
+    # Private: Expand the url template with the passed pairs to get the
+    # final url.
+    def expand_url(pairs)
+      url.expand Hash[pairs]
+    end
+
+    # Private: Separate the parameters needed to construct a url.
+    def pull_url_pairs(params)
+      url.keys.map {|k| [k, params.delete(k) || params.delete(k.to_sym)] }
+    end
 
     # Private: Separate the credentials for authentication from the other
     # request parameters.
