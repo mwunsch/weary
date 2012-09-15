@@ -2,6 +2,7 @@ require 'addressable/uri'
 require 'future'
 require 'rack'
 
+require 'weary/requestable'
 require 'weary/env'
 require 'weary/adapter'
 
@@ -15,12 +16,13 @@ module Weary
   # Rack application. Because the Request performs so much manipulation on
   # the Rack env, you can attach middleware to it to act on its mutated env.
   class Request
+    include Weary::Requestable
+
     attr_reader :uri
 
     def initialize(url, method='GET')
       self.uri = url
       self.method = method
-      @middlewares = []
       yield self if block_given?
     end
 
@@ -38,7 +40,7 @@ module Weary
     # Returns an Array of three items; a Rack tuple.
     def call(environment)
       app = adapter.new
-      middlewares = @middlewares
+      middlewares = @middlewares || []
       stack = Rack::Builder.new do
         middlewares.each do |middleware|
           klass, *args = middleware
@@ -64,15 +66,6 @@ module Weary
       @method = verb.to_s.upcase
     end
 
-    def headers(hash=nil)
-      @headers = hash unless hash.nil?
-      @headers ||= {}
-    end
-
-    def user_agent(agent)
-      headers.update 'User-Agent' => agent
-    end
-
     def params(parameters=nil)
       if !parameters.nil?
         if ["POST", "PUT"].include? method
@@ -96,11 +89,6 @@ module Weary
     def body(io=nil)
       @attachment = io unless io.nil?
       @attachment ||= StringIO.new('')
-    end
-
-    def adapter(connection=nil)
-      @connection = connection unless connection.nil?
-      @connection ||= Weary::Adapter::NetHttp
     end
 
     def basic_auth(*credentials)
@@ -131,10 +119,6 @@ module Weary
         yield response if block_given?
         response
       end
-    end
-
-    def use(middleware, *args, &block)
-      @middlewares << [middleware, args.compact, block]
     end
 
     private

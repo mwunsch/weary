@@ -7,6 +7,8 @@ module Weary
   # retrieve the resource and some constraints on the parameters necessary
   # to complete the request.
   class Resource
+    include Weary::Requestable
+
     UnmetRequirementsError = Class.new(StandardError)
 
     attr_reader :method
@@ -47,24 +49,6 @@ module Weary
     def defaults(hash=nil)
       @defaults = hash unless hash.nil?
       @defaults ||= {}
-    end
-
-    # An accessor to set HTTP request headers.
-    def headers(hash=nil)
-      @headers = hash unless hash.nil?
-      @headers ||= {}
-    end
-
-    # Set up a Rack::Middleware to be used by the Request (which is
-    # Rack-friendly).
-    def use(middleware, *args, &block)
-      @middlewares ||= []
-      @middlewares << [middleware, args.compact, block]
-    end
-
-    # Convenience method to set a User Agent Header
-    def user_agent(agent)
-      headers.update 'User-Agent' => agent
     end
 
     # Tell the Resource to anticipate Basic Authentication. Optionally,
@@ -112,11 +96,6 @@ module Weary
     # Given a hash of Request parameters, do they meet the requirements?
     def meets_requirements?(params)
       requirements.reject {|k| params.keys.map(&:to_s).include? k.to_s }.empty?
-    end
-
-    # Should the Request use one or more Rack::Middleware?
-    def has_middleware?
-      !@middlewares.nil? && !@middlewares.empty?
     end
 
     # Construct the request from the given parameters.

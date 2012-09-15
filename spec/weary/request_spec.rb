@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe Weary::Request do
+  it_behaves_like "a Requestable" do
+    subject { described_class.new "http://github.com/api/v2/json/repos/show/mwunsch/weary" }
+  end
+
   describe "#uri" do
     subject { described_class.new "http://github.com/api/v2/json/repos/show/mwunsch/weary" }
 
@@ -97,16 +101,6 @@ describe Weary::Request do
     subject { described_class.new "http://github.com/api/v2/json/repos/show/mwunsch/weary" }
     let(:hash) { {'User-Agent' => Weary::USER_AGENTS['Lynx 2.8.4rel.1 on Linux']} }
 
-    it "sets headers for the request" do
-      subject.headers(hash)
-      subject.instance_variable_get(:@headers).should eql hash
-    end
-
-    it "gets previously set headers" do
-      subject.headers(hash)
-      subject.headers.should eql hash
-    end
-
     it "updates the env with the Rack-friendly key" do
       subject.headers(hash)
       subject.env.should have_key('HTTP_USER_AGENT')
@@ -115,21 +109,6 @@ describe Weary::Request do
     it "updates the env with its HTTP_* value" do
       subject.headers(hash)
       subject.env['HTTP_USER_AGENT'].should eql(hash.values.first)
-    end
-  end
-
-  describe "#user_agent" do
-    subject { described_class.new "http://github.com/api/v2/json/repos/show/mwunsch/weary" }
-    let(:agent) { 'RSpec' }
-
-    it "updates the #headers hash with a User-Agent" do
-      subject.user_agent agent
-      subject.headers.should have_key 'User-Agent'
-    end
-
-    it "sets the user agent for the headers" do
-      subject.user_agent agent
-      subject.headers['User-Agent'].should be agent
     end
   end
 
@@ -195,20 +174,6 @@ describe Weary::Request do
     end
   end
 
-  describe "#adapter" do
-    subject { described_class.new "http://github.com/api/v2/json/repos/show/mwunsch/weary" }
-
-    it "sets a new adapter to set the connection" do
-      klass = Class.new { include Weary::Adapter }
-      subject.adapter(klass)
-      subject.adapter.should be klass
-    end
-
-    it "defaults to the Net::HTTP adapter" do
-      subject.adapter.should be Weary::Adapter::NetHttp
-    end
-  end
-
   describe "#perform" do
     subject do
       url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
@@ -232,7 +197,7 @@ describe Weary::Request do
   end
 
   describe "#use" do
-    it "adds a middleware to the stack" do
+    it "runs middleware through the calling stack" do
       req = described_class.new "http://github.com/api/v2/json/repos/show/mwunsch/weary"
       req.adapter(Class.new { include Weary::Adapter })
       # Rack::Runtime sets an "X-Runtime" response header

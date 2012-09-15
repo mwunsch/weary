@@ -2,6 +2,10 @@ require 'spec_helper'
 require 'rack/lobster'
 
 describe Weary::Client do
+  it_behaves_like "a Requestable" do
+    subject { Class.new(Weary::Client) }
+  end
+
   describe "::resource" do
     before do
       @url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"

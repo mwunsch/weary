@@ -1,6 +1,11 @@
 require 'spec_helper'
 
 describe Weary::Resource do
+  it_behaves_like "a Requestable" do
+    url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
+    subject { described_class.new "GET", url }
+  end
+
   describe "#url" do
     it "is an Addressable::Template" do
       url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
@@ -67,15 +72,6 @@ describe Weary::Resource do
     end
   end
 
-  describe "#headers" do
-    it "prepares headers for the request" do
-      url = "http://github.com/api/v2/json/repos/show/{user}/{repo}"
-      resource = described_class.new "GET", url
-      resource.headers 'User-Agent' => 'RSpec'
-      resource.headers.should eql 'User-Agent' => 'RSpec'
-    end
-  end
-
   describe "#use" do
     it "adds a middleware to the stack and passes them onto the request" do
       require 'rack/lobster'
@@ -84,15 +80,6 @@ describe Weary::Resource do
       resource.use Rack::Lobster
       stack = resource.request.instance_variable_get :@middlewares
       stack.flatten.should include Rack::Lobster
-    end
-  end
-
-  describe "#user_agent" do
-    it "updates the #headers hash with a User-Agent" do
-      url = "http://github.com/api/v2/json/repos/show/{user}/{repo}"
-      resource = described_class.new "GET", url
-      resource.user_agent 'RSpec'
-      resource.headers.should eql 'User-Agent' => 'RSpec'
     end
   end
 
@@ -222,22 +209,6 @@ describe Weary::Resource do
       hash = { :user => "mwunsch" }
       resource = described_class.new "GET", url
       resource.should_not be_meets_requirements hash
-    end
-  end
-
-  describe "#has_middleware?" do
-    it "is true if the Request is set up to use a Middleware" do
-      require 'rack/lobster'
-      url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
-      resource = described_class.new "GET", url
-      resource.use Rack::Lobster
-      resource.should have_middleware
-    end
-
-    it "is false if no Middleware is attached to this Resource" do
-      url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
-      resource = described_class.new "GET", url
-      resource.should_not have_middleware
     end
   end
 
