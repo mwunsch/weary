@@ -19,7 +19,6 @@ shared_examples_for "a Rack application" do
   end
 
   it "passes Rack::Lint" do
-    require "rack/lint"
     rack_defaults = {
       'rack.version'      => Rack::VERSION,
       'rack.errors'       => $stderr,
