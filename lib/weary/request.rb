@@ -70,7 +70,7 @@ module Weary
       if !parameters.nil?
         if ["POST", "PUT"].include? method
           @body = query_params_from_hash(parameters)
-          body StringIO.new(@body)
+          body stringio_encode(@body)
           use Weary::Middleware::ContentType
         else
           uri.query_values = parameters
@@ -82,13 +82,13 @@ module Weary
 
     def json(parameters)
       json = MultiJson.encode(parameters)
-      body StringIO.new(json)
+      body stringio_encode(json)
       json
     end
 
     def body(io=nil)
       @attachment = io unless io.nil?
-      @attachment ||= StringIO.new('')
+      @attachment ||= stringio_encode("")
     end
 
     def basic_auth(*credentials)
@@ -135,6 +135,13 @@ module Weary
         'rack.multithread'  => true,
         'rack.multiprocess' => false,
         'rack.run_once'     => false }
+    end
+
+    def stringio_encode(content)
+      io = StringIO.new(content)
+      io.binmode
+      io.set_encoding "ASCII-8BIT" if io.respond_to? :set_encoding
+      io
     end
 
   end

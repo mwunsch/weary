@@ -18,6 +18,19 @@ shared_examples_for "a Rack application" do
     subject.call(env).length.should be 3
   end
 
+  it "passes Rack::Lint" do
+    require "rack/lint"
+    rack_defaults = {
+      'rack.version'      => Rack::VERSION,
+      'rack.errors'       => $stderr,
+      'rack.multithread'  => true,
+      'rack.multiprocess' => false,
+      'rack.run_once'     => false
+    }
+    lint = Rack::Lint.new subject
+    expect { lint.call(rack_defaults.update(env)) }.to_not raise_error Rack::Lint::LintError
+  end
+
   describe "the status" do
     let(:status) { subject.call(env).first }
 
