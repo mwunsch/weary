@@ -96,7 +96,7 @@ module Weary
 
     # The keys expected as parameters to the Request.
     def expected_params
-      defaults.keys.map(&:to_s) | optional.map(&:to_s) | required.map(&:to_s)
+      (defaults.keys | optional | required).map(&:to_s).uniq
     end
 
     # Does the Resource expect this parameter to be used to make the Request?
