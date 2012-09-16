@@ -1,11 +1,5 @@
 begin
   require 'typhoeus'
-rescue LoadError => e
-  if defined? RUBY_ENGINE and 'rbx' == RUBY_ENGINE
-    warn "Typhoeus is not yet available on Rubinius: #{e.message}"
-  else
-    raise $!
-  end
 end
 
 module Weary
