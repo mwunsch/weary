@@ -25,7 +25,7 @@ module Weary
 
     def method_missing(method, *args, &block)
       if @model.method_defined? method
-        @target ||= @callable.call @model, @future.force
+        @target ||= @callable.call @model, @future
         @target.send(method, *args, &block)
       else
         super
