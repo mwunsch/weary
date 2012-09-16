@@ -91,11 +91,6 @@ module Weary
       @attachment ||= stringio_encode("")
     end
 
-    def adapter(connection=nil)
-      @connection = connection unless connection.nil?
-      @connection ||= Weary.adapter
-    end
-
     def basic_auth(*credentials)
       if !credentials.empty?
         @basic_auth = true
