@@ -3,6 +3,10 @@ source "http://rubygems.org"
 gemspec
 
 gem "rake", "~> 0.9.2"
+gem "excon"
+if !(RUBY_ENGINE =~ /rbx/)
+  gem "typhoeus"
+end
 
 group :test do
   gem "rspec", "~> 2.11.0"
@@ -16,9 +20,4 @@ end
 
 platforms :jruby do
   gem "jruby-openssl"
-end
-
-group :test, :development do
-  gem "excon"
-  gem "typhoeus"
 end

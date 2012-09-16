@@ -1,4 +1,12 @@
-require 'typhoeus'
+begin
+  require 'typhoeus'
+rescue LoadError => e
+  if RUBY_ENGINE =~ /rbx/
+    warn "Typhoeus is not yet available on Rubinius: #{e.message}"
+  else
+    raise $!
+  end
+end
 
 module Weary
   module Adapter

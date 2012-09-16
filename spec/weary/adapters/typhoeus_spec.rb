@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Weary::Adapter::Typhoeus do
+describe Weary::Adapter::Typhoeus, :exclude_from_rbx => true do
   before do
     @url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
     @request = Weary::Request.new @url
