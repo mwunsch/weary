@@ -4,3 +4,4 @@ doc/
 .bundle/
 .yardoc/
 .rbenv-version
+*.rbc
