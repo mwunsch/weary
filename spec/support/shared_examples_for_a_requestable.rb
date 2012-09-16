@@ -46,4 +46,32 @@ shared_examples_for "a Requestable" do
     end
   end
 
+  describe "#pass_values_onto_requestable" do
+    it "passes middleware onto another Requestable object" do
+      require 'rack/lobster'
+      klass = Class.new { include Weary::Requestable }
+      requestable = klass.new
+      subject.use Rack::Lobster
+      subject.pass_values_onto_requestable(requestable)
+      requestable.should have_middleware
+    end
+
+    it "passes adapter onto another Requestable" do
+      klass = Class.new { include Weary::Requestable }
+      adapterClass = Class.new { include Weary::Adapter }
+      requestable = klass.new
+      subject.adapter(adapterClass)
+      subject.pass_values_onto_requestable(requestable)
+      requestable.adapter.should eql adapterClass
+    end
+
+    it "passes headers onto another Requestable" do
+      klass = Class.new { include Weary::Requestable }
+      requestable = klass.new
+      subject.user_agent "RSpec"
+      subject.pass_values_onto_requestable(requestable)
+      requestable.headers.should eql "User-Agent" => "RSpec"
+    end
+  end
+
 end

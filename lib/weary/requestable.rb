@@ -50,5 +50,20 @@ module Weary
       !@middlewares.nil? && !@middlewares.empty?
     end
 
+    # Pass Requestable values on to another Requestable object
+    # (including Middleware).
+    #
+    # requestable - Another Requestable object.
+    #
+    # Returns the Requestable object.
+    def pass_values_onto_requestable(requestable)
+      requestable.headers self.headers
+      requestable.adapter self.adapter
+      if has_middleware?
+        @middlewares.each {|middleware| requestable.use *middleware }
+      end
+      requestable
+    end
+
   end
 end

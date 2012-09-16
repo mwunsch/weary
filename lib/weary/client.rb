@@ -134,10 +134,7 @@ module Weary
         resource.optional *optional
         resource.required *required
         resource.defaults defaults
-        resource.headers headers
-        if !@middlewares.nil? && !@middlewares.empty?
-          @middlewares.each {|middleware| resource.use *middleware }
-        end
+        pass_values_onto_requestable resource
         yield resource if block_given?
         self[name] = resource
       end

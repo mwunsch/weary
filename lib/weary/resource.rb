@@ -122,10 +122,7 @@ module Weary
     # Private: Build the Request object with the given Resource parameters.
     def construct_request(uri, params, credentials=[])
       Weary::Request.new uri, @method do |r|
-        r.headers headers
-        if has_middleware?
-          @middlewares.each {|middleware| r.use *middleware }
-        end
+        pass_values_onto_requestable(r)
         if !expected_params.empty?
           r.params params.reject {|k,v| !expects? k }
         end
