@@ -17,3 +17,8 @@ end
 platforms :jruby do
   gem "jruby-openssl"
 end
+
+group :test, :development do
+  gem "excon"
+  gem "typhoeus"
+end
