@@ -19,6 +19,6 @@ platforms :jruby do
   gem "jruby-openssl"
 end
 
-platforms :ruby do
+platforms :mri, :jruby do
   gem "typhoeus"
 end
