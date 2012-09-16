@@ -1,7 +1,7 @@
 begin
   require 'typhoeus'
 rescue LoadError => e
-  if RUBY_ENGINE =~ /rbx/
+  if defined? RUBY_ENGINE and 'rbx' == RUBY_ENGINE
     warn "Typhoeus is not yet available on Rubinius: #{e.message}"
   else
     raise $!

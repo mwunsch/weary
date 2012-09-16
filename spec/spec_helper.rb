@@ -6,6 +6,11 @@ Dir['./spec/support/**/*.rb'].each {|f| require f }
 
 WebMock.disable_net_connect!
 
-RSpec.configure do |c|
-  c.filter_run_excluding :exclude_from_rbx => !!(RUBY_ENGINE =~ /rbx/)
+def rbx?
+  defined? RUBY_ENGINE and 'rbx' == RUBY_ENGINE
 end
+
+RSpec.configure do |c|
+  c.filter_run_excluding :exclude_from_rbx => rbx?
+end
+
