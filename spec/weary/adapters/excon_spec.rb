@@ -53,30 +53,6 @@ describe Weary::Adapter::Excon do
         a_request(:post, @url).with(:body => "foo=baz").should have_been_made
       end
     end
-
-    describe ".host_and_port_for_request" do
-      it "cracks the Rack::Request open and returns a scheme + fqdn + port" do
-        req = Rack::Request.new(@request.env)
-        host_and_port = described_class.host_and_port_for_request(req)
-        host_and_port.should == "http://github.com"
-      end
-
-      it "correctly picks the right scheme" do
-        url = "https://github.com/hypomodern"
-        request = Weary::Request.new url
-        req = Rack::Request.new(request.env)
-        host_and_port = described_class.host_and_port_for_request(req)
-        host_and_port.should == "https://github.com"
-      end
-
-      it "correctly picks the right port" do
-        url = "http://mytestserver.com:9292/"
-        request = Weary::Request.new url
-        req = Rack::Request.new(request.env)
-        host_and_port = described_class.host_and_port_for_request(req)
-        host_and_port.should == "http://mytestserver.com:9292"
-      end
-    end
   end
 
   describe "#connect" do

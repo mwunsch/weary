@@ -8,19 +8,9 @@ module Weary
         include Weary::Adapter
 
         def connect(request)
-          connection = ::Excon.new(host_and_port_for_request(request))
+          connection = ::Excon.new("#{request.scheme}://#{request.host_with_port}")
           response = connection.request prepare(request)
           Rack::Response.new response.body, response.status, normalize_response(response.headers)
-        end
-
-        def host_and_port_for_request(request)
-          host = request.env['HTTP_HOST'] || request.env['SERVER_NAME']
-          port = request.env['SERVER_PORT'].to_s
-          if port == "80" || port == "443"
-            "#{request.scheme}://#{host}"
-          else
-            "#{request.scheme}://#{host}:#{port}"
-          end
         end
 
         def prepare(request)
