@@ -8,15 +8,7 @@ describe Weary::Adapter do
     req.env
   }
 
-  describe "#call" do
-    it_behaves_like "a Rack application"
-  end
-
-  describe "#connect" do
-    it "returns a Rack::Response" do
-      subject.connect(Rack::Request.new(env)).should be_a Rack::Response
-    end
-  end
+  it_behaves_like "an Adapter"
 
   describe "#normalize_request_headers" do
     it "removes the HTTP_ prefix from request headers" do
