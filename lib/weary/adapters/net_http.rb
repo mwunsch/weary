@@ -27,9 +27,7 @@ module Weary
         end
 
         def socket(request)
-          host = request.env['HTTP_HOST'] || request.env['SERVER_NAME']
-          port = request.env['SERVER_PORT'].to_s
-          connection = Net::HTTP.new host, port
+          connection = Net::HTTP.new request.host, request.port.to_s
           connection.use_ssl = request.scheme == 'https'
           connection.verify_mode = OpenSSL::SSL::VERIFY_NONE if connection.use_ssl?
           connection
