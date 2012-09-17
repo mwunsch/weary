@@ -74,14 +74,6 @@ describe Weary::Adapter::NetHttp do
     end
   end
 
-  describe ".normalize_request_headers" do
-    it "removes the HTTP_ prefix from request headers" do
-      @request.headers 'User-Agent' => Weary::USER_AGENTS['Lynx 2.8.4rel.1 on Linux']
-      headers = described_class.normalize_request_headers(@request.env)
-      headers.should have_key "User-Agent"
-    end
-  end
-
   describe ".socket" do
     it "sets up the http connection" do
       req = Rack::Request.new(@request.env)

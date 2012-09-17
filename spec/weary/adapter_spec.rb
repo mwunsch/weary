@@ -4,6 +4,7 @@ describe Weary::Adapter do
   subject { Class.new { include Weary::Adapter }.new }
   let(:env) {
     req = Weary::Request.new("http://github.com/api/v2/json/repos/show/mwunsch/weary")
+    req.headers 'User-Agent' => Weary::USER_AGENTS['Lynx 2.8.4rel.1 on Linux']
     req.env
   }
 
@@ -11,9 +12,16 @@ describe Weary::Adapter do
     it_behaves_like "a Rack application"
   end
 
-  describe "connect" do
+  describe "#connect" do
     it "returns a Rack::Response" do
       subject.connect(Rack::Request.new(env)).should be_a Rack::Response
+    end
+  end
+
+  describe "#normalize_request_headers" do
+    it "removes the HTTP_ prefix from request headers" do
+      headers = subject.normalize_request_headers(env)
+      headers.should have_key "User-Agent"
     end
   end
 end

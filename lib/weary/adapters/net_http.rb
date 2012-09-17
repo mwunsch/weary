@@ -26,19 +26,6 @@ module Weary
           net_http_req
         end
 
-        def normalize_request_headers(env)
-          req_headers = env.reject {|k,v| !k.start_with? "HTTP_" }
-          normalized = req_headers.map do |k, v|
-            new_key = k.sub("HTTP_",'').split('_').map(&:capitalize).join('-')
-            [new_key, v] unless UNWANTED_REQUEST_HEADERS.include? new_key
-          end
-          Hash[normalized]
-        end
-
-        def normalize_response(headers)
-          headers.reject {|k,v| k.downcase == 'status' }
-        end
-
         def socket(request)
           host = request.env['HTTP_HOST'] || request.env['SERVER_NAME']
           port = request.env['SERVER_PORT'].to_s
@@ -59,10 +46,6 @@ module Weary
       def connect(rack_request)
         self.class.connect(rack_request)
       end
-
-      private
-
-      UNWANTED_REQUEST_HEADERS = []
 
     end
   end
