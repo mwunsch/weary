@@ -13,14 +13,11 @@ module Weary
         end
 
         def parameters_for(request)
-          {
-            :headers => normalize_request_headers(request.env),
-            :method  => request.request_method.downcase.to_sym
-          }.merge(if request.request_method.upcase == "GET"
-            { :query => request.params }
-          else
-            { :body => request.params.map { |k,v| "#{k}=#{v}" }.join("&") }
-          end)
+          typhoeus_params = { :headers => normalize_request_headers(request.env),
+                              :method  => request.request_method.downcase.to_sym,
+                              :body => request.body.read }
+          request.body.rewind
+          typhoeus_params
         end
       end
 
