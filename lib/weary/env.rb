@@ -17,7 +17,7 @@ module Weary
         'SERVER_NAME'     => @request.uri.host,
         'SERVER_PORT'     => port,
         'REQUEST_URI'     => @request.uri.request_uri,
-        'HTTP_HOST'       => @request.uri.host,
+        'HTTP_HOST'       => http_host,
         'rack.url_scheme' => @request.uri.scheme,
         'rack.input'      => @request.body,
         'weary.request'   => @request
@@ -26,6 +26,11 @@ module Weary
 
     def port
       (@request.uri.port || @request.uri.inferred_port).to_s
+    end
+
+    def http_host
+      uri = @request.uri
+      uri.host + (uri.normalized_port ? ":#{uri.normalized_port}" : "")
     end
 
   end
