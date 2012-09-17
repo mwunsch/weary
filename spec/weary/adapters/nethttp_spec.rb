@@ -24,11 +24,20 @@ describe Weary::Adapter::NetHttp do
     end
   end
 
+  describe "#connect" do
+    it "calls the class method `.connect`" do
+      described_class.stub(:connect) { [200, {'Content-Type' => 'text/plain'}, [""]] }
+      described_class.should_receive(:connect)
+      described_class.new.connect(Rack::Request.new(@request.env))
+    end
+  end
+
   describe "#call" do
-    it "calls the class method `.call`" do
-      described_class.stub(:call) { [200, {'Content-Type' => 'text/plain'}, [""]] }
-      described_class.should_receive(:call)
-      described_class.new.call(@request.env)
+    it "uses the overriden `#connect` method" do
+      instance = described_class.new
+      instance.stub(:connect) { Rack::Response.new [""], 501, {"Content-Type" => "text/plain"} }
+      instance.should_receive(:connect)
+      instance.call(@request.env)
     end
   end
 
