@@ -14,15 +14,14 @@ module Weary
         end
 
         def prepare(request)
-          {
-            :headers => normalize_request_headers(request.env),
-            :method  => request.request_method,
-            :path    => request.fullpath
-          }.merge(if request.request_method.upcase == "GET"
-            { :query => request.params }
-          else
-            { :body => request.params.map { |k,v| "#{k}=#{v}" }.join("&") }
-          end)
+          has_query = !(request.query_string.nil? || request.query_string.empty?)
+          excon_params = { :headers => normalize_request_headers(request.env),
+                           :method  => request.request_method,
+                           :path    => request.path,
+                           :body    => request.body.read }
+          excon_params[:query] if has_query
+          request.body.rewind
+          excon_params
         end
       end
 
