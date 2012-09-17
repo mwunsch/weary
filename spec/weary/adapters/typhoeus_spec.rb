@@ -25,30 +25,6 @@ begin
           described_class.call(@request.env)
         end
       end
-
-      describe ".url_for" do
-        it "cracks the Rack::Request open and returns a scheme + fqdn + port" do
-          req = Rack::Request.new(@request.env)
-          url = described_class.url_for(req)
-          url.should == @url
-        end
-
-        it "correctly uses the right scheme" do
-          input_url = "https://github.com/hypomodern"
-          request = Weary::Request.new input_url
-          req = Rack::Request.new(request.env)
-          output_url = described_class.url_for(req)
-          output_url.should == input_url
-        end
-
-        it "correctly uses the right port" do
-          input_url = "http://mytestserver.com:9292/v1/foo"
-          request = Weary::Request.new input_url
-          req = Rack::Request.new(request.env)
-          output_url = described_class.url_for(req)
-          output_url.should == input_url
-        end
-      end
     end
 
     describe "#connect" do
