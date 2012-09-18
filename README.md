@@ -119,6 +119,12 @@ No matter how you get there, you'll end up with a Weary::Request object. Call th
 
 By default, the request is performed through [Net::HTTP](http://www.ruby-doc.org/stdlib-1.9.3/libdoc/net/http/rdoc/Net/HTTP.html). This is done through `Weary::Adapter::NetHttp`. A `Weary::Adapter` is just a special kind of Rack application. `Request#adapter` allows you to hook up your own. Weary also includes adapters for [Typhoeus](http://typhoeus.github.com/) and [Excon](https://github.com/geemus/excon).
 
+#### Requestable
+
+`Client`, `Resource`, and `Request` include a Module named `Requestable`. Using this module, it's easy to cascade certain pieces of configuration down from the stack.
+
+For example, you can call `Client#adapter` to change the adapter for all of the resources of that client. Or you can call `Resource#adapter` to change the adapter for requests built for that resource. OR you can call `Request#adapter` to change the adapter for just that request.
+
 ## Rack
 
 To maximize the utility of Weary, it's important to remember that driving everything is Rack. Almost every class is built to provide a Rack interface.
@@ -132,12 +138,6 @@ When using `Weary::Client` the `use` method will add the passed middleware to ev
 Authentication, by default is done by either `Weary::Middleware::BasicAuth` or `Weary::Middleware::OAuth`. Both are just Rack middleware, and can be used in any Rack stack.
 
 The point is, **it's just Rack**.
-
-## Requestable
-
-`Client`,`Resource`, and `Request` include a Module named `Requestable`. Using this module, it's easy to cascade certain pieces of configuration down from the stack.
-
-For example, you can call `Client#adapter` to change the adapter for all of the resources of that client. Or you can call `Resource#adapter` to change the adapter for requests built for that resource. OR you can call `Request#adapter` to change the adapter for just that request.
 
 ## Weary needs your help.
 
