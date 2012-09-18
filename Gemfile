@@ -11,8 +11,8 @@ group :test do
 end
 
 group :doc do
-  gem "yard", "~> 0.7.5"
-  gem "yard-tomdoc", "~> 0.4.0"
+  gem "yard", "~> 0.8.2"
+  gem "yard-tomdoc", "~> 0.5.0"
 end
 
 platforms :jruby do
