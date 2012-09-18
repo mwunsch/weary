@@ -58,7 +58,7 @@ end
 
 The DSL provides methods for all of the HTTP verbs (See `Weary::Client::REQUEST_METHODS`). When you instantiate this class, the object will have an instance method named "resource" that will return a `Weary::Request` object set up to perform a "GET" request on "http://host.com/path/to/resource".
 
-You can pass a block these methods for access to the `Weary::Resource`.
+You can pass a block to these methods for access to the `Weary::Resource`.
 
 Further methods in the DSL include:
 
@@ -115,9 +115,9 @@ The method that the Client defines (in the above example, the `client.update` me
 
 ### Weary::Request
 
-No matter how you get there, you'll end up with a Weary::Request object. Call the `perform` method to actually make the request and get back a `Weary::Response`. That's not entirely true `Weary::Request#perform` is asynchronous and non-blocking. It returns a future and will only block once you call a method on the response. You can optionally pass a block that's executed once the response has returned.
+No matter how you get there, you'll end up with a Weary::Request object. Call the `perform` method to actually make the request and get back a `Weary::Response`. That's not entirely true... `Weary::Request#perform` is asynchronous and non-blocking. It returns a future and will only block once you call a method on the response. You can optionally pass a block that's executed once the response has returned.
 
-By default, the request is performed through [Net::HTTP](http://www.ruby-doc.org/stdlib-1.9.3/libdoc/net/http/rdoc/Net/HTTP.html). This is done through `Weary::Adapter::NetHttp`. A `Weary::Adapter` is just a special kind of Rack application. `Request#adapter` allows you to hook up your own.
+By default, the request is performed through [Net::HTTP](http://www.ruby-doc.org/stdlib-1.9.3/libdoc/net/http/rdoc/Net/HTTP.html). This is done through `Weary::Adapter::NetHttp`. A `Weary::Adapter` is just a special kind of Rack application. `Request#adapter` allows you to hook up your own. Weary also includes adapters for [Typhoeus](http://typhoeus.github.com/) and [Excon](https://github.com/geemus/excon).
 
 ## Rack
 
@@ -132,6 +132,12 @@ When using `Weary::Client` the `use` method will add the passed middleware to ev
 Authentication, by default is done by either `Weary::Middleware::BasicAuth` or `Weary::Middleware::OAuth`. Both are just Rack middleware, and can be used in any Rack stack.
 
 The point is, **it's just Rack**.
+
+## Requestable
+
+`Client`,`Resource`, and `Request` include a Module named `Requestable`. Using this module, it's easy to cascade certain pieces of configuration down from the stack.
+
+For example, you can call `Client#adapter` to change the adapter for all of the resources of that client. Or you can call `Resource#adapter` to change the adapter for requests built for that resource. OR you can call `Request#adapter` to change the adapter for just that request.
 
 ## Weary needs your help.
 
