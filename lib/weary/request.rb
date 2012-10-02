@@ -124,9 +124,7 @@ module Weary
     private
 
     def query_params_from_hash(hash)
-      tmp_uri = Addressable::URI.new
-      tmp_uri.query_values = hash
-      tmp_uri.query
+      Rack::Utils.build_nested_query(hash)
     end
 
     def rack_env_defaults
