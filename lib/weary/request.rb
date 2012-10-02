@@ -124,7 +124,7 @@ module Weary
     private
 
     def query_params_from_hash(hash)
-      Rack::Utils.build_nested_query(hash)
+      Rack::Utils.build_nested_query(hash).gsub('+', '%20')
     end
 
     def rack_env_defaults
