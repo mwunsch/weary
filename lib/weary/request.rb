@@ -70,7 +70,7 @@ module Weary
       if !parameters.nil?
         if ["POST", "PUT"].include? method
           @body = query_params_from_hash(parameters)
-          body stringio_encode(@body)
+          body StringIO.new(@body)
           use Weary::Middleware::ContentType
         else
           uri.query_values = parameters
