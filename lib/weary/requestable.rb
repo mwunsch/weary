@@ -57,8 +57,8 @@ module Weary
     #
     # Returns the Requestable object.
     def pass_values_onto_requestable(requestable)
-      requestable.headers self.headers
-      requestable.adapter self.adapter
+      requestable.headers self.headers unless @headers.nil?
+      requestable.adapter self.adapter unless @connection.nil?
       if has_middleware?
         @middlewares.each {|middleware| requestable.use *middleware }
       end
