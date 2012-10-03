@@ -207,9 +207,16 @@ module Weary
           parameters = parameters.first || {}
           @defaults ||= {}
           request = resource.request(@defaults.merge(parameters), &block)
+          self.pass_values_onto_requestable(request)
           request
         end
       end
+    end
+
+    include Weary::Requestable
+
+    def initialize
+      yield self if block_given?
     end
 
   end

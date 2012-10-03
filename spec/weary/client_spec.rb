@@ -257,6 +257,27 @@ describe Weary::Client do
       client.instance_variable_set :@defaults, :user => "mwunsch", :repo => "weary"
       expect { client.send(action) }.to_not raise_error
     end
+
+    it "forwards requestables on to the requests" do
+      action = :show
+      url = "http://github.com/api/v2/json/repos/show/{user}/{repo}"
+      @klass.get action, url
+      adapter = Class.new { include Weary::Adapter }
+      client = @klass.new
+      client.adapter adapter
+      client.send(action, :user => "mwunsch", :repo => "weary").adapter.should eql adapter
+    end
+
+    it "accepts a block to further add requestables" do
+      action = :show
+      url = "http://github.com/api/v2/json/repos/show/{user}/{repo}"
+      @klass.get action, url
+      adapter = Class.new { include Weary::Adapter }
+      client = @klass.new do |c|
+        c.adapter adapter
+      end
+      client.send(action, :user => "mwunsch", :repo => "weary").adapter.should eql adapter
+    end
   end
 
 end
