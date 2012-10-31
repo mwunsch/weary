@@ -1,4 +1,5 @@
 require 'addressable/uri'
+require 'thread' unless defined? ::Mutex # Ruby 1.8.7 support for promises
 require 'future'
 require 'rack'
 
