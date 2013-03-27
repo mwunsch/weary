@@ -1,6 +1,6 @@
 # Weary
 
-[![Build Status](https://secure.travis-ci.org/mwunsch/weary.png)](http://travis-ci.org/mwunsch/weary) [![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/mwunsch/weary)
+[![Build Status](https://secure.travis-ci.org/mwunsch/weary.png)](http://travis-ci.org/mwunsch/weary) [![Code Climate](https://codeclimate.com/github/mwunsch/weary.png)](https://codeclimate.com/github/mwunsch/weary)
 
 _Weary is a framework and DSL for building clients for (preferably RESTful) web service APIs._
 
