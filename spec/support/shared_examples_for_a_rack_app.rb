@@ -39,7 +39,8 @@ shared_examples_for "a Rack application" do
   end
 
   describe "the headers" do
-    let(:headers) { subject.call(env)[1] }
+    let(:response) { subject.call(env) }
+    let(:headers) { response[1] }
 
     it { headers.should respond_to :each }
 
@@ -57,10 +58,6 @@ shared_examples_for "a Rack application" do
 
     it "contains values of Strings" do
       headers.values.should be_all {|value| value.kind_of? String }
-    end
-
-    it "contains a 'Content-Type' header" do
-      headers.should have_key 'Content-Type'
     end
   end
 
