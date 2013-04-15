@@ -7,7 +7,7 @@ gem "excon"
 
 group :test do
   gem "rspec", "~> 2.11.0"
-  gem "webmock", "~> 1.8.10"
+  gem "webmock", "~> 1.8"
 end
 
 group :doc do
@@ -20,5 +20,5 @@ platforms :jruby do
 end
 
 platforms :mri, :jruby do
-  gem "typhoeus"
+  gem "typhoeus", "~> 0.5"
 end

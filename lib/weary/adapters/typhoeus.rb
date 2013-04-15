@@ -8,7 +8,7 @@ module Weary
         include Weary::Adapter
 
         def connect(rack_request)
-          response = ::Typhoeus::Request.run(rack_request.url, parameters_for(rack_request))
+          response = ::Typhoeus::Request.new(rack_request.url, parameters_for(rack_request)).run
           Rack::Response.new response.body, response.code, response.headers_hash
         end
 
