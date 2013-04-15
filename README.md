@@ -149,4 +149,4 @@ At this point, I need _your_ help to further Weary along. I'd love to see more e
 
 ## Copyright
 
-Copyright (c) 2009 - 2012 Mark Wunsch. Licensed under the [MIT License](http://opensource.org/licenses/mit-license.php).
+Copyright (c) 2009 - 2013 Mark Wunsch. Licensed under the [MIT License](http://opensource.org/licenses/mit-license.php).
