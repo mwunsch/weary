@@ -115,8 +115,14 @@ module Weary
     # Returns a future-wrapped Response.
     def perform
       future do
-        status, headers, body = call(rack_env_defaults)
-        response = Weary::Response.new body, status, headers
+        response = nil
+        begin
+          status, headers, body = call(rack_env_defaults)
+          response = Weary::Response.new(body, status, headers)
+        rescue ::Exception => e
+          response = Weary::Response.new([], 0)
+          response.connection_error = e
+        end
         yield response if block_given?
         response
       end
