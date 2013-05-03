@@ -120,7 +120,7 @@ module Weary
           status, headers, body = call(rack_env_defaults)
           response = Weary::Response.new(body, status, headers)
         rescue ::Exception => e
-          response = Weary::Response.new([], 0, {}, e)
+          response = Weary::Response.new([], 502, {}, e)
         end
         yield response if block_given?
         response
