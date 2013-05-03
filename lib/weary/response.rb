@@ -5,15 +5,19 @@ autoload :MultiJson, 'multi_json'
 module Weary
   class Response
     include Rack::Response::Helpers
-    attr_accessor :connection_error
 
-    def initialize(body, status, headers)
+    def initialize(body, status, headers, connection_error = nil)
       @response = Rack::Response.new body, status, headers
       @status = self.status
+      @connection_error = connection_error
     end
 
     def status
       @response.status.to_i
+    end
+
+    def connection_error
+      @connection_error
     end
 
     def header
