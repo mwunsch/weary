@@ -246,5 +246,12 @@ describe Weary::Resource do
       req = resource.request :user_id => "markwunsch"
       req.params.should eql "user_id=markwunsch"
     end
+
+    it "passes nested hash parameters into the request body" do
+      resource = described_class.new "GET", "http://github.com/api/v2/json/repos/show/mwunsch/weary"
+      resource.optional :search
+      req = resource.request :search => {:description => 'weary'}
+      req.params.should eql "search%5Bdescription%5D=weary"
+    end
   end
 end
