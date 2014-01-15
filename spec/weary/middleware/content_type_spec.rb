@@ -6,6 +6,7 @@ describe Weary::Middleware::ContentType do
     before do
       @url = "http://github.com/api/v2/json/repos/show/mwunsch/weary"
       @request = Weary::Request.new @url, 'POST'
+      @request.params apikey: "secret"
       stub_request :post, @request.uri.to_s
     end
 

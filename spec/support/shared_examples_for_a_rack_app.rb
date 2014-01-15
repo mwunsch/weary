@@ -27,7 +27,7 @@ shared_examples_for "a Rack application" do
       'rack.run_once'     => false
     }
     lint = Rack::Lint.new subject
-    expect { lint.call(rack_defaults.update(env)) }.to_not raise_error Rack::Lint::LintError
+    expect { lint.call(rack_defaults.update(env)) }.not_to raise_error
   end
 
   describe "the status" do

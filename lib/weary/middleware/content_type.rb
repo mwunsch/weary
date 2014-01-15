@@ -15,13 +15,14 @@ module Weary
       end
 
       def call(env)
+        size = length(env['rack.input'])
         env.update CONTENT_TYPE => @type
-        env.update CONTENT_LENGTH => length(env['rack.input'])
+        env.update CONTENT_LENGTH => size.to_s unless size.nil? or size.zero?
         @app.call(env)
       end
 
       def length(input)
-        input.size.to_s
+        input.respond_to?(:size) ? input.size : 0
       end
     end
   end
