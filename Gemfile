@@ -22,3 +22,7 @@ end
 platforms :mri, :jruby do
   gem "typhoeus", "~> 0.5"
 end
+
+platforms :rbx do
+  gem "rubysl", "~> 2.0"
+end
