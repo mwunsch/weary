@@ -247,6 +247,14 @@ describe Weary::Resource do
       req.params.should eql "user_id=markwunsch"
     end
 
+    it "passes nil value parameters into the request body" do
+      resource = described_class.new "GET", "http://api.twitter.com/version/users/show.json"
+      resource.required :user_id
+      resource.optional :include_entities
+      req = resource.request :user_id => "markwunsch", include_entities: nil
+      req.params.should eql "user_id=markwunsch&include_entities"
+    end
+
     it "passes nested hash parameters into the request body" do
       resource = described_class.new "GET", "http://github.com/api/v2/json/repos/show/mwunsch/weary"
       resource.optional :search
