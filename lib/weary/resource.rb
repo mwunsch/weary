@@ -130,10 +130,8 @@ module Weary
       end
     end
 
-    # Private: For a set of parameters passed in to build a Request, delete
-    # those with no values, and merge them with the defaults.
+    # Private: Merge parameters passed in to build a Request with the defaults.
     def normalize_parameters(params)
-      params.delete_if {|k,v| v.nil? || v.to_s.empty? }
       params.update(defaults)
       params
     end
