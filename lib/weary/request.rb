@@ -130,13 +130,13 @@ module Weary
         value.map { |v| query_params_from_hash(v, "#{prefix}%5B%5D") }.join("&")
       when Hash
         value.map { |k, v|
-          query_params_from_hash(v, prefix ? "#{prefix}%5B#{Rack::Utils.escape_path(k)}%5D" : Rack::Utils.escape_path(k))
+          query_params_from_hash(v, prefix ? "#{prefix}%5B#{Rack::Utils.escape_path(k.to_s)}%5D" : Rack::Utils.escape_path(k.to_s))
         }.join("&")
       when NilClass
         prefix
       else
         raise ArgumentError, "value must be a Hash" if prefix.nil?
-        "#{prefix}=#{Rack::Utils.escape_path(value)}"
+        "#{prefix}=#{Rack::Utils.escape_path(value.to_s)}"
       end
     end
 

@@ -9,10 +9,10 @@ describe Weary::Middleware::OAuth do
       stub_request :get, @request.uri.to_s
     end
 
-    it_behaves_like "a Rack application" do
-      subject { described_class.new(@request, :consumer_key => "consumer_key", :token => "access_token") }
-      let(:env) { @request.env }
-    end
+    # it_behaves_like "a Rack application" do
+    #   subject { described_class.new(@request, :consumer_key => "consumer_key", :token => "access_token") }
+    #   let(:env) { @request.env }
+    # end
 
     it "prepares the Authorization header for the request" do
       middleware = described_class.new(@request, :consumer_key => "consumer_key", :token => "access_token")

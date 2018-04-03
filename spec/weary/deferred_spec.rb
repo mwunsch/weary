@@ -28,7 +28,7 @@ describe Weary::Deferred do
     it "is true when the target is ready" do
       deferred = described_class.new @request.perform, @struct
       deferred.inspect
-      deferred.complete?.should be_true
+      deferred.complete?.should be true
     end
   end
 

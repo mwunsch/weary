@@ -2,12 +2,12 @@ source "http://rubygems.org"
 
 gemspec
 
-gem "rake", "~> 0.9.2"
+gem "rake", "~> 12.3.1"
 gem "excon"
 
 group :test do
-  gem "rspec", "~> 2.13"
-  gem "webmock", "~> 1.8"
+  gem "rspec", "~> 3.7"
+  gem "webmock", "~> 3.3"
 end
 
 group :doc do

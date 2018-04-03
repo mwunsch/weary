@@ -140,17 +140,17 @@ describe Weary::Resource do
     end
 
     it "is false when the resource does not accept authentication" do
-      subject.authenticates?.should be_false
+      subject.authenticates?.should be false
     end
 
     it "is true when basic authentication has been declared" do
       subject.basic_auth!
-      subject.authenticates?.should be_true
+      subject.authenticates?.should be true
     end
 
     it "is true when OAuth has been declared" do
       subject.oauth!
-      subject.authenticates?.should be_true
+      subject.authenticates?.should be true
     end
   end
 

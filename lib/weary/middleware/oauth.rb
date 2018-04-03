@@ -30,7 +30,7 @@ module Weary
 
       # Stolen from Rack::Utils
       def request_body_to_hash(qs, d = nil)
-        params = Rack::Utils::KeySpaceConstrainedParams.new
+        params = Rack::Utils::KeySpaceConstrainedParams.new Rack::Utils.key_space_limit
         default_sep = /[&;] */n
 
         (qs || '').split(d ? /[#{d}] */n : default_sep).each do |p|

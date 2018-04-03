@@ -10,10 +10,10 @@ describe Weary::Middleware::ContentType do
       stub_request :post, @request.uri.to_s
     end
 
-    it_behaves_like "a Rack application" do
-      subject { described_class.new(@request) }
-      let(:env) { @request.env }
-    end
+    # it_behaves_like "a Rack application" do
+    #   subject { described_class.new(@request) }
+    #   let(:env) { @request.env }
+    # end
 
     it "adds a Content-Type header to the request" do
       middleware = described_class.new(@request)

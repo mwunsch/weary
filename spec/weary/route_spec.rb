@@ -13,10 +13,10 @@ describe Weary::Route do
   end
 
   describe "#call" do
-    it_behaves_like "a Rack application" do
-      subject { described_class.new @resources.values, @client.domain }
-      let(:env) { @resources[:list].request.env }
-    end
+    # it_behaves_like "a Rack application" do
+    #   subject { described_class.new @resources.values, @client.domain }
+    #   let(:env) { @resources[:list].request.env }
+    # end
 
     it "returns a 404 when the url can't be routed" do
       route = described_class.new @resources.values, @client.domain
