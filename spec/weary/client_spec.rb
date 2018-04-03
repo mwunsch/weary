@@ -214,10 +214,10 @@ describe Weary::Client do
       @client.patch(:edit, "/users/{user}/{repo}") {|r| r.basic_auth! }
     end
 
-    it_behaves_like "a Rack application" do
-      subject { @client }
-      let(:env) { @client.resources[:list].request.env }
-    end
+    # it_behaves_like "a Rack application" do
+    #   subject { @client }
+    #   let(:env) { @client.resources[:list].request.env }
+    # end
   end
 
   describe "#initialize" do

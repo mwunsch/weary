@@ -17,9 +17,9 @@ Gem::Specification.new do |s|
 
   s.require_paths = ['lib']
 
-  s.add_runtime_dependency "rack", ">= 1.4.5", "< 2.0"
+  s.add_runtime_dependency "rack", '~> 2.0'
   s.add_runtime_dependency "addressable", "~> 2.3"
   s.add_runtime_dependency "promise", "~> 0.3.0"
-  s.add_runtime_dependency "simple_oauth", "~> 0.2"
+  s.add_runtime_dependency "simple_oauth", "~> 0.3"
   s.add_runtime_dependency "multi_json", "~> 1.7"
 end

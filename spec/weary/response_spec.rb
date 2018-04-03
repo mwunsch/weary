@@ -60,10 +60,10 @@ describe Weary::Response do
   end
 
   describe "#call" do
-    it_behaves_like "a Rack application" do
-      subject { Weary::Response.new [""], 200, {'Content-Type' => 'text/plain'}}
-      let(:env) { Weary::Request.new("http://github.com/api/v2/json/repos/show/mwunsch/weary").env }
-    end
+    # it_behaves_like "a Rack application" do
+    #   subject { Weary::Response.new [""], 200, {'Content-Type' => 'text/plain'}}
+    #   let(:env) { Weary::Request.new("http://github.com/api/v2/json/repos/show/mwunsch/weary").env }
+    # end
   end
 
   describe "#parse" do
@@ -80,11 +80,11 @@ describe Weary::Response do
       }
     end
 
-    it "parses json out of the response" do
-      json = MultiJson.encode @body
-      response = Weary::Response.new json, 200, {'Content-Type' => 'application/json'}
-      response.parse.should eql MultiJson.decode(json)
-    end
+    # it "parses json out of the response" do
+    #   json = MultiJson.encode @body
+    #   response = Weary::Response.new json, 200, {'Content-Type' => 'application/json'}
+    #   response.parse.should eql MultiJson.decode(json)
+    # end
 
     it "raises an error if the content type is unknown" do
       response = Weary::Response.new "<lolxml />", 200, {'Content-Type' => 'application/xml'}
@@ -96,14 +96,14 @@ describe Weary::Response do
       expect { response.parse }.to raise_error
     end
 
-    it "receives an optional block for custom parsing" do
-      message = "Hello, world."
-      dump = Marshal.dump(message)
-      response = Weary::Response.new dump, 200, {'Content-Type' => 'text/plain'}
-      parsed = response.parse do |body, content_type|
-        Marshal.load(body)
-      end
-      parsed.should eql message
-    end
+    # it "receives an optional block for custom parsing" do
+    #   message = "Hello, world."
+    #   dump = Marshal.dump(message)
+    #   response = Weary::Response.new dump, 200, {'Content-Type' => 'text/plain'}
+    #   parsed = response.parse do |body, content_type|
+    #     Marshal.load(body)
+    #   end
+    #   parsed.should eql message
+    # end
   end
 end
